@@ -1,0 +1,17 @@
+{
+  "name": "clip-tracker",
+  "version": "1.0.0",
+  "description": "ระบบติดตามงานคลิป — Real-Time Collaboration",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "dotenv": "^17.4.2",
+    "express": "^4.21.0",
+    "firebase-admin": "^13.10.0",
+    "isomorphic-git": "^1.38.4",
+    "socket.io": "^4.7.5"
+  }
+}

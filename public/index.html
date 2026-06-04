@@ -1,0 +1,1311 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clip Tracker — ระบบติดตามงานคลิป</title>
+    <meta name="description" content="ระบบติดตามงานคลิปสำหรับทีมผลิตวิดีโอ — Real-Time Collaboration">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@300;400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+    <style>
+        /* ============ RESET & VARIABLES ============ */
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --bg-primary: #0a0a0f;
+            --bg-secondary: #12121a;
+            --bg-card: rgba(22, 22, 35, 0.7);
+            --bg-card-hover: rgba(30, 30, 48, 0.85);
+            --glass: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.06);
+
+            --text-primary: #f0f0f5;
+            --text-secondary: #8888a0;
+            --text-muted: #555568;
+
+            --accent-violet: #8b5cf6;
+            --accent-violet-glow: rgba(139, 92, 246, 0.25);
+            --accent-blue: #3b82f6;
+            --accent-cyan: #06b6d4;
+            --accent-emerald: #10b981;
+            --accent-amber: #f59e0b;
+            --accent-rose: #f43f5e;
+            --accent-pink: #ec4899;
+
+            --status-idle: #6b7280;
+            --status-filming: #f59e0b;
+            --status-editing: #3b82f6;
+            --status-done: #10b981;
+            --status-uploaded: #8b5cf6;
+
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 20px;
+            --radius-full: 9999px;
+
+            --shadow-sm: 0 2px 8px rgba(0,0,0,0.3);
+            --shadow-md: 0 4px 24px rgba(0,0,0,0.4);
+            --shadow-lg: 0 8px 48px rgba(0,0,0,0.5);
+            --shadow-glow: 0 0 40px var(--accent-violet-glow);
+
+            --transition-fast: 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-smooth: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-spring: 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        body {
+            font-family: 'Noto Sans Thai', 'Inter', -apple-system, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        /* ============ AMBIENT BACKGROUND ============ */
+        .ambient-bg {
+            position: fixed; inset: 0; z-index: 0;
+            pointer-events: none; overflow: hidden;
+        }
+        .ambient-orb {
+            position: absolute; border-radius: 50%;
+            filter: blur(120px); opacity: 0.15;
+            animation: orbFloat 20s ease-in-out infinite;
+        }
+        .ambient-orb:nth-child(1) { width:600px;height:600px;background:var(--accent-violet);top:-15%;left:-10%; }
+        .ambient-orb:nth-child(2) { width:500px;height:500px;background:var(--accent-cyan);top:50%;right:-10%;animation-delay:-7s; }
+        .ambient-orb:nth-child(3) { width:400px;height:400px;background:var(--accent-pink);bottom:-10%;left:30%;animation-delay:-14s; }
+
+        @keyframes orbFloat {
+            0%,100%{transform:translate(0,0) scale(1)}
+            25%{transform:translate(30px,-40px) scale(1.05)}
+            50%{transform:translate(-20px,20px) scale(0.95)}
+            75%{transform:translate(40px,30px) scale(1.02)}
+        }
+
+        .grid-overlay {
+            position:fixed;inset:0;z-index:0;pointer-events:none;
+            background-image:linear-gradient(rgba(255,255,255,0.015) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.015) 1px,transparent 1px);
+            background-size:60px 60px;
+        }
+
+        /* ============ LAYOUT ============ */
+        .app-container { position:relative;z-index:1;max-width:1400px;margin:0 auto;padding:24px 32px 64px; }
+
+        /* ============ HEADER ============ */
+        .header { display:flex;align-items:center;justify-content:space-between;padding:20px 0 32px;flex-wrap:wrap;gap:16px; }
+        .header-left { display:flex;align-items:center;gap:16px; }
+        .logo-icon {
+            width:52px;height:52px;background:linear-gradient(135deg,var(--accent-violet),var(--accent-pink));
+            border-radius:var(--radius-md);display:flex;align-items:center;justify-content:center;font-size:28px;
+            box-shadow:var(--shadow-glow);animation:logoPulse 3s ease-in-out infinite;
+        }
+        @keyframes logoPulse {
+            0%,100%{box-shadow:0 0 20px var(--accent-violet-glow)}
+            50%{box-shadow:0 0 40px var(--accent-violet-glow),0 0 60px rgba(236,72,153,0.15)}
+        }
+        .header-title h1 {
+            font-size:1.8rem;font-weight:800;
+            background:linear-gradient(135deg,var(--text-primary) 0%,var(--accent-violet) 100%);
+            -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:-0.02em;
+        }
+        .header-title p { font-size:0.85rem;color:var(--text-secondary);font-weight:400; }
+        .header-actions { display:flex;gap:10px;align-items:center; }
+
+        /* ============ ONLINE INDICATOR ============ */
+        .online-badge {
+            display:inline-flex;align-items:center;gap:6px;padding:6px 14px;
+            border-radius:var(--radius-full);background:rgba(16,185,129,0.1);
+            border:1px solid rgba(16,185,129,0.2);font-size:0.78rem;font-weight:600;color:var(--accent-emerald);
+        }
+        .online-dot {
+            width:8px;height:8px;border-radius:50%;background:var(--accent-emerald);
+            animation:onlinePulse 2s ease-in-out infinite;
+        }
+        @keyframes onlinePulse {
+            0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(16,185,129,0.4)}
+            50%{opacity:0.7;box-shadow:0 0 0 6px rgba(16,185,129,0)}
+        }
+
+        /* ============ SYNC INDICATOR ============ */
+        .sync-indicator {
+            position:fixed;top:16px;right:16px;z-index:3000;
+            padding:10px 18px;border-radius:var(--radius-full);
+            background:var(--bg-secondary);border:1px solid var(--accent-violet);
+            color:var(--accent-violet);font-size:0.8rem;font-weight:600;
+            display:flex;align-items:center;gap:8px;
+            opacity:0;transform:translateY(-20px);transition:all 0.3s ease;
+            box-shadow:0 0 20px var(--accent-violet-glow);
+        }
+        .sync-indicator.show { opacity:1;transform:translateY(0); }
+        .sync-indicator .material-icons-round { font-size:16px;animation:spin 1s linear infinite; }
+        @keyframes spin { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
+
+        /* ============ BUTTONS ============ */
+        .btn {
+            display:inline-flex;align-items:center;gap:8px;padding:10px 20px;
+            border:1px solid var(--glass-border);border-radius:var(--radius-full);
+            background:var(--bg-card);color:var(--text-primary);font-family:inherit;
+            font-size:0.85rem;font-weight:500;cursor:pointer;transition:all var(--transition-smooth);
+            backdrop-filter:blur(12px);white-space:nowrap;
+        }
+        .btn:hover { background:var(--bg-card-hover);border-color:rgba(255,255,255,0.12);transform:translateY(-1px);box-shadow:var(--shadow-sm); }
+        .btn-primary { background:linear-gradient(135deg,var(--accent-violet),var(--accent-pink));border:none;color:#fff;font-weight:600; }
+        .btn-primary:hover { box-shadow:var(--shadow-glow);transform:translateY(-2px); }
+        .btn .material-icons-round { font-size:18px; }
+
+        /* ============ STATS BAR ============ */
+        .stats-bar { display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;margin-bottom:32px; }
+        .stat-card {
+            background:var(--bg-card);border:1px solid var(--glass-border);border-radius:var(--radius-lg);
+            padding:20px 24px;display:flex;align-items:center;gap:16px;backdrop-filter:blur(12px);
+            transition:all var(--transition-smooth);position:relative;overflow:hidden;
+        }
+        .stat-card::before { content:'';position:absolute;top:0;left:0;width:4px;height:100%;border-radius:4px 0 0 4px; }
+        .stat-card:nth-child(1)::before{background:var(--status-idle)}
+        .stat-card:nth-child(2)::before{background:var(--status-filming)}
+        .stat-card:nth-child(3)::before{background:var(--status-editing)}
+        .stat-card:nth-child(4)::before{background:var(--status-done)}
+        .stat-card:nth-child(5)::before{background:var(--status-uploaded)}
+        .stat-card:hover { background:var(--bg-card-hover);transform:translateY(-2px);box-shadow:var(--shadow-md); }
+        .stat-icon { width:44px;height:44px;border-radius:var(--radius-md);display:flex;align-items:center;justify-content:center;font-size:22px; }
+        .stat-card:nth-child(1) .stat-icon{background:rgba(107,114,128,0.15);color:var(--status-idle)}
+        .stat-card:nth-child(2) .stat-icon{background:rgba(245,158,11,0.15);color:var(--status-filming)}
+        .stat-card:nth-child(3) .stat-icon{background:rgba(59,130,246,0.15);color:var(--status-editing)}
+        .stat-card:nth-child(4) .stat-icon{background:rgba(16,185,129,0.15);color:var(--status-done)}
+        .stat-card:nth-child(5) .stat-icon{background:rgba(139,92,246,0.15);color:var(--status-uploaded)}
+        .stat-info{flex:1}
+        .stat-number{font-size:1.6rem;font-weight:800;letter-spacing:-0.02em;line-height:1.2}
+        .stat-label{font-size:0.75rem;color:var(--text-secondary);font-weight:500;text-transform:uppercase;letter-spacing:0.04em}
+
+        /* ============ CALENDAR ============ */
+        .calendar-section {
+            background:var(--bg-card);border:1px solid var(--glass-border);
+            border-radius:var(--radius-xl);backdrop-filter:blur(12px);overflow:hidden;margin-bottom:32px;
+        }
+        .calendar-header {
+            display:flex;align-items:center;justify-content:space-between;
+            padding:20px 28px;border-bottom:1px solid var(--glass-border);
+        }
+        .calendar-header h2 {
+            font-size:1.1rem;font-weight:700;display:flex;align-items:center;gap:10px;
+        }
+        .calendar-header h2 .material-icons-round { color:var(--accent-violet); }
+        .calendar-nav { display:flex;align-items:center;gap:12px; }
+        .calendar-nav .nav-btn {
+            width:36px;height:36px;border-radius:50%;border:1px solid var(--glass-border);
+            background:transparent;color:var(--text-secondary);cursor:pointer;
+            display:flex;align-items:center;justify-content:center;transition:all var(--transition-fast);
+        }
+        .calendar-nav .nav-btn:hover { background:rgba(255,255,255,0.06);color:var(--text-primary); }
+        .calendar-month-label { font-size:1rem;font-weight:700;min-width:160px;text-align:center; }
+        .calendar-nav .today-btn {
+            padding:6px 14px;border-radius:var(--radius-full);font-size:0.75rem;font-weight:600;
+            cursor:pointer;border:1px solid var(--accent-violet);background:transparent;
+            color:var(--accent-violet);font-family:inherit;transition:all var(--transition-fast);
+        }
+        .calendar-nav .today-btn:hover { background:var(--accent-violet);color:#fff; }
+
+        .calendar-grid {
+            display:grid;grid-template-columns:repeat(7,1fr);
+        }
+        .calendar-day-header {
+            padding:12px 8px;text-align:center;font-size:0.72rem;font-weight:600;
+            text-transform:uppercase;letter-spacing:0.06em;color:var(--text-muted);
+            border-bottom:1px solid var(--glass-border);
+        }
+        .calendar-day-header.weekend { color:var(--accent-rose); opacity:0.6; }
+
+        .calendar-cell {
+            min-height:110px;padding:8px;border:1px solid rgba(255,255,255,0.025);
+            position:relative;transition:all var(--transition-fast);cursor:pointer;
+            display:flex;flex-direction:column;
+        }
+        .calendar-cell:hover { background:rgba(139,92,246,0.04); }
+        .calendar-cell.other-month { opacity:0.3; }
+        .calendar-cell.today { background:rgba(139,92,246,0.06); }
+        .calendar-cell.today::after {
+            content:'';position:absolute;top:0;left:0;right:0;height:2px;
+            background:linear-gradient(90deg,var(--accent-violet),var(--accent-pink));
+        }
+        .calendar-cell.weekend { background:rgba(244,63,94,0.02); }
+        .cell-date {
+            font-size:0.82rem;font-weight:600;margin-bottom:4px;
+            color:var(--text-secondary);font-variant-numeric:tabular-nums;
+            display:flex;align-items:center;justify-content:space-between;
+        }
+        .calendar-cell.today .cell-date { color:var(--accent-violet); }
+        .cell-date .date-num {
+            width:26px;height:26px;display:flex;align-items:center;justify-content:center;border-radius:50%;
+        }
+        .calendar-cell.today .cell-date .date-num {
+            background:var(--accent-violet);color:#fff;font-weight:700;
+        }
+        .cell-date .clip-count-badge {
+            font-size:0.6rem;font-weight:700;background:rgba(255,255,255,0.06);
+            padding:1px 6px;border-radius:var(--radius-full);color:var(--text-muted);
+        }
+        .cell-clips { flex:1;display:flex;flex-direction:column;gap:3px;overflow:hidden; }
+        .cell-clip-item {
+            display:flex;align-items:center;gap:5px;padding:3px 7px;border-radius:6px;
+            font-size:0.68rem;font-weight:500;transition:all var(--transition-fast);
+            white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer;
+            line-height:1.4;
+        }
+        .cell-clip-item:hover { filter:brightness(1.2);transform:scale(1.02); }
+        .cell-clip-item .clip-dot { width:6px;height:6px;border-radius:50%;flex-shrink:0; }
+        .cell-clip-item.st-idle    { background:rgba(107,114,128,0.12);color:#9ca3af; }
+        .cell-clip-item.st-idle .clip-dot { background:#6b7280; }
+        .cell-clip-item.st-filming { background:rgba(245,158,11,0.12);color:#fbbf24; }
+        .cell-clip-item.st-filming .clip-dot { background:#f59e0b; }
+        .cell-clip-item.st-editing { background:rgba(59,130,246,0.12);color:#60a5fa; }
+        .cell-clip-item.st-editing .clip-dot { background:#3b82f6; }
+        .cell-clip-item.st-done    { background:rgba(16,185,129,0.12);color:#34d399; }
+        .cell-clip-item.st-done .clip-dot { background:#10b981; }
+        .cell-clip-more { font-size:0.65rem;color:var(--text-muted);padding:2px 7px;font-weight:600; }
+        .cell-add-btn {
+            opacity:0;position:absolute;top:6px;right:6px;
+            width:22px;height:22px;border-radius:50%;border:none;
+            background:var(--accent-violet);color:#fff;cursor:pointer;font-size:14px;
+            display:flex;align-items:center;justify-content:center;
+            transition:all var(--transition-fast);
+        }
+        .calendar-cell:hover .cell-add-btn { opacity:1; }
+        .cell-add-btn:hover { transform:scale(1.15);box-shadow:0 0 12px var(--accent-violet-glow); }
+        .calendar-legend {
+            display:flex;align-items:center;gap:20px;padding:14px 28px;
+            border-top:1px solid var(--glass-border);flex-wrap:wrap;
+        }
+        .legend-item { display:flex;align-items:center;gap:6px;font-size:0.72rem;color:var(--text-secondary); }
+        .legend-dot { width:8px;height:8px;border-radius:50%; }
+
+        /* ============ TABLE CONTAINER ============ */
+        .table-section {
+            background:var(--bg-card);border:1px solid var(--glass-border);
+            border-radius:var(--radius-xl);backdrop-filter:blur(12px);overflow:hidden;
+        }
+        .table-header {
+            display:flex;align-items:center;justify-content:space-between;
+            padding:20px 28px;border-bottom:1px solid var(--glass-border);flex-wrap:wrap;gap:12px;
+        }
+        .table-header h2 { font-size:1.1rem;font-weight:700;display:flex;align-items:center;gap:10px; }
+        .table-header h2 .material-icons-round { color:var(--accent-violet); }
+        .filter-pills { display:flex;gap:6px;flex-wrap:wrap; }
+        .filter-pill {
+            padding:6px 14px;border-radius:var(--radius-full);font-size:0.75rem;font-weight:500;
+            cursor:pointer;border:1px solid var(--glass-border);background:transparent;
+            color:var(--text-secondary);font-family:inherit;transition:all var(--transition-fast);
+        }
+        .filter-pill:hover { border-color:rgba(255,255,255,0.15);color:var(--text-primary); }
+        .filter-pill.active { background:var(--accent-violet);border-color:var(--accent-violet);color:#fff; }
+        .table-wrapper { overflow-x:auto; }
+        table { width:100%;border-collapse:collapse; }
+        thead th {
+            padding:14px 20px;text-align:left;font-size:0.72rem;font-weight:600;
+            text-transform:uppercase;letter-spacing:0.06em;color:var(--text-muted);
+            border-bottom:1px solid var(--glass-border);position:sticky;top:0;
+            background:var(--bg-secondary);z-index:2;white-space:nowrap;
+        }
+        tbody tr { border-bottom:1px solid rgba(255,255,255,0.03);transition:all var(--transition-fast); }
+        tbody tr:hover { background:rgba(139,92,246,0.04); }
+        tbody tr:last-child { border-bottom:none; }
+        tbody td { padding:14px 20px;font-size:0.88rem;vertical-align:middle;white-space:nowrap; }
+        .clip-number { font-weight:700;color:var(--text-muted);font-size:0.8rem;font-variant-numeric:tabular-nums; }
+        .clip-title-cell { display:flex;flex-direction:column;gap:2px;min-width:200px;white-space:normal; }
+        .clip-title { font-weight:600;color:var(--text-primary); }
+        .clip-description { font-size:0.78rem;color:var(--text-muted); }
+        .assigned-cell { display:flex;align-items:center;gap:10px; }
+        .avatar {
+            width:32px;height:32px;border-radius:50%;display:flex;align-items:center;
+            justify-content:center;font-size:0.75rem;font-weight:700;color:#fff;flex-shrink:0;
+        }
+        .avatar-1{background:linear-gradient(135deg,#f59e0b,#ef4444)}
+        .avatar-2{background:linear-gradient(135deg,#3b82f6,#06b6d4)}
+        .avatar-3{background:linear-gradient(135deg,#10b981,#14b8a6)}
+        .avatar-uploader{background:linear-gradient(135deg,#8b5cf6,#ec4899)}
+        .assigned-name { font-weight:500;font-size:0.85rem; }
+        .status-badge {
+            display:inline-flex;align-items:center;gap:6px;padding:5px 14px;border-radius:var(--radius-full);
+            font-size:0.75rem;font-weight:600;cursor:pointer;transition:all var(--transition-smooth);
+            border:none;font-family:inherit;position:relative;
+        }
+        .status-badge:hover { transform:scale(1.05);box-shadow:var(--shadow-sm); }
+        .status-badge .dot { width:7px;height:7px;border-radius:50%;flex-shrink:0; }
+        .status-idle{background:rgba(107,114,128,0.15);color:#9ca3af}
+        .status-idle .dot{background:#6b7280}
+        .status-filming{background:rgba(245,158,11,0.15);color:#fbbf24}
+        .status-filming .dot{background:#f59e0b;animation:statusPulse 1.5s ease-in-out infinite}
+        .status-editing{background:rgba(59,130,246,0.15);color:#60a5fa}
+        .status-editing .dot{background:#3b82f6;animation:statusPulse 1.5s ease-in-out infinite}
+        .status-done{background:rgba(16,185,129,0.15);color:#34d399}
+        .status-done .dot{background:#10b981}
+        .status-uploaded{background:rgba(139,92,246,0.15);color:#a78bfa}
+        .status-uploaded .dot{background:#8b5cf6}
+        @keyframes statusPulse {
+            0%,100%{opacity:1;transform:scale(1)}
+            50%{opacity:0.5;transform:scale(1.3)}
+        }
+        .status-dropdown-wrapper { position:relative;display:inline-block; }
+        .status-dropdown {
+            position:absolute;top:calc(100% + 6px);left:0;z-index:100;
+            background:var(--bg-secondary);border:1px solid var(--glass-border);
+            border-radius:var(--radius-md);padding:6px;min-width:180px;
+            box-shadow:var(--shadow-lg);backdrop-filter:blur(20px);
+            opacity:0;visibility:hidden;transform:translateY(-8px) scale(0.96);
+            transition:all var(--transition-smooth);
+        }
+        .status-dropdown.open { opacity:1;visibility:visible;transform:translateY(0) scale(1); }
+        .status-option {
+            display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:var(--radius-sm);
+            cursor:pointer;font-size:0.82rem;font-weight:500;color:var(--text-secondary);
+            transition:all var(--transition-fast);border:none;background:none;width:100%;
+            font-family:inherit;text-align:left;
+        }
+        .status-option:hover { background:rgba(255,255,255,0.05);color:var(--text-primary); }
+        .status-option .option-dot { width:10px;height:10px;border-radius:50%;flex-shrink:0; }
+        .status-option.selected { background:rgba(139,92,246,0.1);color:var(--accent-violet); }
+        .upload-toggle { display:flex;align-items:center;gap:10px;cursor:pointer; }
+        .toggle-switch {
+            position:relative;width:42px;height:24px;background:rgba(107,114,128,0.25);
+            border-radius:12px;transition:all var(--transition-smooth);flex-shrink:0;
+        }
+        .toggle-switch::after {
+            content:'';position:absolute;top:3px;left:3px;width:18px;height:18px;
+            border-radius:50%;background:#fff;transition:all var(--transition-spring);
+            box-shadow:0 2px 4px rgba(0,0,0,0.3);
+        }
+        .upload-toggle.active .toggle-switch { background:var(--accent-violet); }
+        .upload-toggle.active .toggle-switch::after { transform:translateX(18px); }
+        .upload-label { font-size:0.78rem;color:var(--text-muted);font-weight:500; }
+        .upload-toggle.active .upload-label { color:var(--accent-violet); }
+        .date-cell { font-variant-numeric:tabular-nums;color:var(--text-secondary);font-size:0.82rem; }
+        .action-btn {
+            width:34px;height:34px;border-radius:var(--radius-sm);border:none;
+            background:transparent;color:var(--text-muted);cursor:pointer;
+            display:flex;align-items:center;justify-content:center;transition:all var(--transition-fast);
+        }
+        .action-btn:hover { background:rgba(255,255,255,0.06);color:var(--text-primary); }
+        .action-btn.delete:hover { background:rgba(244,63,94,0.15);color:var(--accent-rose); }
+        .actions-cell { display:flex;gap:4px; }
+
+        /* ============ MODAL ============ */
+        .modal-overlay {
+            position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,0.6);
+            backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;
+            padding:24px;opacity:0;visibility:hidden;transition:all var(--transition-smooth);
+        }
+        .modal-overlay.open { opacity:1;visibility:visible; }
+        .modal {
+            background:var(--bg-secondary);border:1px solid var(--glass-border);
+            border-radius:var(--radius-xl);width:100%;max-width:520px;box-shadow:var(--shadow-lg);
+            transform:translateY(20px) scale(0.95);transition:all var(--transition-spring);overflow:hidden;
+        }
+        .modal-overlay.open .modal { transform:translateY(0) scale(1); }
+        .modal-header { display:flex;align-items:center;justify-content:space-between;padding:24px 28px 16px; }
+        .modal-header h3 { font-size:1.15rem;font-weight:700;display:flex;align-items:center;gap:10px; }
+        .modal-header h3 .material-icons-round { color:var(--accent-violet); }
+        .modal-close {
+            width:36px;height:36px;border-radius:50%;border:none;
+            background:rgba(255,255,255,0.05);color:var(--text-secondary);cursor:pointer;
+            display:flex;align-items:center;justify-content:center;transition:all var(--transition-fast);
+        }
+        .modal-close:hover { background:rgba(244,63,94,0.15);color:var(--accent-rose); }
+        .modal-body { padding:8px 28px 28px;display:flex;flex-direction:column;gap:18px; }
+        .form-group { display:flex;flex-direction:column;gap:6px; }
+        .form-label { font-size:0.78rem;font-weight:600;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.04em; }
+        .form-input,.form-select,.form-textarea {
+            padding:12px 16px;border:1px solid var(--glass-border);border-radius:var(--radius-md);
+            background:rgba(255,255,255,0.03);color:var(--text-primary);font-family:inherit;
+            font-size:0.9rem;transition:all var(--transition-fast);outline:none;
+        }
+        .form-input:focus,.form-select:focus,.form-textarea:focus {
+            border-color:var(--accent-violet);box-shadow:0 0 0 3px var(--accent-violet-glow);
+        }
+        .form-select {
+            cursor:pointer;appearance:none;
+            background-image:url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1.5L6 6.5L11 1.5' stroke='%238888a0' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+            background-repeat:no-repeat;background-position:right 16px center;padding-right:40px;
+        }
+        .form-select option { background:var(--bg-secondary);color:var(--text-primary); }
+        .form-textarea { resize:vertical;min-height:80px; }
+        .modal-footer { display:flex;gap:10px;justify-content:flex-end;padding:16px 28px 24px;border-top:1px solid var(--glass-border); }
+
+        /* ============ EMPTY STATE ============ */
+        .empty-state { text-align:center;padding:60px 24px; }
+        .empty-state .material-icons-round { font-size:56px;color:var(--text-muted);margin-bottom:16px; }
+        .empty-state h3 { font-size:1.1rem;font-weight:600;margin-bottom:6px; }
+        .empty-state p { color:var(--text-secondary);font-size:0.85rem; }
+
+        /* ============ PROGRESS BAR ============ */
+        .progress-section { margin-bottom:24px; }
+        .progress-bar-wrapper { background:rgba(255,255,255,0.04);border-radius:var(--radius-full);height:8px;overflow:hidden;display:flex; }
+        .progress-segment { height:100%;transition:width 0.6s cubic-bezier(0.4,0,0.2,1); }
+        .progress-segment.seg-idle{background:var(--status-idle)}
+        .progress-segment.seg-filming{background:var(--status-filming)}
+        .progress-segment.seg-editing{background:var(--status-editing)}
+        .progress-segment.seg-done{background:var(--status-done)}
+        .progress-labels { display:flex;justify-content:space-between;margin-top:8px;font-size:0.72rem;color:var(--text-muted); }
+
+        /* ============ TEAM SECTION ============ */
+        .team-bar { display:flex;gap:16px;margin-bottom:24px;flex-wrap:wrap; }
+        .team-member {
+            display:flex;align-items:center;gap:10px;padding:10px 18px;
+            background:var(--bg-card);border:1px solid var(--glass-border);
+            border-radius:var(--radius-full);backdrop-filter:blur(12px);transition:all var(--transition-smooth);
+        }
+        .team-member:hover { background:var(--bg-card-hover);transform:translateY(-1px); }
+        .team-avatar { width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.65rem;font-weight:700;color:#fff; }
+        .team-info .team-name { font-size:0.82rem;font-weight:600; }
+        .team-info .team-role { font-size:0.68rem;color:var(--text-muted); }
+        .team-count { background:rgba(255,255,255,0.06);padding:2px 8px;border-radius:var(--radius-full);font-size:0.7rem;font-weight:600;color:var(--text-secondary); }
+
+        /* ============ TOAST ============ */
+        .toast-container { position:fixed;bottom:24px;right:24px;z-index:2000;display:flex;flex-direction:column-reverse;gap:8px; }
+        .toast {
+            padding:14px 20px;background:var(--bg-secondary);border:1px solid var(--glass-border);
+            border-radius:var(--radius-md);box-shadow:var(--shadow-lg);display:flex;align-items:center;
+            gap:10px;font-size:0.85rem;font-weight:500;
+            animation:toastIn 0.4s var(--transition-spring),toastOut 0.3s ease forwards;
+            animation-delay:0s,2.5s;backdrop-filter:blur(12px);min-width:280px;
+        }
+        .toast .material-icons-round{font-size:20px}
+        .toast.success .material-icons-round{color:var(--accent-emerald)}
+        .toast.info .material-icons-round{color:var(--accent-blue)}
+        .toast.warning .material-icons-round{color:var(--accent-amber)}
+        .toast.error .material-icons-round{color:var(--accent-rose)}
+        @keyframes toastIn{from{opacity:0;transform:translateX(40px)}to{opacity:1;transform:translateX(0)}}
+        @keyframes toastOut{from{opacity:1;transform:translateX(0)}to{opacity:0;transform:translateX(40px)}}
+
+        /* ============ TEAM INPUT ROW ============ */
+        .team-input-row { display:flex;align-items:center;gap:12px; }
+        .team-input-row .form-input { flex:1; }
+
+        /* ============ RESPONSIVE ============ */
+        @media(max-width:768px){
+            .app-container{padding:16px 16px 48px}
+            .header{flex-direction:column;align-items:flex-start}
+            .stats-bar{grid-template-columns:repeat(2,1fr)}
+            .filter-pills{flex-wrap:wrap}
+            .team-bar{flex-direction:column}
+            .calendar-cell{min-height:80px;padding:4px}
+            .cell-clip-item{font-size:0.6rem;padding:2px 4px}
+            .calendar-month-label{font-size:0.85rem;min-width:120px}
+        }
+        @media(max-width:480px){
+            .stats-bar{grid-template-columns:1fr}
+        }
+
+        /* ============ SCROLLBAR & SELECTION ============ */
+        ::-webkit-scrollbar{width:6px;height:6px}
+        ::-webkit-scrollbar-track{background:transparent}
+        ::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.08);border-radius:3px}
+        ::-webkit-scrollbar-thumb:hover{background:rgba(255,255,255,0.15)}
+        ::selection{background:var(--accent-violet-glow);color:#fff}
+        tbody tr.row-done{opacity:0.65}
+        tbody tr.row-done .clip-title{text-decoration:line-through;text-decoration-color:var(--text-muted)}
+
+        /* ============ TOOLTIP ============ */
+        .cal-tooltip {
+            position:fixed;z-index:500;
+            background:var(--bg-secondary);border:1px solid var(--glass-border);
+            border-radius:var(--radius-md);padding:12px 16px;box-shadow:var(--shadow-lg);
+            backdrop-filter:blur(20px);pointer-events:none;
+            opacity:0;transition:opacity 0.15s;max-width:260px;
+        }
+        .cal-tooltip.show { opacity:1; }
+        .cal-tooltip .tt-title { font-size:0.82rem;font-weight:600;margin-bottom:4px; }
+        .cal-tooltip .tt-desc { font-size:0.72rem;color:var(--text-secondary);margin-bottom:6px; }
+        .cal-tooltip .tt-meta { font-size:0.68rem;color:var(--text-muted);display:flex;align-items:center;gap:6px; }
+    </style>
+</head>
+<body>
+
+    <!-- AMBIENT BACKGROUND -->
+    <div class="ambient-bg">
+        <div class="ambient-orb"></div>
+        <div class="ambient-orb"></div>
+        <div class="ambient-orb"></div>
+    </div>
+    <div class="grid-overlay"></div>
+
+    <!-- SYNC INDICATOR -->
+    <div class="sync-indicator" id="syncIndicator">
+        <span class="material-icons-round">sync</span>
+        กำลังซิงค์ข้อมูล...
+    </div>
+
+    <!-- APP -->
+    <div class="app-container">
+
+        <!-- HEADER -->
+        <header class="header">
+            <div class="header-left">
+                <div class="logo-icon">
+                    <span class="material-icons-round">videocam</span>
+                </div>
+                <div class="header-title">
+                    <h1>Clip Tracker</h1>
+                    <p>ระบบติดตามงานคลิป — Real-Time</p>
+                </div>
+            </div>
+            <div class="header-actions">
+                <div class="online-badge" id="onlineBadge">
+                    <span class="online-dot"></span>
+                    <span id="onlineCount">1</span> ออนไลน์
+                </div>
+                <button class="btn" id="btnTeamSettings" onclick="openTeamModal()">
+                    <span class="material-icons-round">group</span>
+                    ตั้งค่าทีม
+                </button>
+                <button class="btn" id="btnExport" onclick="exportData()">
+                    <span class="material-icons-round">download</span>
+                    ส่งออกข้อมูล
+                </button>
+                <button class="btn btn-primary" id="btnAddClip" onclick="openModal()">
+                    <span class="material-icons-round">add</span>
+                    เพิ่มคลิปใหม่
+                </button>
+            </div>
+        </header>
+
+        <!-- TEAM BAR -->
+        <div class="team-bar" id="teamBar"></div>
+
+        <!-- PROGRESS -->
+        <div class="progress-section">
+            <div class="progress-bar-wrapper" id="progressBar"></div>
+            <div class="progress-labels">
+                <span>ความคืบหน้ารวม</span>
+                <span id="progressPercent">0%</span>
+            </div>
+        </div>
+
+        <!-- STATS -->
+        <div class="stats-bar" id="statsBar"></div>
+
+        <!-- CALENDAR -->
+        <div class="calendar-section">
+            <div class="calendar-header">
+                <h2>
+                    <span class="material-icons-round">calendar_month</span>
+                    ตารางลงคลิปประจำเดือน
+                </h2>
+                <div class="calendar-nav">
+                    <button class="today-btn" onclick="calGoToday()">วันนี้</button>
+                    <button class="nav-btn" onclick="calPrev()">
+                        <span class="material-icons-round">chevron_left</span>
+                    </button>
+                    <span class="calendar-month-label" id="calMonthLabel"></span>
+                    <button class="nav-btn" onclick="calNext()">
+                        <span class="material-icons-round">chevron_right</span>
+                    </button>
+                </div>
+            </div>
+            <div class="calendar-grid" id="calendarGrid"></div>
+            <div class="calendar-legend">
+                <div class="legend-item"><span class="legend-dot" style="background:#6b7280"></span> ยังไม่ทำ</div>
+                <div class="legend-item"><span class="legend-dot" style="background:#f59e0b"></span> กำลังถ่ายทำ</div>
+                <div class="legend-item"><span class="legend-dot" style="background:#3b82f6"></span> กำลังตัด</div>
+                <div class="legend-item"><span class="legend-dot" style="background:#10b981"></span> ทำเสร็จ</div>
+            </div>
+        </div>
+
+        <!-- TABLE -->
+        <div class="table-section">
+            <div class="table-header">
+                <h2>
+                    <span class="material-icons-round">list_alt</span>
+                    รายการคลิปทั้งหมด
+                </h2>
+                <div class="filter-pills" id="filterPills"></div>
+            </div>
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>ชื่อคลิป</th>
+                            <th>คนทำ</th>
+                            <th>สถานะ</th>
+                            <th>คนลงคลิป</th>
+                            <th>สถานะอัปโหลด</th>
+                            <th>วันที่สร้าง</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody id="clipTableBody"></tbody>
+                </table>
+                <div class="empty-state" id="emptyState" style="display:none">
+                    <span class="material-icons-round">movie_creation</span>
+                    <h3>ยังไม่มีคลิป</h3>
+                    <p>กดปุ่ม "เพิ่มคลิปใหม่" เพื่อเริ่มต้น</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>
+                    <span class="material-icons-round">movie_creation</span>
+                    <span id="modalTitle">เพิ่มคลิปใหม่</span>
+                </h3>
+                <button class="modal-close" onclick="closeModal()">
+                    <span class="material-icons-round">close</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label" for="clipName">ชื่อคลิป *</label>
+                    <input class="form-input" id="clipName" type="text" placeholder="เช่น รีวิว iPhone 17 Pro Max">
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="clipDesc">รายละเอียด</label>
+                    <textarea class="form-textarea" id="clipDesc" placeholder="รายละเอียดเพิ่มเติม (ไม่จำเป็น)"></textarea>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="clipCreator">คนทำคลิป *</label>
+                    <select class="form-select" id="clipCreator">
+                        <option value="">-- เลือกคนทำ --</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="clipStatus">สถานะเริ่มต้น</label>
+                    <select class="form-select" id="clipStatus">
+                        <option value="idle">ยังไม่ทำ</option>
+                        <option value="filming">กำลังถ่ายทำ</option>
+                        <option value="editing">กำลังตัด</option>
+                        <option value="done">ทำเสร็จ</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="clipDate">วันที่ลงคลิป *</label>
+                    <input class="form-input" id="clipDate" type="date">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn" onclick="closeModal()">ยกเลิก</button>
+                <button class="btn btn-primary" id="btnSaveClip" onclick="saveClip()">
+                    <span class="material-icons-round">check</span>
+                    บันทึก
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- TEAM SETTINGS MODAL -->
+    <div class="modal-overlay" id="teamModalOverlay">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>
+                    <span class="material-icons-round">group</span>
+                    <span>ตั้งค่าชื่อทีม</span>
+                </h3>
+                <button class="modal-close" onclick="closeTeamModal()">
+                    <span class="material-icons-round">close</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">คนทำคลิป คนที่ 1</label>
+                    <div class="team-input-row">
+                        <div class="avatar avatar-1" style="width:32px;height:32px;font-size:0.7rem;flex-shrink:0">C1</div>
+                        <input class="form-input" id="teamName_c1" type="text" placeholder="ชื่อคนทำคลิปคนที่ 1">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">คนทำคลิป คนที่ 2</label>
+                    <div class="team-input-row">
+                        <div class="avatar avatar-2" style="width:32px;height:32px;font-size:0.7rem;flex-shrink:0">C2</div>
+                        <input class="form-input" id="teamName_c2" type="text" placeholder="ชื่อคนทำคลิปคนที่ 2">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">คนทำคลิป คนที่ 3</label>
+                    <div class="team-input-row">
+                        <div class="avatar avatar-3" style="width:32px;height:32px;font-size:0.7rem;flex-shrink:0">C3</div>
+                        <input class="form-input" id="teamName_c3" type="text" placeholder="ชื่อคนทำคลิปคนที่ 3">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">คนลงคลิป</label>
+                    <div class="team-input-row">
+                        <div class="avatar avatar-uploader" style="width:32px;height:32px;font-size:0.7rem;flex-shrink:0">UP</div>
+                        <input class="form-input" id="teamName_u1" type="text" placeholder="ชื่อคนลงคลิป">
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn" onclick="closeTeamModal()">ยกเลิก</button>
+                <button class="btn btn-primary" onclick="saveTeamNames()">
+                    <span class="material-icons-round">check</span>
+                    บันทึก
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOOLTIP -->
+    <div class="cal-tooltip" id="calTooltip">
+        <div class="tt-title"></div>
+        <div class="tt-desc"></div>
+        <div class="tt-meta"></div>
+    </div>
+
+    <!-- TOAST CONTAINER -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- SOCKET.IO CLIENT -->
+    <script src="/socket.io/socket.io.js"></script>
+
+    <script>
+        // ============ SOCKET.IO ============
+        const socket = io();
+        let isConnected = false;
+
+        // ============ DATA ============
+        let CREATORS = [
+            { id: 'c1', name: 'คนที่ 1', initials: 'C1', avatarClass: 'avatar-1', role: 'คนทำคลิป' },
+            { id: 'c2', name: 'คนที่ 2', initials: 'C2', avatarClass: 'avatar-2', role: 'คนทำคลิป' },
+            { id: 'c3', name: 'คนที่ 3', initials: 'C3', avatarClass: 'avatar-3', role: 'คนทำคลิป' },
+        ];
+        let UPLOADER = { id: 'u1', name: 'คนลงคลิป', initials: 'UP', avatarClass: 'avatar-uploader', role: 'คนลงคลิป' };
+
+        const STATUSES = {
+            idle:    { label: 'ยังไม่ทำ',    class: 'status-idle',    icon: 'hourglass_empty', color: '#6b7280' },
+            filming: { label: 'กำลังถ่ายทำ', class: 'status-filming', icon: 'videocam',        color: '#f59e0b' },
+            editing: { label: 'กำลังตัด',    class: 'status-editing', icon: 'content_cut',     color: '#3b82f6' },
+            done:    { label: 'ทำเสร็จ',     class: 'status-done',    icon: 'check_circle',    color: '#10b981' },
+        };
+
+        const FILTERS = [
+            { key: 'all',     label: 'ทั้งหมด' },
+            { key: 'idle',    label: 'ยังไม่ทำ' },
+            { key: 'filming', label: 'กำลังถ่ายทำ' },
+            { key: 'editing', label: 'กำลังตัด' },
+            { key: 'done',    label: 'ทำเสร็จ' },
+        ];
+
+        const THAI_MONTHS = ['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน',
+                             'กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
+        const THAI_DAYS_SHORT = ['อา','จ','อ','พ','พฤ','ศ','ส'];
+
+        let clips = [];
+        let currentFilter = 'all';
+        let editingClipId = null;
+        let openDropdownId = null;
+        let calYear, calMonth;
+
+        // ============ SOCKET EVENTS ============
+        socket.on('connect', () => {
+            isConnected = true;
+            console.log('✅ Connected to server');
+        });
+
+        socket.on('disconnect', () => {
+            isConnected = false;
+            showToast('ขาดการเชื่อมต่อ กำลังเชื่อมต่อใหม่...', 'warning');
+        });
+
+        // Initial data from server
+        socket.on('init:data', (data) => {
+            clips = data.clips || [];
+            applyTeamData(data.team);
+            renderCreatorSelect();
+            renderFilters();
+            render();
+        });
+
+        // Real-time updates from other users
+        socket.on('clips:updated', (newClips) => {
+            clips = newClips;
+            render();
+            showSyncIndicator();
+        });
+
+        socket.on('team:updated', (team) => {
+            applyTeamData(team);
+            renderCreatorSelect();
+            render();
+            showSyncIndicator();
+        });
+
+        socket.on('online:count', (count) => {
+            document.getElementById('onlineCount').textContent = count;
+        });
+
+        // ============ SYNC HELPERS ============
+        function syncClips() {
+            socket.emit('clips:update', clips);
+        }
+
+        function syncTeam() {
+            const teamData = {
+                creators: CREATORS.map(c => ({ id: c.id, name: c.name })),
+                uploader: { id: UPLOADER.id, name: UPLOADER.name }
+            };
+            socket.emit('team:update', teamData);
+        }
+
+        function applyTeamData(team) {
+            if (!team) return;
+            if (team.creators) {
+                team.creators.forEach(saved => {
+                    const c = CREATORS.find(cr => cr.id === saved.id);
+                    if (c && saved.name) { c.name = saved.name; c.initials = getInitials(saved.name); }
+                });
+            }
+            if (team.uploader && team.uploader.name) {
+                UPLOADER.name = team.uploader.name;
+                UPLOADER.initials = getInitials(team.uploader.name);
+            }
+        }
+
+        function showSyncIndicator() {
+            const el = document.getElementById('syncIndicator');
+            el.classList.add('show');
+            setTimeout(() => el.classList.remove('show'), 1500);
+        }
+
+        // ============ INIT ============
+        function init() {
+            const now = new Date();
+            calYear = now.getFullYear();
+            calMonth = now.getMonth();
+            renderFilters();
+        }
+
+        // ============ TEAM NAMES ============
+        function getInitials(name) {
+            const parts = name.trim().split(/\s+/);
+            if(parts.length >= 2) return (parts[0][0] + parts[1][0]).toUpperCase();
+            return name.substring(0, 2).toUpperCase();
+        }
+
+        function saveTeamNames() {
+            CREATORS.forEach(c => {
+                const input = document.getElementById('teamName_' + c.id);
+                const val = input.value.trim();
+                if(val) { c.name = val; c.initials = getInitials(val); }
+            });
+            const uploaderInput = document.getElementById('teamName_u1');
+            const uploaderVal = uploaderInput.value.trim();
+            if(uploaderVal) { UPLOADER.name = uploaderVal; UPLOADER.initials = getInitials(uploaderVal); }
+
+            closeTeamModal();
+            renderCreatorSelect();
+            render();
+            syncTeam();
+            showToast('บันทึกชื่อทีมเรียบร้อย','success');
+        }
+
+        function openTeamModal() {
+            CREATORS.forEach(c => { document.getElementById('teamName_' + c.id).value = c.name; });
+            document.getElementById('teamName_u1').value = UPLOADER.name;
+            document.getElementById('teamModalOverlay').classList.add('open');
+        }
+
+        function closeTeamModal() {
+            document.getElementById('teamModalOverlay').classList.remove('open');
+        }
+
+        function genId() { return 'clip_' + Date.now().toString(36) + '_' + Math.random().toString(36).substr(2, 5); }
+
+        // ============ RENDER ============
+        function render() {
+            renderStats();
+            renderProgress();
+            renderCalendar();
+            renderTable();
+            renderTeamBar();
+        }
+
+        function renderStats() {
+            const counts = { idle:0, filming:0, editing:0, done:0, uploaded:0 };
+            clips.forEach(c => { counts[c.status]++; if(c.uploaded) counts.uploaded++; });
+            const icons = ['hourglass_empty','videocam','content_cut','check_circle','cloud_upload'];
+            const labels = ['ยังไม่ทำ','กำลังถ่ายทำ','กำลังตัด','ทำเสร็จ','อัปโหลดแล้ว'];
+            const keys = ['idle','filming','editing','done','uploaded'];
+            document.getElementById('statsBar').innerHTML = keys.map((k,i) => `
+                <div class="stat-card">
+                    <div class="stat-icon"><span class="material-icons-round">${icons[i]}</span></div>
+                    <div class="stat-info">
+                        <div class="stat-number">${counts[k]}</div>
+                        <div class="stat-label">${labels[i]}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderProgress() {
+            const total = clips.length;
+            if(!total){ document.getElementById('progressBar').innerHTML=''; document.getElementById('progressPercent').textContent='0%'; return; }
+            const counts={idle:0,filming:0,editing:0,done:0};
+            clips.forEach(c=>counts[c.status]++);
+            const pct=k=>((counts[k]/total)*100).toFixed(1);
+            document.getElementById('progressBar').innerHTML = `
+                <div class="progress-segment seg-done" style="width:${pct('done')}%"></div>
+                <div class="progress-segment seg-editing" style="width:${pct('editing')}%"></div>
+                <div class="progress-segment seg-filming" style="width:${pct('filming')}%"></div>
+                <div class="progress-segment seg-idle" style="width:${pct('idle')}%"></div>
+            `;
+            document.getElementById('progressPercent').textContent = `${((counts.done/total)*100).toFixed(0)}% เสร็จแล้ว`;
+        }
+
+        // ============ CALENDAR ============
+        function renderCalendar() {
+            document.getElementById('calMonthLabel').textContent = `${THAI_MONTHS[calMonth]} ${calYear + 543}`;
+            const firstDay = new Date(calYear, calMonth, 1).getDay();
+            const daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
+            const daysInPrevMonth = new Date(calYear, calMonth, 0).getDate();
+            const today = new Date();
+            const todayStr = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
+
+            const clipsByDate = {};
+            clips.forEach(c => {
+                if(!clipsByDate[c.date]) clipsByDate[c.date] = [];
+                clipsByDate[c.date].push(c);
+            });
+
+            let html = '';
+            THAI_DAYS_SHORT.forEach((d, i) => {
+                const isWeekend = (i === 0 || i === 6);
+                html += `<div class="calendar-day-header ${isWeekend?'weekend':''}">${d}</div>`;
+            });
+
+            const totalCells = Math.ceil((firstDay + daysInMonth) / 7) * 7;
+            for (let i = 0; i < totalCells; i++) {
+                const dayNum = i - firstDay + 1;
+                let dateStr = '';
+                let displayNum = '';
+                let isOther = false;
+                let isToday = false;
+                const dayOfWeek = i % 7;
+                const isWeekend = (dayOfWeek === 0 || dayOfWeek === 6);
+
+                if (dayNum < 1) {
+                    const d = daysInPrevMonth + dayNum;
+                    const pm = calMonth === 0 ? 12 : calMonth;
+                    const py = calMonth === 0 ? calYear - 1 : calYear;
+                    dateStr = `${py}-${String(pm).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+                    displayNum = d; isOther = true;
+                } else if (dayNum > daysInMonth) {
+                    const d = dayNum - daysInMonth;
+                    const nm = calMonth === 11 ? 1 : calMonth + 2;
+                    const ny = calMonth === 11 ? calYear + 1 : calYear;
+                    dateStr = `${ny}-${String(nm).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+                    displayNum = d; isOther = true;
+                } else {
+                    dateStr = `${calYear}-${String(calMonth+1).padStart(2,'0')}-${String(dayNum).padStart(2,'0')}`;
+                    displayNum = dayNum;
+                    isToday = (dateStr === todayStr);
+                }
+
+                const dayClips = clipsByDate[dateStr] || [];
+                const maxShow = 3;
+                let classes = 'calendar-cell';
+                if (isOther) classes += ' other-month';
+                if (isToday) classes += ' today';
+                if (isWeekend && !isOther) classes += ' weekend';
+
+                html += `<div class="${classes}" onclick="calCellClick('${dateStr}')" data-date="${dateStr}">`;
+                html += `<div class="cell-date">`;
+                html += `<span class="date-num">${displayNum}</span>`;
+                if (dayClips.length > 0) html += `<span class="clip-count-badge">${dayClips.length}</span>`;
+                html += `</div><div class="cell-clips">`;
+
+                dayClips.slice(0, maxShow).forEach(clip => {
+                    html += `<div class="cell-clip-item st-${clip.status}"
+                                  onmouseenter="showCalTooltip(event,'${clip.id}')"
+                                  onmouseleave="hideCalTooltip()"
+                                  onclick="event.stopPropagation(); editClip('${clip.id}')">
+                        <span class="clip-dot"></span>
+                        ${escHtml(clip.title)}
+                    </div>`;
+                });
+                if (dayClips.length > maxShow) html += `<div class="cell-clip-more">+${dayClips.length - maxShow} อื่นๆ</div>`;
+                html += `</div>`;
+                html += `<button class="cell-add-btn" onclick="event.stopPropagation(); calAddClip('${dateStr}')" title="เพิ่มคลิป">+</button>`;
+                html += `</div>`;
+            }
+            document.getElementById('calendarGrid').innerHTML = html;
+        }
+
+        function calPrev() { calMonth--; if(calMonth<0){calMonth=11;calYear--;} renderCalendar(); }
+        function calNext() { calMonth++; if(calMonth>11){calMonth=0;calYear++;} renderCalendar(); }
+        function calGoToday() { const now=new Date(); calYear=now.getFullYear(); calMonth=now.getMonth(); renderCalendar(); }
+        function calCellClick(dateStr) { calAddClip(dateStr); }
+
+        function calAddClip(dateStr) {
+            editingClipId = null;
+            document.getElementById('modalTitle').textContent = 'เพิ่มคลิปใหม่';
+            document.getElementById('clipName').value = '';
+            document.getElementById('clipDesc').value = '';
+            document.getElementById('clipCreator').value = '';
+            document.getElementById('clipStatus').value = 'idle';
+            document.getElementById('clipDate').value = dateStr;
+            document.getElementById('modalOverlay').classList.add('open');
+            setTimeout(() => document.getElementById('clipName').focus(), 300);
+        }
+
+        function showCalTooltip(e, clipId) {
+            const clip = clips.find(c => c.id === clipId);
+            if (!clip) return;
+            const tt = document.getElementById('calTooltip');
+            const creator = CREATORS.find(c => c.id === clip.creator);
+            const st = STATUSES[clip.status];
+            tt.querySelector('.tt-title').textContent = clip.title;
+            tt.querySelector('.tt-desc').textContent = clip.desc || '';
+            tt.querySelector('.tt-meta').innerHTML = `
+                <span style="color:${st.color}">● ${st.label}</span>
+                <span>|</span>
+                <span>${creator ? creator.name : '-'}</span>
+                <span>|</span>
+                <span>${clip.uploaded ? '✓ อัปโหลดแล้ว' : '○ ยังไม่อัปโหลด'}</span>
+            `;
+            const rect = e.target.getBoundingClientRect();
+            let left = rect.left;
+            let top = rect.bottom + 8;
+            if (left + 260 > window.innerWidth) left = window.innerWidth - 270;
+            if (left < 10) left = 10;
+            if (top + 100 > window.innerHeight) top = rect.top - 80;
+            tt.style.left = left + 'px';
+            tt.style.top = top + 'px';
+            tt.classList.add('show');
+        }
+        function hideCalTooltip() { document.getElementById('calTooltip').classList.remove('show'); }
+
+        // ============ TABLE ============
+        function renderTable() {
+            const filtered = currentFilter === 'all' ? clips : clips.filter(c => c.status === currentFilter);
+            const tbody = document.getElementById('clipTableBody');
+            const empty = document.getElementById('emptyState');
+            if (filtered.length === 0) { tbody.innerHTML=''; empty.style.display='block'; return; }
+            empty.style.display = 'none';
+
+            tbody.innerHTML = filtered.map((clip, i) => {
+                const creator = CREATORS.find(c => c.id === clip.creator);
+                const st = STATUSES[clip.status];
+                const isDone = clip.status === 'done';
+                return `
+                <tr class="${isDone && clip.uploaded ? 'row-done' : ''}" data-id="${clip.id}">
+                    <td class="clip-number">${String(i+1).padStart(2,'0')}</td>
+                    <td>
+                        <div class="clip-title-cell">
+                            <span class="clip-title">${escHtml(clip.title)}</span>
+                            ${clip.desc ? `<span class="clip-description">${escHtml(clip.desc)}</span>` : ''}
+                        </div>
+                    </td>
+                    <td>
+                        <div class="assigned-cell">
+                            <div class="avatar ${creator?creator.avatarClass:''}">${creator?creator.initials:'?'}</div>
+                            <span class="assigned-name">${creator?creator.name:'-'}</span>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="status-dropdown-wrapper" id="sdw_${clip.id}">
+                            <button class="status-badge ${st.class}" onclick="toggleStatusDropdown('${clip.id}')">
+                                <span class="dot"></span>${st.label}
+                            </button>
+                            <div class="status-dropdown" id="sd_${clip.id}">
+                                ${Object.entries(STATUSES).map(([k,v]) => `
+                                    <button class="status-option ${clip.status===k?'selected':''}" onclick="changeStatus('${clip.id}','${k}')">
+                                        <span class="option-dot" style="background:${v.color}"></span>${v.label}
+                                    </button>
+                                `).join('')}
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="assigned-cell">
+                            <div class="avatar ${UPLOADER.avatarClass}">${UPLOADER.initials}</div>
+                            <span class="assigned-name">${UPLOADER.name}</span>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="upload-toggle ${clip.uploaded?'active':''}" onclick="toggleUpload('${clip.id}')">
+                            <div class="toggle-switch"></div>
+                            <span class="upload-label">${clip.uploaded?'อัปโหลดแล้ว':'ยังไม่อัปโหลด'}</span>
+                        </div>
+                    </td>
+                    <td class="date-cell">${formatDate(clip.date)}</td>
+                    <td>
+                        <div class="actions-cell">
+                            <button class="action-btn" onclick="editClip('${clip.id}')" title="แก้ไข">
+                                <span class="material-icons-round" style="font-size:18px">edit</span>
+                            </button>
+                            <button class="action-btn delete" onclick="deleteClip('${clip.id}')" title="ลบ">
+                                <span class="material-icons-round" style="font-size:18px">delete_outline</span>
+                            </button>
+                        </div>
+                    </td>
+                </tr>`;
+            }).join('');
+        }
+
+        function renderTeamBar() {
+            const allMembers = [...CREATORS, UPLOADER];
+            document.getElementById('teamBar').innerHTML = allMembers.map(m => {
+                const count = m.role==='คนทำคลิป' ? clips.filter(c=>c.creator===m.id).length : clips.filter(c=>c.uploaded).length;
+                return `
+                <div class="team-member">
+                    <div class="team-avatar ${m.avatarClass}">${m.initials}</div>
+                    <div class="team-info">
+                        <div class="team-name">${m.name}</div>
+                        <div class="team-role">${m.role}</div>
+                    </div>
+                    <span class="team-count">${count} คลิป</span>
+                </div>`;
+            }).join('');
+        }
+
+        function renderCreatorSelect() {
+            const sel = document.getElementById('clipCreator');
+            const currentVal = sel.value;
+            while(sel.options.length > 1) sel.remove(1);
+            CREATORS.forEach(c => { const o=document.createElement('option'); o.value=c.id; o.textContent=c.name; sel.appendChild(o); });
+            sel.value = currentVal;
+        }
+
+        function renderFilters() {
+            document.getElementById('filterPills').innerHTML = FILTERS.map(f => `
+                <button class="filter-pill ${f.key===currentFilter?'active':''}" onclick="setFilter('${f.key}')">${f.label}</button>
+            `).join('');
+        }
+
+        // ============ ACTIONS ============
+        function setFilter(key) { currentFilter=key; renderFilters(); renderTable(); }
+
+        function toggleStatusDropdown(clipId) {
+            const dd = document.getElementById('sd_'+clipId);
+            if(openDropdownId && openDropdownId!==clipId){ const old=document.getElementById('sd_'+openDropdownId); if(old) old.classList.remove('open'); }
+            dd.classList.toggle('open');
+            openDropdownId = dd.classList.contains('open') ? clipId : null;
+        }
+
+        function changeStatus(clipId, newStatus) {
+            const clip = clips.find(c=>c.id===clipId);
+            if(clip){ clip.status=newStatus; syncClips(); render(); showToast(`เปลี่ยนสถานะเป็น "${STATUSES[newStatus].label}"`, 'success'); }
+            openDropdownId = null;
+        }
+
+        function toggleUpload(clipId) {
+            const clip = clips.find(c=>c.id===clipId);
+            if(clip){ clip.uploaded=!clip.uploaded; syncClips(); render(); showToast(clip.uploaded?'อัปโหลดแล้ว ✓':'ยกเลิกอัปโหลด', clip.uploaded?'success':'info'); }
+        }
+
+        function openModal(editing = false) {
+            const overlay = document.getElementById('modalOverlay');
+            overlay.classList.add('open');
+            if(!editing){
+                editingClipId = null;
+                document.getElementById('modalTitle').textContent = 'เพิ่มคลิปใหม่';
+                document.getElementById('clipName').value = '';
+                document.getElementById('clipDesc').value = '';
+                document.getElementById('clipCreator').value = '';
+                document.getElementById('clipStatus').value = 'idle';
+                document.getElementById('clipDate').value = new Date().toISOString().split('T')[0];
+            }
+            setTimeout(()=>document.getElementById('clipName').focus(), 300);
+        }
+
+        function closeModal() { document.getElementById('modalOverlay').classList.remove('open'); editingClipId=null; }
+
+        function saveClip() {
+            const name = document.getElementById('clipName').value.trim();
+            const desc = document.getElementById('clipDesc').value.trim();
+            const creator = document.getElementById('clipCreator').value;
+            const status = document.getElementById('clipStatus').value;
+            const date = document.getElementById('clipDate').value;
+
+            if(!name){ showToast('กรุณาใส่ชื่อคลิป','warning'); return; }
+            if(!creator){ showToast('กรุณาเลือกคนทำคลิป','warning'); return; }
+            if(!date){ showToast('กรุณาเลือกวันที่','warning'); return; }
+
+            if(editingClipId){
+                const clip = clips.find(c=>c.id===editingClipId);
+                if(clip){ clip.title=name; clip.desc=desc; clip.creator=creator; clip.status=status; clip.date=date; }
+                showToast('แก้ไขคลิปเรียบร้อย','success');
+            } else {
+                clips.unshift({ id:genId(), title:name, desc:desc, creator:creator, status:status, uploaded:false, date:date });
+                showToast('เพิ่มคลิปใหม่เรียบร้อย','success');
+            }
+            syncClips(); closeModal(); render();
+        }
+
+        function editClip(clipId) {
+            const clip = clips.find(c=>c.id===clipId);
+            if(!clip) return;
+            editingClipId = clipId;
+            document.getElementById('modalTitle').textContent = 'แก้ไขคลิป';
+            document.getElementById('clipName').value = clip.title;
+            document.getElementById('clipDesc').value = clip.desc||'';
+            document.getElementById('clipCreator').value = clip.creator;
+            document.getElementById('clipStatus').value = clip.status;
+            document.getElementById('clipDate').value = clip.date;
+            openModal(true);
+        }
+
+        function deleteClip(clipId) {
+            const clip = clips.find(c=>c.id===clipId);
+            if(!clip) return;
+            if(!confirm(`ต้องการลบ "${clip.title}" หรือไม่?`)) return;
+            clips = clips.filter(c=>c.id!==clipId);
+            syncClips(); render(); showToast('ลบคลิปเรียบร้อย','info');
+        }
+
+        function exportData() {
+            const csv = [
+                ['#','ชื่อคลิป','รายละเอียด','คนทำ','สถานะ','อัปโหลด','วันที่'].join(','),
+                ...clips.map((c,i)=>{
+                    const creator = CREATORS.find(cr=>cr.id===c.creator);
+                    return [i+1,`"${c.title}"`,`"${c.desc||''}"`,creator?creator.name:'-',STATUSES[c.status].label,c.uploaded?'อัปโหลดแล้ว':'ยังไม่อัปโหลด',c.date].join(',');
+                })
+            ].join('\n');
+            const blob = new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a'); a.href=url; a.download=`clip_tracker_${new Date().toISOString().split('T')[0]}.csv`; a.click();
+            URL.revokeObjectURL(url);
+            showToast('ส่งออกข้อมูลเรียบร้อย','success');
+        }
+
+        // ============ UTILS ============
+        function formatDate(dateStr) {
+            if(!dateStr) return '-';
+            const d = new Date(dateStr+'T00:00:00');
+            return d.toLocaleDateString('th-TH',{day:'numeric',month:'short',year:'numeric'});
+        }
+        function escHtml(str){ const d=document.createElement('div'); d.textContent=str; return d.innerHTML; }
+        function showToast(msg,type='info'){
+            const container=document.getElementById('toastContainer');
+            const icons={success:'check_circle',info:'info',warning:'warning',error:'error'};
+            const toast=document.createElement('div'); toast.className=`toast ${type}`;
+            toast.innerHTML=`<span class="material-icons-round">${icons[type]}</span>${escHtml(msg)}`;
+            container.appendChild(toast);
+            setTimeout(()=>{if(toast.parentNode)toast.remove()},3000);
+        }
+
+        // Close dropdown on outside click
+        document.addEventListener('click',e=>{
+            if(openDropdownId&&!e.target.closest('.status-dropdown-wrapper')){
+                const dd=document.getElementById('sd_'+openDropdownId); if(dd)dd.classList.remove('open'); openDropdownId=null;
+            }
+        });
+        document.getElementById('modalOverlay').addEventListener('click',e=>{
+            if(e.target===document.getElementById('modalOverlay')) closeModal();
+        });
+        document.getElementById('teamModalOverlay').addEventListener('click',e=>{
+            if(e.target===document.getElementById('teamModalOverlay')) closeTeamModal();
+        });
+        document.addEventListener('keydown',e=>{
+            if(e.key==='Escape'){ closeModal(); closeTeamModal(); }
+            if(e.key==='n'&&e.ctrlKey){e.preventDefault();openModal();}
+        });
+
+        init();
+    </script>
+</body>
+</html>

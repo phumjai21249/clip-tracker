@@ -1,0 +1,8 @@
+node_modules/
+.env
+.DS_Store
+firebase-admin.json
+PortableGit.exe
+data/firebase-admin.json  
+PortableGit.exe  
+data/  
