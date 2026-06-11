@@ -1071,6 +1071,8 @@
             tt.querySelector('.tt-meta').innerHTML = `
                 <span style="color:${st.color}">● ${st.label}</span>
                 <span>|</span>
+                <span style="font-weight:700; color:${clip.channel === 'Me SPORT' ? 'var(--accent-rose)' : 'var(--accent-cyan)'}">${clip.channel || 'JS SPORT SHOP'}</span>
+                <span>|</span>
                 <span>${creator ? creator.name : '-'}</span>
                 <span>|</span>
                 <span>${clip.uploaded ? '✓ อัปโหลดแล้ว' : '○ ยังไม่อัปโหลด'}</span>
@@ -1130,7 +1132,7 @@
                     </td>
                     <td>
                         <div class="assigned-cell">
-                            <span class="assigned-name" style="font-weight:700; color:var(--accent-cyan)">${clip.channel || 'JS SPORT SHOP'}</span>
+                            <span class="assigned-name" style="font-weight:700; color:${clip.channel === 'Me SPORT' ? 'var(--accent-rose)' : 'var(--accent-cyan)'}">${clip.channel || 'JS SPORT SHOP'}</span>
                         </div>
                     </td>
                     <td>
