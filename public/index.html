@@ -607,7 +607,7 @@
                 <div class="legend-item"><span class="legend-dot" style="background:#6b7280"></span> ยังไม่ทำ</div>
                 <div class="legend-item"><span class="legend-dot" style="background:#f59e0b"></span> กำลังถ่ายทำ</div>
                 <div class="legend-item"><span class="legend-dot" style="background:#3b82f6"></span> กำลังตัด</div>
-                <div class="legend-item"><span class="legend-dot" style="background:#10b981"></span> ทำเสร็จ</div>
+                <div class="legend-item"><span class="legend-dot" style="background:#10b981"></span> อัปแล้ว</div>
             </div>
         </div>
 
@@ -628,6 +628,7 @@
                             <th>ชื่อคลิป</th>
                             <th>คนทำ</th>
                             <th>สถานะ</th>
+                            <th>ช่องที่ลง</th>
                             <th>คนลงคลิป</th>
                             <th>สถานะอัปโหลด</th>
                             <th>วันที่สร้าง</th>
@@ -678,7 +679,14 @@
                         <option value="idle">ยังไม่ทำ</option>
                         <option value="filming">กำลังถ่ายทำ</option>
                         <option value="editing">กำลังตัด</option>
-                        <option value="done">ทำเสร็จ</option>
+                        <option value="done">อัปแล้ว</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="clipChannel">ช่องที่จะลง *</label>
+                    <select class="form-select" id="clipChannel">
+                        <option value="JS SPORT SHOP">JS SPORT SHOP</option>
+                        <option value="Me SPORT">Me SPORT</option>
                     </select>
                 </div>
                 <div class="form-group">
@@ -778,7 +786,7 @@
             idle:    { label: 'ยังไม่ทำ',    class: 'status-idle',    icon: 'hourglass_empty', color: '#6b7280' },
             filming: { label: 'กำลังถ่ายทำ', class: 'status-filming', icon: 'videocam',        color: '#f59e0b' },
             editing: { label: 'กำลังตัด',    class: 'status-editing', icon: 'content_cut',     color: '#3b82f6' },
-            done:    { label: 'ทำเสร็จ',     class: 'status-done',    icon: 'check_circle',    color: '#10b981' },
+            done:    { label: 'อัปแล้ว',     class: 'status-done',    icon: 'check_circle',    color: '#10b981' },
         };
 
         const FILTERS = [
@@ -786,7 +794,7 @@
             { key: 'idle',    label: 'ยังไม่ทำ' },
             { key: 'filming', label: 'กำลังถ่ายทำ' },
             { key: 'editing', label: 'กำลังตัด' },
-            { key: 'done',    label: 'ทำเสร็จ' },
+            { key: 'done',    label: 'อัปแล้ว' },
         ];
 
         const THAI_MONTHS = ['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน',
@@ -927,7 +935,7 @@
             const counts = { idle:0, filming:0, editing:0, done:0, uploaded:0 };
             clips.forEach(c => { counts[c.status]++; if(c.uploaded) counts.uploaded++; });
             const icons = ['hourglass_empty','videocam','content_cut','check_circle','cloud_upload'];
-            const labels = ['ยังไม่ทำ','กำลังถ่ายทำ','กำลังตัด','ทำเสร็จ','อัปโหลดแล้ว'];
+            const labels = ['ยังไม่ทำ','กำลังถ่ายทำ','กำลังตัด','อัปแล้ว','อัปโหลดแล้ว'];
             const keys = ['idle','filming','editing','done','uploaded'];
             document.getElementById('statsBar').innerHTML = keys.map((k,i) => `
                 <div class="stat-card">
@@ -952,7 +960,7 @@
                 <div class="progress-segment seg-filming" style="width:${pct('filming')}%"></div>
                 <div class="progress-segment seg-idle" style="width:${pct('idle')}%"></div>
             `;
-            document.getElementById('progressPercent').textContent = `${((counts.done/total)*100).toFixed(0)}% เสร็จแล้ว`;
+            document.getElementById('progressPercent').textContent = `${((counts.done/total)*100).toFixed(0)}% อัปแล้ว`;
         }
 
         // ============ CALENDAR ============
@@ -1046,6 +1054,7 @@
             document.getElementById('clipDesc').value = '';
             document.getElementById('clipCreator').value = '';
             document.getElementById('clipStatus').value = 'idle';
+            document.getElementById('clipChannel').value = 'JS SPORT SHOP';
             document.getElementById('clipDate').value = dateStr;
             document.getElementById('modalOverlay').classList.add('open');
             setTimeout(() => document.getElementById('clipName').focus(), 300);
@@ -1117,6 +1126,11 @@
                                     </button>
                                 `).join('')}
                             </div>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="assigned-cell">
+                            <span class="assigned-name" style="font-weight:700; color:var(--accent-cyan)">${clip.channel || 'JS SPORT SHOP'}</span>
                         </div>
                     </td>
                     <td>
@@ -1207,6 +1221,7 @@
                 document.getElementById('clipDesc').value = '';
                 document.getElementById('clipCreator').value = '';
                 document.getElementById('clipStatus').value = 'idle';
+                document.getElementById('clipChannel').value = 'JS SPORT SHOP';
                 document.getElementById('clipDate').value = new Date().toISOString().split('T')[0];
             }
             setTimeout(()=>document.getElementById('clipName').focus(), 300);
@@ -1219,6 +1234,7 @@
             const desc = document.getElementById('clipDesc').value.trim();
             const creator = document.getElementById('clipCreator').value;
             const status = document.getElementById('clipStatus').value;
+            const channel = document.getElementById('clipChannel').value;
             const date = document.getElementById('clipDate').value;
 
             if(!name){ showToast('กรุณาใส่ชื่อคลิป','warning'); return; }
@@ -1227,10 +1243,10 @@
 
             if(editingClipId){
                 const clip = clips.find(c=>c.id===editingClipId);
-                if(clip){ clip.title=name; clip.desc=desc; clip.creator=creator; clip.status=status; clip.date=date; }
+                if(clip){ clip.title=name; clip.desc=desc; clip.creator=creator; clip.status=status; clip.channel=channel; clip.date=date; }
                 showToast('แก้ไขคลิปเรียบร้อย','success');
             } else {
-                clips.unshift({ id:genId(), title:name, desc:desc, creator:creator, status:status, uploaded:false, date:date });
+                clips.unshift({ id:genId(), title:name, desc:desc, creator:creator, status:status, channel:channel, uploaded:false, date:date });
                 showToast('เพิ่มคลิปใหม่เรียบร้อย','success');
             }
             syncClips(); closeModal(); render();
@@ -1245,6 +1261,7 @@
             document.getElementById('clipDesc').value = clip.desc||'';
             document.getElementById('clipCreator').value = clip.creator;
             document.getElementById('clipStatus').value = clip.status;
+            document.getElementById('clipChannel').value = clip.channel || 'JS SPORT SHOP';
             document.getElementById('clipDate').value = clip.date;
             openModal(true);
         }
