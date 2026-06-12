@@ -607,7 +607,7 @@
                 <div class="legend-item"><span class="legend-dot" style="background:#6b7280"></span> ยังไม่ทำ</div>
                 <div class="legend-item"><span class="legend-dot" style="background:#f59e0b"></span> กำลังถ่ายทำ</div>
                 <div class="legend-item"><span class="legend-dot" style="background:#3b82f6"></span> กำลังตัด</div>
-                <div class="legend-item"><span class="legend-dot" style="background:#10b981"></span> อัปแล้ว</div>
+                <div class="legend-item"><span class="legend-dot" style="background:#10b981"></span> อัปลงไดร์ฟแล้ว</div>
             </div>
         </div>
 
@@ -679,7 +679,7 @@
                         <option value="idle">ยังไม่ทำ</option>
                         <option value="filming">กำลังถ่ายทำ</option>
                         <option value="editing">กำลังตัด</option>
-                        <option value="done">อัปแล้ว</option>
+                        <option value="done">อัปลงไดร์ฟแล้ว</option>
                     </select>
                 </div>
                 <div class="form-group">
@@ -786,7 +786,7 @@
             idle:    { label: 'ยังไม่ทำ',    class: 'status-idle',    icon: 'hourglass_empty', color: '#6b7280' },
             filming: { label: 'กำลังถ่ายทำ', class: 'status-filming', icon: 'videocam',        color: '#f59e0b' },
             editing: { label: 'กำลังตัด',    class: 'status-editing', icon: 'content_cut',     color: '#3b82f6' },
-            done:    { label: 'อัปแล้ว',     class: 'status-done',    icon: 'check_circle',    color: '#10b981' },
+            done:    { label: 'อัปลงไดร์ฟแล้ว',     class: 'status-done',    icon: 'check_circle',    color: '#10b981' },
         };
 
         const FILTERS = [
@@ -794,7 +794,7 @@
             { key: 'idle',    label: 'ยังไม่ทำ' },
             { key: 'filming', label: 'กำลังถ่ายทำ' },
             { key: 'editing', label: 'กำลังตัด' },
-            { key: 'done',    label: 'อัปแล้ว' },
+            { key: 'done',    label: 'อัปลงไดร์ฟแล้ว' },
         ];
 
         const THAI_MONTHS = ['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน',
@@ -935,7 +935,7 @@
             const counts = { idle:0, filming:0, editing:0, done:0, uploaded:0 };
             clips.forEach(c => { counts[c.status]++; if(c.uploaded) counts.uploaded++; });
             const icons = ['hourglass_empty','videocam','content_cut','check_circle','cloud_upload'];
-            const labels = ['ยังไม่ทำ','กำลังถ่ายทำ','กำลังตัด','อัปแล้ว','อัปโหลดแล้ว'];
+            const labels = ['ยังไม่ทำ','กำลังถ่ายทำ','กำลังตัด','อัปลงไดร์ฟแล้ว','อัปโหลดแล้ว'];
             const keys = ['idle','filming','editing','done','uploaded'];
             document.getElementById('statsBar').innerHTML = keys.map((k,i) => `
                 <div class="stat-card">
@@ -960,7 +960,7 @@
                 <div class="progress-segment seg-filming" style="width:${pct('filming')}%"></div>
                 <div class="progress-segment seg-idle" style="width:${pct('idle')}%"></div>
             `;
-            document.getElementById('progressPercent').textContent = `${((counts.done/total)*100).toFixed(0)}% อัปแล้ว`;
+            document.getElementById('progressPercent').textContent = `${((counts.done/total)*100).toFixed(0)}% อัปลงไดร์ฟแล้ว`;
         }
 
         // ============ CALENDAR ============
