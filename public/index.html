@@ -625,6 +625,7 @@
                     <thead>
                         <tr>
                             <th>#</th>
+                            <th>รูปปก</th>
                             <th>ชื่อคลิป</th>
                             <th>คนทำ</th>
                             <th>สถานะ</th>
@@ -666,6 +667,13 @@
                 <div class="form-group">
                     <label class="form-label" for="clipDesc">รายละเอียด</label>
                     <textarea class="form-textarea" id="clipDesc" placeholder="รายละเอียดเพิ่มเติม (ไม่จำเป็น)"></textarea>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="clipCover">รูปปกคลิป (ถ้ามี)</label>
+                    <input class="form-input" id="clipCover" type="file" accept="image/*" onchange="previewCover(event)">
+                    <img id="clipCoverPreview" src="" style="display:none; max-width: 100%; margin-top: 10px; border-radius: 8px;">
+                    <input type="hidden" id="clipCoverBase64" value="">
+                    <button class="btn" style="margin-top:5px; display:none;" id="btnRemoveCover" onclick="removeCover()">ลบรูปปก</button>
                 </div>
                 <div class="form-group">
                     <label class="form-label" for="clipCreator">คนทำคลิป *</label>
@@ -758,6 +766,7 @@
 
     <!-- TOOLTIP -->
     <div class="cal-tooltip" id="calTooltip">
+        <img class="tt-cover" src="" style="display:none; width: 100%; height: 120px; object-fit: cover; border-radius: 6px; margin-bottom: 8px;">
         <div class="tt-title"></div>
         <div class="tt-desc"></div>
         <div class="tt-meta"></div>
@@ -1068,6 +1077,14 @@
             const st = STATUSES[clip.status];
             tt.querySelector('.tt-title').textContent = clip.title;
             tt.querySelector('.tt-desc').textContent = clip.desc || '';
+            const ttCover = tt.querySelector('.tt-cover');
+            if(clip.coverImage) {
+                ttCover.src = clip.coverImage;
+                ttCover.style.display = 'block';
+            } else {
+                ttCover.style.display = 'none';
+                ttCover.src = '';
+            }
             tt.querySelector('.tt-meta').innerHTML = `
                 <span style="color:${st.color}">● ${st.label}</span>
                 <span>|</span>
@@ -1104,6 +1121,9 @@
                 return `
                 <tr class="${isDone && clip.uploaded ? 'row-done' : ''}" data-id="${clip.id}">
                     <td class="clip-number">${String(i+1).padStart(2,'0')}</td>
+                    <td>
+                        ${clip.coverImage ? `<img src="${clip.coverImage}" style="width: 80px; height: 45px; object-fit: cover; border-radius: 4px;">` : `<div style="width: 80px; height: 45px; background: #374151; border-radius: 4px; display: flex; align-items: center; justify-content: center; color: #9ca3af; font-size: 10px;">ไม่มีรูป</div>`}
+                    </td>
                     <td>
                         <div class="clip-title-cell">
                             <span class="clip-title">${escHtml(clip.title)}</span>
@@ -1216,6 +1236,7 @@
         function openModal(editing = false) {
             const overlay = document.getElementById('modalOverlay');
             overlay.classList.add('open');
+            removeCover(); // Reset cover image fields
             if(!editing){
                 editingClipId = null;
                 document.getElementById('modalTitle').textContent = 'เพิ่มคลิปใหม่';
@@ -1238,6 +1259,7 @@
             const status = document.getElementById('clipStatus').value;
             const channel = document.getElementById('clipChannel').value;
             const date = document.getElementById('clipDate').value;
+            const coverImage = document.getElementById('clipCoverBase64').value;
 
             if(!name){ showToast('กรุณาใส่ชื่อคลิป','warning'); return; }
             if(!creator){ showToast('กรุณาเลือกคนทำคลิป','warning'); return; }
@@ -1245,10 +1267,10 @@
 
             if(editingClipId){
                 const clip = clips.find(c=>c.id===editingClipId);
-                if(clip){ clip.title=name; clip.desc=desc; clip.creator=creator; clip.status=status; clip.channel=channel; clip.date=date; }
+                if(clip){ clip.title=name; clip.desc=desc; clip.creator=creator; clip.status=status; clip.channel=channel; clip.date=date; clip.coverImage=coverImage; }
                 showToast('แก้ไขคลิปเรียบร้อย','success');
             } else {
-                clips.unshift({ id:genId(), title:name, desc:desc, creator:creator, status:status, channel:channel, uploaded:false, date:date });
+                clips.unshift({ id:genId(), title:name, desc:desc, creator:creator, status:status, channel:channel, uploaded:false, date:date, coverImage:coverImage });
                 showToast('เพิ่มคลิปใหม่เรียบร้อย','success');
             }
             syncClips(); closeModal(); render();
@@ -1258,6 +1280,13 @@
             const clip = clips.find(c=>c.id===clipId);
             if(!clip) return;
             editingClipId = clipId;
+            removeCover();
+            if(clip.coverImage) {
+                document.getElementById('clipCoverBase64').value = clip.coverImage;
+                document.getElementById('clipCoverPreview').src = clip.coverImage;
+                document.getElementById('clipCoverPreview').style.display = 'block';
+                document.getElementById('btnRemoveCover').style.display = 'inline-block';
+            }
             document.getElementById('modalTitle').textContent = 'แก้ไขคลิป';
             document.getElementById('clipName').value = clip.title;
             document.getElementById('clipDesc').value = clip.desc||'';
@@ -1292,6 +1321,41 @@
         }
 
         // ============ UTILS ============
+        function previewCover(e) {
+            const file = e.target.files[0];
+            if(!file) return;
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                const img = new Image();
+                img.onload = function() {
+                    const canvas = document.createElement('canvas');
+                    const MAX_WIDTH = 320;
+                    const MAX_HEIGHT = 180;
+                    let width = img.width; let height = img.height;
+                    if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; }
+                    canvas.width = width; canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+                    const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
+                    
+                    document.getElementById('clipCoverBase64').value = dataUrl;
+                    document.getElementById('clipCoverPreview').src = dataUrl;
+                    document.getElementById('clipCoverPreview').style.display = 'block';
+                    document.getElementById('btnRemoveCover').style.display = 'inline-block';
+                }
+                img.src = evt.target.result;
+            }
+            reader.readAsDataURL(file);
+        }
+        
+        function removeCover() {
+            document.getElementById('clipCover').value = '';
+            document.getElementById('clipCoverBase64').value = '';
+            document.getElementById('clipCoverPreview').src = '';
+            document.getElementById('clipCoverPreview').style.display = 'none';
+            document.getElementById('btnRemoveCover').style.display = 'none';
+        }
+
         function formatDate(dateStr) {
             if(!dateStr) return '-';
             const d = new Date(dateStr+'T00:00:00');
