@@ -935,7 +935,7 @@
             const counts = { idle:0, filming:0, editing:0, done:0, uploaded:0 };
             clips.forEach(c => { counts[c.status]++; if(c.uploaded) counts.uploaded++; });
             const icons = ['hourglass_empty','videocam','content_cut','check_circle','cloud_upload'];
-            const labels = ['ยังไม่ทำ','กำลังถ่ายทำ','กำลังตัด','อัปลงไดร์ฟแล้ว','อัปโหลดแล้ว'];
+            const labels = ['ยังไม่ทำ','กำลังถ่ายทำ','กำลังตัด','อัปลงไดร์ฟแล้ว','อัปลง TikTok แล้ว'];
             const keys = ['idle','filming','editing','done','uploaded'];
             document.getElementById('statsBar').innerHTML = keys.map((k,i) => `
                 <div class="stat-card">
@@ -1075,7 +1075,7 @@
                 <span>|</span>
                 <span>${creator ? creator.name : '-'}</span>
                 <span>|</span>
-                <span>${clip.uploaded ? '✓ อัปโหลดแล้ว' : '○ ยังไม่อัปโหลด'}</span>
+                <span>${clip.uploaded ? '✓ อัปลง TikTok แล้ว' : '○ ยังไม่อัปลง TikTok'}</span>
             `;
             const rect = e.target.getBoundingClientRect();
             let left = rect.left;
@@ -1144,7 +1144,7 @@
                     <td>
                         <div class="upload-toggle ${clip.uploaded?'active':''}" onclick="toggleUpload('${clip.id}')">
                             <div class="toggle-switch"></div>
-                            <span class="upload-label">${clip.uploaded?'อัปโหลดแล้ว':'ยังไม่อัปโหลด'}</span>
+                            <span class="upload-label">${clip.uploaded?'อัปลง TikTok แล้ว':'ยังไม่อัปลง TikTok'}</span>
                         </div>
                     </td>
                     <td class="date-cell">${formatDate(clip.date)}</td>
@@ -1210,7 +1210,7 @@
 
         function toggleUpload(clipId) {
             const clip = clips.find(c=>c.id===clipId);
-            if(clip){ clip.uploaded=!clip.uploaded; syncClips(); render(); showToast(clip.uploaded?'อัปโหลดแล้ว ✓':'ยกเลิกอัปโหลด', clip.uploaded?'success':'info'); }
+            if(clip){ clip.uploaded=!clip.uploaded; syncClips(); render(); showToast(clip.uploaded?'อัปลง TikTok แล้ว ✓':'ยกเลิกอัปลง TikTok', clip.uploaded?'success':'info'); }
         }
 
         function openModal(editing = false) {
@@ -1281,7 +1281,7 @@
                 ['#','ชื่อคลิป','รายละเอียด','คนทำ','สถานะ','อัปโหลด','วันที่'].join(','),
                 ...clips.map((c,i)=>{
                     const creator = CREATORS.find(cr=>cr.id===c.creator);
-                    return [i+1,`"${c.title}"`,`"${c.desc||''}"`,creator?creator.name:'-',STATUSES[c.status].label,c.uploaded?'อัปโหลดแล้ว':'ยังไม่อัปโหลด',c.date].join(',');
+                    return [i+1,`"${c.title}"`,`"${c.desc||''}"`,creator?creator.name:'-',STATUSES[c.status].label,c.uploaded?'อัปลง TikTok แล้ว':'ยังไม่อัปลง TikTok',c.date].join(',');
                 })
             ].join('\n');
             const blob = new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'});
