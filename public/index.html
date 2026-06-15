@@ -399,10 +399,11 @@
         .modal {
             background:var(--bg-secondary);border:1px solid var(--glass-border);
             border-radius:var(--radius-xl);width:100%;max-width:520px;box-shadow:var(--shadow-lg);
-            transform:translateY(20px) scale(0.95);transition:all var(--transition-spring);overflow:hidden;
+            transform:translateY(20px) scale(0.95);transition:all var(--transition-spring);
+            display: flex; flex-direction: column; max-height: 90vh;
         }
         .modal-overlay.open .modal { transform:translateY(0) scale(1); }
-        .modal-header { display:flex;align-items:center;justify-content:space-between;padding:24px 28px 16px; }
+        .modal-header { display:flex;align-items:center;justify-content:space-between;padding:24px 28px 16px; flex-shrink: 0; }
         .modal-header h3 { font-size:1.15rem;font-weight:700;display:flex;align-items:center;gap:10px; }
         .modal-header h3 .material-icons-round { color:var(--accent-violet); }
         .modal-close {
@@ -411,7 +412,7 @@
             display:flex;align-items:center;justify-content:center;transition:all var(--transition-fast);
         }
         .modal-close:hover { background:rgba(244,63,94,0.15);color:var(--accent-rose); }
-        .modal-body { padding:8px 28px 28px;display:flex;flex-direction:column;gap:18px; }
+        .modal-body { padding:8px 28px 28px;display:flex;flex-direction:column;gap:18px; overflow-y: auto; }
         .form-group { display:flex;flex-direction:column;gap:6px; }
         .form-label { font-size:0.78rem;font-weight:600;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.04em; }
         .form-input,.form-select,.form-textarea {
@@ -429,7 +430,7 @@
         }
         .form-select option { background:var(--bg-secondary);color:var(--text-primary); }
         .form-textarea { resize:vertical;min-height:80px; }
-        .modal-footer { display:flex;gap:10px;justify-content:flex-end;padding:16px 28px 24px;border-top:1px solid var(--glass-border); }
+        .modal-footer { display:flex;gap:10px;justify-content:flex-end;padding:16px 28px 24px;border-top:1px solid var(--glass-border); flex-shrink: 0; }
 
         /* ============ EMPTY STATE ============ */
         .empty-state { text-align:center;padding:60px 24px; }
