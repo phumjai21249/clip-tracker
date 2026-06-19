@@ -284,6 +284,7 @@
         }
         .legend-item { display:flex;align-items:center;gap:6px;font-size:0.72rem;color:var(--text-secondary); }
         .legend-dot { width:8px;height:8px;border-radius:50%; }
+        .scroll-hint { display: none; }
 
         /* ============ TABLE CONTAINER ============ */
         .table-section {
@@ -489,17 +490,127 @@
 
         /* ============ RESPONSIVE ============ */
         @media(max-width:768px){
-            .app-container{padding:16px 16px 48px}
-            .header{flex-direction:column;align-items:flex-start}
-            .stats-bar{grid-template-columns:repeat(2,1fr)}
-            .filter-pills{flex-wrap:wrap}
-            .team-bar{flex-direction:column}
-            .calendar-cell{min-height:80px;padding:4px}
-            .cell-clip-item{font-size:0.6rem;padding:2px 4px}
-            .calendar-month-label{font-size:0.85rem;min-width:120px}
-        }
-        @media(max-width:480px){
-            .stats-bar{grid-template-columns:1fr}
+            .app-container { padding:12px 12px 32px; }
+            .header { flex-direction:column;align-items:flex-start;gap:14px;padding:12px 0 20px; }
+            .header-left { gap:12px; }
+            .logo-icon { width:44px;height:44px;font-size:24px; }
+            .header-title h1 { font-size:1.5rem; }
+            .header-actions {
+                width: 100%;
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 8px;
+            }
+            .header-actions #onlineBadge {
+                grid-column: span 2;
+                justify-content: center;
+            }
+            .header-actions .btn-primary {
+                grid-column: span 2;
+            }
+            .header-actions .btn {
+                padding: 8px 12px;
+                font-size: 0.8rem;
+                justify-content: center;
+                width: 100%;
+            }
+            .team-bar {
+                display: flex;
+                flex-direction: row !important;
+                overflow-x: auto;
+                padding-bottom: 8px;
+                gap: 10px;
+                scroll-behavior: smooth;
+                -webkit-overflow-scrolling: touch;
+            }
+            .team-member {
+                flex-shrink: 0;
+                padding: 6px 12px;
+            }
+            .stats-bar {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 8px;
+            }
+            .stat-card {
+                padding: 10px 14px;
+                gap: 8px;
+            }
+            .stat-card:nth-child(5) {
+                grid-column: span 2;
+            }
+            .stat-number {
+                font-size: 1.3rem;
+            }
+            .stat-label {
+                font-size: 0.68rem;
+            }
+            .calendar-header {
+                padding: 12px 16px;
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+            .calendar-nav {
+                width: 100%;
+                justify-content: space-between;
+            }
+            .calendar-month-label {
+                font-size: 0.85rem;
+                min-width: unset;
+                flex: 1;
+            }
+            .calendar-cell {
+                min-height: 80px;
+                padding: 4px;
+            }
+            .cell-clip-item {
+                font-size: 0.6rem;
+                padding: 2px 4px;
+            }
+            .table-header {
+                padding: 12px 16px;
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+            .filter-pills {
+                width: 100%;
+                display: flex;
+                flex-wrap: nowrap !important;
+                overflow-x: auto;
+                padding-bottom: 6px;
+                gap: 6px;
+                -webkit-overflow-scrolling: touch;
+            }
+            .filter-pill {
+                flex-shrink: 0;
+                padding: 5px 12px;
+                font-size: 0.72rem;
+            }
+            .modal {
+                max-height: 94vh;
+            }
+            .modal-header {
+                padding: 16px 20px 10px;
+            }
+            .modal-body {
+                padding: 8px 20px 20px;
+                gap: 12px;
+            }
+            .modal-footer {
+                padding: 12px 20px 16px;
+            }
+            .scroll-hint {
+                display: inline-flex !important;
+                align-items: center;
+                font-size: 0.7rem;
+                font-weight: 400;
+                color: var(--text-secondary);
+                background: rgba(255,255,255,0.05);
+                padding: 2px 8px;
+                border-radius: 4px;
+                margin-top: 4px;
+            }
         }
 
         /* ============ SCROLLBAR & SELECTION ============ */
@@ -596,6 +707,9 @@
                 <h2>
                     <span class="material-icons-round">calendar_month</span>
                     ตารางลงคลิปประจำเดือน
+                    <span class="scroll-hint">
+                        <span class="material-icons-round" style="font-size:12px; vertical-align:middle; margin-right:2px;">swipe</span> ปัดซ้าย-ขวาเพื่อเลื่อนตาราง
+                    </span>
                 </h2>
                 <div class="calendar-nav">
                     <button class="today-btn" onclick="calGoToday()">วันนี้</button>
