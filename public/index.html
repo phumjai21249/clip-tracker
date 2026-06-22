@@ -1358,8 +1358,8 @@
         function openModal(editing = false) {
             const overlay = document.getElementById('modalOverlay');
             overlay.classList.add('open');
-            removeCover(); // Reset cover image fields
             if(!editing){
+                removeCover(); // Reset cover image fields
                 editingClipId = null;
                 document.getElementById('modalTitle').textContent = 'เพิ่มคลิปใหม่';
                 document.getElementById('clipName').value = '';

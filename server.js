@@ -7,7 +7,8 @@ const admin = require('firebase-admin');
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
-    cors: { origin: '*' }
+    cors: { origin: '*' },
+    maxHttpBufferSize: 1e7 // 10 MB
 });
 
 const PORT = process.env.PORT || 3000;
