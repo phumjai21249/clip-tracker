@@ -64,12 +64,35 @@ function getDefaultTeam() {
     };
 }
 
-// Initialize data in Firestore if empty
+// Initialize data in Firestore if empty and handle migration
 async function initDB() {
     try {
         const clipsDoc = await clipsRef.get();
         if (!clipsDoc.exists) {
             await clipsRef.set({ data: getDefaultClips() });
+        } else {
+            // Check if there are coverImages inside the clipsDoc data, and migrate them to clipCovers if needed
+            const clipsData = clipsDoc.data().data || [];
+            const hasLegacyCovers = clipsData.some(c => c.coverImage);
+            if (hasLegacyCovers) {
+                console.log("Migrating legacy cover images to clipCovers collection...");
+                const batch = db.batch();
+                clipsData.forEach(clip => {
+                    if (clip.coverImage) {
+                        const ref = db.collection('clipCovers').doc(clip.id);
+                        batch.set(ref, { coverImage: clip.coverImage });
+                    }
+                });
+                await batch.commit();
+
+                // Strip coverImages from the main document to free up space
+                const cleanClips = clipsData.map(clip => {
+                    const { coverImage, ...rest } = clip;
+                    return rest;
+                });
+                await clipsRef.set({ data: cleanClips });
+                console.log("✅ Migration completed successfully!");
+            }
         }
         const teamDoc = await teamRef.get();
         if (!teamDoc.exists) {
@@ -93,19 +116,77 @@ io.on('connection', (socket) => {
     io.emit('online:count', onlineCount);
     console.log(`✅ User connected (${onlineCount} online)`);
 
-    // Send current data to new connection
-    Promise.all([clipsRef.get(), teamRef.get()]).then(([clipsDoc, teamDoc]) => {
+    // Send current data to new connection (merged with separate cover images)
+    Promise.all([
+        clipsRef.get(),
+        db.collection('clipCovers').get(),
+        teamRef.get()
+    ]).then(([clipsDoc, coversSnapshot, teamDoc]) => {
+        const covers = {};
+        coversSnapshot.forEach(doc => {
+            covers[doc.id] = doc.data().coverImage;
+        });
+        
+        const clips = clipsDoc.exists ? clipsDoc.data().data : [];
+        const mergedClips = clips.map(clip => ({
+            ...clip,
+            coverImage: covers[clip.id] || ""
+        }));
+
         socket.emit('init:data', {
-            clips: clipsDoc.exists ? clipsDoc.data().data : [],
+            clips: mergedClips,
             team: teamDoc.exists ? teamDoc.data().data : getDefaultTeam()
         });
     }).catch(e => console.error("Error loading init data:", e));
 
     // ---- CLIPS ----
-    socket.on('clips:update', async (clips) => {
+    socket.on('clips:update', async (updatedClips) => {
         try {
-            await clipsRef.set({ data: clips });
-            socket.broadcast.emit('clips:updated', clips);
+            // 1. Extract coverImages and strip them from clips array
+            const clipsToSave = [];
+            const coversToUpdate = [];
+            const idsInUpdated = new Set();
+
+            updatedClips.forEach(clip => {
+                idsInUpdated.add(clip.id);
+                const { coverImage, ...rest } = clip;
+                clipsToSave.push(rest);
+                
+                if (coverImage) {
+                    coversToUpdate.push({ id: clip.id, coverImage });
+                }
+            });
+
+            // 2. Save main clips document
+            await clipsRef.set({ data: clipsToSave });
+
+            // 3. Write covers to separate documents
+            if (coversToUpdate.length > 0) {
+                const batch = db.batch();
+                coversToUpdate.forEach(item => {
+                    const ref = db.collection('clipCovers').doc(item.id);
+                    batch.set(ref, { coverImage: item.coverImage });
+                });
+                await batch.commit();
+            }
+
+            // 4. Cleanup deleted clips or removed cover images
+            const coversSnapshot = await db.collection('clipCovers').get();
+            const deleteBatch = db.batch();
+            let hasDeletes = false;
+            coversSnapshot.forEach(doc => {
+                const clip = updatedClips.find(c => c.id === doc.id);
+                if (!clip || !clip.coverImage) {
+                    deleteBatch.delete(doc.ref);
+                    hasDeletes = true;
+                }
+            });
+            if (hasDeletes) {
+                await deleteBatch.commit();
+            }
+
+            // 5. Broadcast the original updatedClips (with coverImage inside) to other clients
+            socket.broadcast.emit('clips:updated', updatedClips);
         } catch (e) { console.error("Firebase save error (clips):", e); }
     });
 
