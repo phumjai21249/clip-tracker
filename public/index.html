@@ -953,6 +953,222 @@
         @media (prefers-reduced-motion: reduce) {
             *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
         }
+
+        /* ============================================================
+           18. TABS
+        ============================================================ */
+        .tab-bar {
+            display: flex; gap: 2px; margin-bottom: 22px;
+            border-bottom: 1px solid var(--border);
+            overflow-x: auto; -webkit-overflow-scrolling: touch;
+        }
+        .tab-btn {
+            display: inline-flex; align-items: center; gap: 8px;
+            padding: 12px 18px; flex-shrink: 0; position: relative;
+            background: none; border: none; cursor: pointer; outline: none;
+            font-family: inherit; font-size: 0.9rem; font-weight: 700;
+            color: var(--text-2);
+            border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+            transition: color var(--t-fast), background var(--t-fast);
+        }
+        .tab-btn .material-icons-round { font-size: 19px; }
+        .tab-btn:hover { color: var(--text); background: var(--surface-2); }
+        .tab-btn:focus-visible { box-shadow: 0 0 0 2px var(--brand); }
+        .tab-btn.active { color: var(--brand-text); }
+        .tab-btn.active::after {
+            content: ''; position: absolute; left: 12px; right: 12px; bottom: -1px;
+            height: 2px; background: var(--brand); border-radius: 2px 2px 0 0;
+        }
+        .tab-panel { display: none; }
+        .tab-panel.active { display: block; }
+
+        /* ============================================================
+           19. KPI DASHBOARD
+        ============================================================ */
+        .kpi-intro {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: var(--radius-lg); padding: 18px 22px; margin-bottom: 14px;
+            box-shadow: var(--shadow-sm);
+        }
+        .kpi-intro-head {
+            display: flex; align-items: center; justify-content: space-between;
+            gap: 14px; flex-wrap: wrap; margin-bottom: 8px;
+        }
+        .kpi-intro-head h2 { font-size: 1.15rem; font-weight: 800; letter-spacing: -0.01em; color: var(--text); }
+        .kpi-intro-sub { font-size: 0.78rem; line-height: 1.65; color: var(--text-2); }
+
+        .kpi-nav {
+            display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 22px;
+        }
+        .kpi-nav-chip {
+            padding: 6px 13px; border-radius: var(--radius-full);
+            border: 1px solid var(--border); background: var(--surface);
+            font-family: inherit; font-size: 0.75rem; font-weight: 700;
+            color: var(--text-2); cursor: pointer; outline: none;
+            transition: all var(--t-fast);
+        }
+        .kpi-nav-chip:hover { border-color: var(--brand); color: var(--brand-text); background: var(--brand-soft); }
+        .kpi-nav-chip:focus-visible { box-shadow: 0 0 0 2px var(--bg), 0 0 0 4px var(--brand); }
+
+        .kpi-body { padding: 20px 24px 24px; }
+        .kpi-body > h3 {
+            font-size: 0.9rem; font-weight: 800; color: var(--text);
+            margin: 28px 0 10px;
+        }
+        .kpi-body > h3:first-child { margin-top: 0; }
+        #tabKpi .lead { font-size: 0.82rem; line-height: 1.65; color: var(--text-2); margin-bottom: 16px; }
+        #tabKpi .note { font-size: 0.76rem; line-height: 1.55; color: var(--text-2); white-space: normal; }
+        /* .dim / .why carry real explanation, not decoration — keep them readable */
+        #tabKpi .dim { color: var(--text-2); }
+        #tabKpi .small { font-size: 0.7rem; }
+        #tabKpi .mono { font-variant-numeric: tabular-nums; }
+        #tabKpi .strong, #tabKpi td.strong { font-weight: 800; color: var(--text); }
+        #tabKpi .why {
+            font-size: 0.72rem; line-height: 1.5; color: var(--text-2);
+            max-width: 430px; white-space: normal; margin-top: 3px;
+        }
+        .kpi-footer {
+            font-size: 0.75rem; color: var(--text-2); text-align: center; padding: 4px 0 8px;
+        }
+
+        /* tables inside the KPI tab (override the tracker's clip-table rules) */
+        #tabKpi .tablewrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+        #tabKpi table { font-size: 0.82rem; }
+        #tabKpi thead th {
+            position: static; padding: 9px 12px;
+            text-transform: none; letter-spacing: 0; font-size: 0.72rem;
+            color: var(--text-2); background: var(--surface-2);
+        }
+        #tabKpi tbody td, #tabKpi tbody th {
+            padding: 9px 12px; font-size: 0.82rem; white-space: normal;
+            vertical-align: middle; border-bottom: 1px solid var(--border);
+        }
+        #tabKpi tbody th { text-align: left; font-weight: 700; color: var(--text); }
+        #tabKpi td.num, #tabKpi th.num {
+            text-align: right; white-space: nowrap;
+            font-family: 'Manrope', 'Noto Sans Thai', sans-serif; font-variant-numeric: tabular-nums;
+        }
+        #tabKpi td.tgt, #tabKpi td.ladder {
+            font-size: 0.76rem; white-space: nowrap;
+            font-variant-numeric: tabular-nums; color: var(--text-2);
+        }
+        #tabKpi td.ladder b { color: var(--text); }
+        #tabKpi td.chk { text-align: center; width: 54px; }
+        #tabKpi tbody tr.hi { background: var(--st-done-bg); }
+        #tabKpi tbody tr.hi:hover { background: var(--st-done-bg); }
+        #tabKpi tbody tr.hi th { color: var(--st-done-text); }
+        #tabKpi tbody tr.lo { background: var(--danger-bg); }
+        #tabKpi tbody tr.lo:hover { background: var(--danger-bg); }
+        #tabKpi tbody tr.lo th { color: var(--danger); }
+        #tabKpi tbody tr.goal { background: var(--brand-soft); }
+        #tabKpi tbody tr.goal:hover { background: var(--brand-soft); }
+        #tabKpi tbody tr.goal th { color: var(--brand-text); }
+
+        #tabKpi input[type=number] {
+            width: 100%; max-width: 118px; padding: 7px 10px;
+            border: 1px solid var(--border-strong); border-radius: var(--radius-sm);
+            background: var(--surface-2); color: var(--text);
+            font-family: 'Manrope', 'Noto Sans Thai', sans-serif; font-size: 0.82rem;
+            text-align: right; font-variant-numeric: tabular-nums; outline: none;
+            transition: border-color var(--t-fast), box-shadow var(--t-fast);
+        }
+        #tabKpi input[type=number]:focus { border-color: var(--brand); box-shadow: 0 0 0 3px var(--brand-soft); }
+        #tabKpi input[type=checkbox] { width: 18px; height: 18px; accent-color: var(--brand); cursor: pointer; }
+
+        /* score header */
+        .scorewrap {
+            display: flex; gap: 26px; align-items: center; flex-wrap: wrap;
+            background: var(--surface-2); border: 1px solid var(--border);
+            border-radius: var(--radius-lg); padding: 20px 24px; margin-bottom: 18px;
+        }
+        .bigscore {
+            font-size: 3.2rem; font-weight: 800; line-height: 1; letter-spacing: -0.03em;
+            color: var(--brand-text);
+            font-family: 'Manrope', 'Noto Sans Thai', sans-serif; font-variant-numeric: tabular-nums;
+        }
+        .bigscore small { font-size: 1rem; font-weight: 700; color: var(--text-3); letter-spacing: 0; }
+        .gradebox { font-size: 1.05rem; font-weight: 800; color: var(--text); margin-top: 4px; }
+        .grpbars { flex: 1; min-width: 300px; display: grid; gap: 8px; }
+        .grpbar {
+            display: grid; grid-template-columns: 165px 1fr 66px; gap: 12px;
+            align-items: center; font-size: 0.74rem; color: var(--text-2); font-weight: 600;
+        }
+        .grpbar .track { height: 8px; background: var(--surface-3); border-radius: var(--radius-full); overflow: hidden; }
+        .grpbar .fill { height: 100%; background: var(--brand); border-radius: var(--radius-full); }
+
+        /* headline metric tiles */
+        #tabKpi .kv { display: grid; grid-template-columns: repeat(auto-fit, minmax(178px, 1fr)); gap: 12px; }
+        #tabKpi .kv > div {
+            background: var(--surface-2); border: 1px solid var(--border);
+            border-radius: var(--radius-md); padding: 13px 16px;
+        }
+        #tabKpi .kv b {
+            display: block; font-size: 1.3rem; font-weight: 800; color: var(--text);
+            font-family: 'Manrope', 'Noto Sans Thai', sans-serif; font-variant-numeric: tabular-nums;
+            letter-spacing: -0.02em;
+        }
+        #tabKpi .kv span { font-size: 0.72rem; color: var(--text-2); line-height: 1.45; }
+
+        /* KPI groups */
+        .kpigrp { margin-top: 24px; }
+        .kpigrp > h3 {
+            font-size: 0.86rem; font-weight: 800; color: var(--brand-text);
+            margin-bottom: 8px;
+        }
+
+        /* findings & guardrails */
+        #tabKpi .sfind {
+            background: var(--brand-soft); border-radius: var(--radius-md);
+            padding: 13px 16px; margin: 10px 0;
+        }
+        #tabKpi .sfind h4 { font-size: 0.86rem; font-weight: 800; color: var(--brand-text); margin-bottom: 5px; }
+        #tabKpi .sfind .sev { font-size: 0.78rem; color: var(--text); margin-bottom: 5px; font-variant-numeric: tabular-nums; }
+        #tabKpi ul.guards { list-style: none; display: grid; gap: 10px; }
+        #tabKpi ul.guards li {
+            background: var(--danger-bg); border-radius: var(--radius-md); padding: 12px 16px;
+        }
+        #tabKpi ul.guards strong { display: block; font-size: 0.82rem; font-weight: 800; color: var(--text); margin-bottom: 3px; }
+        #tabKpi ul.guards span { font-size: 0.76rem; color: var(--text-2); line-height: 1.5; }
+
+        /* pills, bars, misc */
+        #tabKpi .pill {
+            display: inline-block; padding: 3px 10px; border-radius: var(--radius-full);
+            font-size: 0.7rem; font-weight: 700; white-space: nowrap;
+        }
+        #tabKpi .pill.good { background: var(--st-done-bg); color: var(--st-done-text); }
+        #tabKpi .pill.warn { background: var(--st-filming-bg); color: var(--st-filming-text); }
+        #tabKpi .pill.bad { background: var(--danger-bg); color: var(--danger); }
+        #tabKpi .barcell { min-width: 150px; }
+        #tabKpi .bar { display: block; height: 7px; border-radius: var(--radius-full); background: var(--brand); opacity: 0.8; }
+        #tabKpi .barlab { font-size: 0.7rem; color: var(--text-2); font-variant-numeric: tabular-nums; }
+        #tabKpi .sbar {
+            display: inline-block; height: 6px; border-radius: var(--radius-full);
+            background: var(--brand); opacity: 0.55; vertical-align: middle; margin-left: 5px;
+        }
+        #tabKpi .wk { font-weight: 800; color: var(--brand-text); white-space: nowrap; font-size: 0.76rem; }
+        #tabKpi .act { font-size: 0.8rem; }
+
+        .wkscore { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 14px; }
+        .wkscore > div {
+            background: var(--surface-2); border: 1px solid var(--border);
+            border-radius: var(--radius-md); padding: 10px 16px;
+            font-size: 0.74rem; color: var(--text-2); min-width: 108px; text-align: center;
+        }
+        .wkscore b {
+            display: block; font-size: 1.1rem; font-weight: 800; color: var(--text);
+            font-family: 'Manrope', 'Noto Sans Thai', sans-serif; font-variant-numeric: tabular-nums;
+        }
+        .wkscore .pass { border-color: var(--st-done); }
+        .wkscore .pass b { color: var(--st-done-text); }
+
+        @media (max-width: 768px) {
+            .tab-btn { padding: 11px 14px; font-size: 0.84rem; }
+            .kpi-intro { padding: 14px 16px; }
+            .kpi-body { padding: 16px 16px 20px; }
+            .bigscore { font-size: 2.6rem; }
+            .grpbar { grid-template-columns: 120px 1fr 58px; gap: 8px; font-size: 0.7rem; }
+            #tabKpi .why { max-width: none; }
+        }
     </style>
 </head>
 <body>
@@ -994,16 +1210,29 @@
                     <span class="material-icons-round">group</span>
                     ตั้งค่าทีม
                 </button>
-                <button class="btn" id="btnExport" onclick="exportData()">
+                <button class="btn clips-only" id="btnExport" onclick="exportData()">
                     <span class="material-icons-round">download</span>
                     ส่งออก CSV
                 </button>
-                <button class="btn btn-primary" id="btnAddClip" onclick="openModal()">
+                <button class="btn btn-primary clips-only" id="btnAddClip" onclick="openModal()">
                     <span class="material-icons-round">add</span>
                     เพิ่มคลิปใหม่
                 </button>
             </div>
         </header>
+
+        <!-- TABS -->
+        <nav class="tab-bar" role="tablist" aria-label="มุมมองหลัก">
+            <button type="button" class="tab-btn active" id="tabBtnClips" data-tab="Clips" role="tab" onclick="setTab('Clips')">
+                <span class="material-icons-round">list_alt</span> ติดตามคลิป
+            </button>
+            <button type="button" class="tab-btn" id="tabBtnKpi" data-tab="Kpi" role="tab" onclick="setTab('Kpi')">
+                <span class="material-icons-round">insights</span> KPI คอนเทนต์
+            </button>
+        </nav>
+
+        <!-- ===== TAB: CLIPS ===== -->
+        <div class="tab-panel active" id="tabClips">
 
         <!-- TEAM BAR -->
         <div class="team-bar" id="teamBar"></div>
@@ -1093,6 +1322,298 @@
                     <p id="emptyDesc">กดปุ่ม "เพิ่มคลิปใหม่" เพื่อเริ่มต้น</p>
                 </div>
             </div>
+        </div>
+        </div><!-- /tabClips -->
+
+        <!-- ===== TAB: KPI ===== -->
+        <div class="tab-panel" id="tabKpi">
+
+            <div class="kpi-intro">
+                <div class="kpi-intro-head">
+                    <h2>KPI ฝ่ายคอนเทนต์ — JS Sport Group</h2>
+                    <button class="btn" onclick="kpiReset()">
+                        <span class="material-icons-round">restart_alt</span> ล้างผลที่กรอก
+                    </button>
+                </div>
+                <p class="kpi-intro-sub">สิงหาคม 2026 (เดือนที่ 1) · เน้นครีเอทีฟ 42/100 คะแนน · 4 คลิป/วัน (JS 3 + ME 1) · ประชุมทุกวันจันทร์ · ยอดขาย กำไร แอด นายหน้า อยู่ในไฟล์ KPI ฝ่ายบริหารแยก · ข้อมูลจริงจาก TikTok Shop / TikTok Ads API ณ 24 ก.ค. 2026 · + TikTok Studio Overview CSV (@j.s.sport_shop) 31 ธ.ค. 2025 – 27 ก.ค. 2026 = 209 วัน</p>
+            </div>
+
+            <div class="kpi-nav" role="navigation" aria-label="ข้ามไปยังหัวข้อ">
+                <button type="button" class="kpi-nav-chip" onclick="kpiJump(1)">ภาพรวม & คะแนน</button>
+                <button type="button" class="kpi-nav-chip" onclick="kpiJump(2)">ตาราง KPI</button>
+                <button type="button" class="kpi-nav-chip" onclick="kpiJump(3)">เป้า 3 ระดับ</button>
+                <button type="button" class="kpi-nav-chip" onclick="kpiJump(4)">เช็กลิสต์รายสัปดาห์</button>
+                <button type="button" class="kpi-nav-chip" onclick="kpiJump(5)">ข้อมูลออร์แกนิก</button>
+                <button type="button" class="kpi-nav-chip" onclick="kpiJump(6)">ผลงานรายคลิป</button>
+                <button type="button" class="kpi-nav-chip" onclick="kpiJump(7)">คลิปที่ชนะ</button>
+                <button type="button" class="kpi-nav-chip" onclick="kpiJump(8)">Baseline ร้าน</button>
+                <button type="button" class="kpi-nav-chip" onclick="kpiJump(9)">Benchmark ตลาด</button>
+                <button type="button" class="kpi-nav-chip" onclick="kpiJump(10)">แยกตามฟอร์แมต</button>
+                <button type="button" class="kpi-nav-chip" onclick="kpiJump(11)">กติกา</button>
+                <button type="button" class="kpi-nav-chip" onclick="kpiJump(12)">ความเสี่ยง</button>
+                <button type="button" class="kpi-nav-chip" onclick="kpiJump(13)">แผน 4 สัปดาห์</button>
+                <button type="button" class="kpi-nav-chip" onclick="kpiJump(14)">แหล่งข้อมูล</button>
+            </div>
+
+            <div class="section-card" id="kpiSec1">
+                <div class="section-header">
+                    <h2><span class="material-icons-round">speed</span>ภาพรวมและคะแนน</h2>
+                </div>
+                <div class="kpi-body">
+<p class="lead">กรอกผลจริงในตารางด้านล่าง คะแนนจะคำนวณให้ทันที — ตัวเลขนี้ตรงกับสูตรในไฟล์ Excel</p>
+  <div class="scorewrap">
+    <div>
+      <div class="bigscore" id="score">0.0<small> / 100</small></div>
+      <div class="gradebox" id="grade">รอกรอกผล</div>
+    </div>
+    <div class="grpbars" id="grpbars"></div>
+  </div>
+  <div class="kv">
+    <div><b>24.5%</b><span>hook rate · เกณฑ์ Poor = ต่ำกว่า 25%</span></div>
+    <div><b>29.5%</b><span>hold rate · ร่วงจาก 36.7% เหลือ 24.7%</span></div>
+    <div><b>฿0.37</b><span>CPC · ก.ค. ฿0.55 แพงขึ้น 112%</span></div>
+    <div><b>2,238</b><span>median วิว/คลิป · ตลาด 3,240</span></div>
+    <div><b>0.87%</b><span>engagement rate · ตลาด 3.85%</span></div>
+  </div>
+                </div>
+            </div>
+
+            <div class="section-card" id="kpiSec2">
+                <div class="section-header">
+                    <h2><span class="material-icons-round">fact_check</span>ตาราง KPI (กรอกผลจริงได้)</h2>
+                </div>
+                <div class="kpi-body">
+<p class="lead">Min = ผ่านขั้นต่ำ (60% ของน้ำหนัก) · Target = ตามเป้า (85%) · Stretch = เกินเป้า (100%) · ระหว่างระดับคิดแบบเชิงเส้น
+  · ตัวชี้วัดแบบผ่าน/ไม่ผ่านให้กรอก 1 หรือ 0 · เกินเพดานคลิปตัดไลฟ์ (A3) หักคะแนนรวมเพิ่มอีก 5 คะแนน</p>
+  <div id="kpitables"></div>
+                </div>
+            </div>
+
+            <div class="section-card" id="kpiSec3">
+                <div class="section-header">
+                    <h2><span class="material-icons-round">flag</span>เป้าหมาย 3 ระดับ — รายวัน / รายสัปดาห์ / รายเดือน</h2>
+                </div>
+                <div class="kpi-body">
+<p class="lead">ตัวเลขทุกระดับสอดคล้องกัน: เป้ารายวัน × 30 = เป้าเดือน · เป้าเดือน ÷ 4.3 = เป้าสัปดาห์</p>
+  <div class="tablewrap"><table>
+    <thead><tr><th>รายการ</th><th>รายวัน</th><th>รายสัปดาห์</th><th>รายเดือน</th><th>KPI</th></tr></thead>
+    <tbody><tr><th scope='row'>คลิปผลิตใหม่รวม</th><td class='tgt'>4 คลิป (JS 3 + ME 1)</td><td class='tgt'>28 คลิป (JS 21 + ME 7)</td><td class='tgt strong'>120 คลิป (JS 90 + ME 30)</td><td class='mono dim'>A1 A2 A3</td></tr><tr><th scope='row'>คลิปที่ปักตะกร้า</th><td class='tgt'>≈ 1 คลิป (บางวัน 0)</td><td class='tgt'>≥ 8 คลิป</td><td class='tgt strong'>≥ 32 คลิป</td><td class='mono dim'>A5</td></tr><tr><th scope='row'>วันที่ทำครบโควตา</th><td class='tgt'>—</td><td class='tgt'>≥ 5 จาก 7 วัน</td><td class='tgt strong'>≥ 22 จาก 30 วัน</td><td class='mono dim'>A4</td></tr><tr><th scope='row'>คลิปตัดไลฟ์ (เพดาน)</th><td class='tgt'>≤ 1–2 คลิป</td><td class='tgt'>≤ 9 คลิป</td><td class='tgt strong'>≤ 40 คลิป</td><td class='mono dim'>A6</td></tr><tr><th scope='row'>วิวรวม</th><td class='tgt'>≈ 53,000 วิว</td><td class='tgt'>≥ 370,000 วิว</td><td class='tgt strong'>≥ 1,600,000 วิว</td><td class='mono dim'>B1</td></tr><tr><th scope='row'>คลิปที่ทำวิวถึง 10,000</th><td class='tgt'>—</td><td class='tgt'>≥ 7 คลิป</td><td class='tgt strong'>≥ 30 คลิป (25%)</td><td class='mono dim'>B3</td></tr><tr><th scope='row'>Hold rate (ดู 25% ÷ 2 วิ)</th><td class='tgt'>—</td><td class='tgt'>≥ 35%</td><td class='tgt strong'>≥ 40% (ฐาน 29.5%)</td><td class='mono dim'>C2</td></tr><tr><th scope='row'>Hook rate (2 วิ ÷ อิมเพรสชัน)</th><td class='tgt'>—</td><td class='tgt'>≥ 27%</td><td class='tgt strong'>≥ 30% (ฐาน 24.5%)</td><td class='mono dim'>C1</td></tr><tr><th scope='row'>CTR ครีเอทีฟแอด</th><td class='tgt'>—</td><td class='tgt'>≥ 4.0%</td><td class='tgt strong'>≥ 5.0% (ฐาน 4.37%)</td><td class='mono dim'>D3</td></tr><tr><th scope='row'>CPC</th><td class='tgt'>—</td><td class='tgt'>≤ ฿0.40</td><td class='tgt strong'>≤ ฿0.35 (ฐาน ฿0.37)</td><td class='mono dim'>D4</td></tr><tr><th scope='row'>ฮุกแบบใหม่ที่ทดสอบ</th><td class='tgt'>—</td><td class='tgt'>≥ 2 แบบ</td><td class='tgt strong'>≥ 6 แบบ (แบบละ ≥ 3 คลิป)</td><td class='mono dim'>E2</td></tr><tr><th scope='row'>คลิปฟอร์แมต &#x27;เปรียบเทียบ&#x27;</th><td class='tgt'>—</td><td class='tgt'>≥ 4 คลิป</td><td class='tgt strong'>≥ 18 คลิป (15%)</td><td class='mono dim'>E3</td></tr><tr><th scope='row'>คลิปฟอร์แมตทดลองใหม่</th><td class='tgt'>—</td><td class='tgt'>≥ 4 คลิป</td><td class='tgt strong'>3 ฟอร์แมต × 5 คลิป</td><td class='mono dim'>E1</td></tr><tr><th scope='row'>คลิปส่งเข้าคลังแอด</th><td class='tgt'>—</td><td class='tgt'>≥ 4 คลิป</td><td class='tgt strong'>≥ 16 คลิป</td><td class='mono dim'>F1</td></tr><tr><th scope='row'>ต่อยอดคลิป Top-3</th><td class='tgt'>—</td><td class='tgt'>≥ 2 เวอร์ชัน</td><td class='tgt strong'>ครบทั้ง 4 สัปดาห์</td><td class='mono dim'>E4</td></tr><tr><th scope='row'>ประชุมทบทวน</th><td class='tgt'>—</td><td class='tgt'>จันทร์ 30 นาที</td><td class='tgt strong'>ครบทุกสัปดาห์</td><td class='mono dim'>G1</td></tr></tbody>
+  </table></div>
+  <h3>ฐานปัจจุบันเทียบเป้า (คลิปต่อวัน)</h3>
+  <div class="tablewrap"><table>
+    <thead><tr><th>ช่วง</th><th class="num">ช่อง JS</th><th class="num">ช่อง ME</th><th class="num">รวม</th><th class="num">วันที่ลงครบ 4 คลิป</th></tr></thead>
+    <tbody><tr class=''><th scope='row'>พ.ค. 2026</th><td class='num'>1.94</td><td class='num'>1.55</td><td class='num strong'>3.48</td><td class='num'>10 / 31 วัน</td></tr><tr class=''><th scope='row'>มิ.ย. 2026</th><td class='num'>1.27</td><td class='num'>1.03</td><td class='num strong'>2.30</td><td class='num'>3 / 30 วัน</td></tr><tr class=''><th scope='row'>ก.ค. 2026 (1–24)</th><td class='num'>2.83</td><td class='num'>1.75</td><td class='num strong'>4.58</td><td class='num'>11 / 24 วัน</td></tr><tr class='goal'><th scope='row'>เป้า ส.ค. 2026</th><td class='num'>3.00</td><td class='num'>1.00</td><td class='num strong'>4.00</td><td class='num'>22 / 30 วัน</td></tr></tbody>
+  </table></div>
+  <p class="note dim" style="margin-top:8px">ช่อง ME ทำเกินเป้าอยู่แล้ว (1 คลิป/วันคือขั้นต่ำไม่ใช่เพดาน) · ช่อง JS ต้องขึ้นจาก ~2 เป็น 3 คลิป/วัน · แต่ตัวที่ต้องแก้จริงคือความสม่ำเสมอ — มีแค่ 8 วัน/เดือนโดยเฉลี่ยที่ลงครบ 4 คลิป</p>
+
+  <h3>เช็กลิสต์รายวัน (หัวหน้าทีมสุ่มเช็ก ไม่ต้องเข้าประชุม)</h3>
+  <div class="tablewrap"><table>
+    <thead><tr><th>รายการ</th><th>เป้าต่อวัน</th><th>วิธีเช็ก</th><th>เหตุผล / ฐานข้อมูล</th></tr></thead>
+    <tbody><tr><th scope='row'>คลิปลงใหม่ทั้งหมด</th><td class='tgt'>4 คลิป (JS 3 + ME 1)</td><td class='note'>นับใน Clip Tracker</td><td class='note dim'>ฐานปัจจุบัน 3.48 / 2.30 / 4.58 คลิปต่อวัน — เป้า 4 อยู่ในวิสัยที่ทำได้</td></tr><tr><th scope='row'>คลิปที่ปักตะกร้า</th><td class='tgt'>≈ 1 คลิป (บางวันไม่มีได้)</td><td class='note'>ดูว่าคลิปมีสินค้าติดหรือไม่</td><td class='note dim'>เกณฑ์ผู้บริหาร: JS 3 คลิปมีปัก 1 คลิป · ดูทั้งสัปดาห์แทนรายวัน (≥ 8 คลิป/สัปดาห์) เพราะบางวันไม่มีเป็นเรื่องปกติ</td></tr><tr><th scope='row'>ฮุก 3 วินาทีแรกต้องไม่ซ้ำของเมื่อวาน</th><td class='tgt'>ทุกคลิป</td><td class='note'>ดูแท็กฮุกใน Clip Tracker</td><td class='note dim'>Hook rate ทรงตัวที่ 24–26% แต่ hold rate ร่วง 39% — ต้องหาฮุกที่พาคนไปต่อได้ ไม่ใช่แค่หยุดนิ้ว</td></tr><tr><th scope='row'>คลิปต้องมี &#x27;เหตุผลให้ดูต่อ&#x27; ภายในวินาทีที่ 5</th><td class='tgt'>ทุกคลิป</td><td class='note'>หัวหน้าทีมดูก่อนโพสต์</td><td class='note dim'>★ ผ่านฮุกแล้วอยู่ต่อ (6s/2s) ร่วงจาก 38% เหลือ 25.3% — คนที่สนใจ 4 ใน 5 หนีก่อนวินาทีที่ 6</td></tr><tr><th scope='row'>ฟอร์แมตซ้ำกันในวันเดียว</th><td class='tgt'>≤ 2 คลิป</td><td class='note'>ดูแท็กฟอร์แมตใน Clip Tracker</td><td class='note dim'>กันวันที่ลง 4 คลิปแต่เป็น &#x27;ไซซ์/ฟิต&#x27; ทั้งหมด</td></tr><tr><th scope='row'>ตอบคอมเมนต์คลิปที่ลงวันนี้</th><td class='tgt'>ภายใน 12 ชม.</td><td class='note'>เช็กในแอป</td><td class='note dim'>คอมเมนต์ที่ถูกตอบดัน ER ซึ่งอยู่ที่ 0.87% เทียบตลาด 3.85%</td></tr><tr><th scope='row'>อัปเดต Clip Tracker</th><td class='tgt'>ครบทุกคลิป ก่อน 21:00</td><td class='note'>หัวหน้าทีมสุ่มเช็ก</td><td class='note dim'>ตัวชี้วัด A1–A6 E1–E3 นับจาก Clip Tracker ทั้งหมด</td></tr></tbody>
+  </table></div>
+                </div>
+            </div>
+
+            <div class="section-card" id="kpiSec4">
+                <div class="section-header">
+                    <h2><span class="material-icons-round">event_available</span>เช็กลิสต์รายสัปดาห์ + ประชุมวันจันทร์</h2>
+                </div>
+                <div class="kpi-body">
+<p class="lead">ติ๊กในประชุมวันจันทร์ · ผ่าน ≥ 9 จาก 12 ข้อ = สัปดาห์นั้นอยู่ในเกณฑ์ · ข้อไหนไม่ผ่านให้พูดถึงในช่วง 5 นาทีแรก</p>
+  <div class="tablewrap"><table>
+    <thead><tr><th>รายการที่ต้องเช็ก</th><th>เป้าต่อสัปดาห์</th><th>ส1</th><th>ส2</th><th>ส3</th><th>ส4</th><th>ส5</th><th>ที่มาของเป้า</th></tr></thead>
+    <tbody><tr><th scope='row'>คลิปผลิตใหม่รวม</th><td class='tgt'>28 คลิป (JS 21 + ME 7)</td><td class='chk'><input type='checkbox' class='wk1' aria-label='สัปดาห์ 1'></td><td class='chk'><input type='checkbox' class='wk2' aria-label='สัปดาห์ 2'></td><td class='chk'><input type='checkbox' class='wk3' aria-label='สัปดาห์ 3'></td><td class='chk'><input type='checkbox' class='wk4' aria-label='สัปดาห์ 4'></td><td class='chk'><input type='checkbox' class='wk5' aria-label='สัปดาห์ 5'></td><td class='note dim'>120 คลิป/เดือน ÷ 4.3 สัปดาห์</td></tr><tr><th scope='row'>วันที่ทำครบ 4 คลิป</th><td class='tgt'>≥ 5 จาก 7 วัน</td><td class='chk'><input type='checkbox' class='wk1' aria-label='สัปดาห์ 1'></td><td class='chk'><input type='checkbox' class='wk2' aria-label='สัปดาห์ 2'></td><td class='chk'><input type='checkbox' class='wk3' aria-label='สัปดาห์ 3'></td><td class='chk'><input type='checkbox' class='wk4' aria-label='สัปดาห์ 4'></td><td class='chk'><input type='checkbox' class='wk5' aria-label='สัปดาห์ 5'></td><td class='note dim'>เป้าเดือน 22 วัน ÷ 4.3</td></tr><tr><th scope='row'>คลิปที่ปักตะกร้า</th><td class='tgt'>≥ 8 คลิป (จาก 28)</td><td class='chk'><input type='checkbox' class='wk1' aria-label='สัปดาห์ 1'></td><td class='chk'><input type='checkbox' class='wk2' aria-label='สัปดาห์ 2'></td><td class='chk'><input type='checkbox' class='wk3' aria-label='สัปดาห์ 3'></td><td class='chk'><input type='checkbox' class='wk4' aria-label='สัปดาห์ 4'></td><td class='chk'><input type='checkbox' class='wk5' aria-label='สัปดาห์ 5'></td><td class='note dim'>เป้าเดือน 32 คลิป ÷ 4.3 สัปดาห์</td></tr><tr><th scope='row'>คลิปตัดไลฟ์</th><td class='tgt'>≤ 9 คลิป</td><td class='chk'><input type='checkbox' class='wk1' aria-label='สัปดาห์ 1'></td><td class='chk'><input type='checkbox' class='wk2' aria-label='สัปดาห์ 2'></td><td class='chk'><input type='checkbox' class='wk3' aria-label='สัปดาห์ 3'></td><td class='chk'><input type='checkbox' class='wk4' aria-label='สัปดาห์ 4'></td><td class='chk'><input type='checkbox' class='wk5' aria-label='สัปดาห์ 5'></td><td class='note dim'>เพดานเดือน 40 คลิป ÷ 4.3</td></tr><tr><th scope='row'>Hold rate ของครีเอทีฟที่ยิงแอด</th><td class='tgt'>≥ 10%</td><td class='chk'><input type='checkbox' class='wk1' aria-label='สัปดาห์ 1'></td><td class='chk'><input type='checkbox' class='wk2' aria-label='สัปดาห์ 2'></td><td class='chk'><input type='checkbox' class='wk3' aria-label='สัปดาห์ 3'></td><td class='chk'><input type='checkbox' class='wk4' aria-label='สัปดาห์ 4'></td><td class='chk'><input type='checkbox' class='wk5' aria-label='สัปดาห์ 5'></td><td class='note dim'>เป้าเดือน 11% (ฐาน 8.0%)</td></tr><tr><th scope='row'>ผ่านฮุกแล้วอยู่ต่อ (6s/2s)</th><td class='tgt'>≥ 35%</td><td class='chk'><input type='checkbox' class='wk1' aria-label='สัปดาห์ 1'></td><td class='chk'><input type='checkbox' class='wk2' aria-label='สัปดาห์ 2'></td><td class='chk'><input type='checkbox' class='wk3' aria-label='สัปดาห์ 3'></td><td class='chk'><input type='checkbox' class='wk4' aria-label='สัปดาห์ 4'></td><td class='chk'><input type='checkbox' class='wk5' aria-label='สัปดาห์ 5'></td><td class='note dim'>เป้าเดือน 38% (ฐาน 32.2%)</td></tr><tr><th scope='row'>CTR แอด</th><td class='tgt'>≥ 4.0%</td><td class='chk'><input type='checkbox' class='wk1' aria-label='สัปดาห์ 1'></td><td class='chk'><input type='checkbox' class='wk2' aria-label='สัปดาห์ 2'></td><td class='chk'><input type='checkbox' class='wk3' aria-label='สัปดาห์ 3'></td><td class='chk'><input type='checkbox' class='wk4' aria-label='สัปดาห์ 4'></td><td class='chk'><input type='checkbox' class='wk5' aria-label='สัปดาห์ 5'></td><td class='note dim'>เป้าเดือน 5.0% · ตกเกิน 20% จากสัปดาห์ก่อน = เปลี่ยนครีเอทีฟทันที</td></tr><tr><th scope='row'>CPC</th><td class='tgt'>≤ ฿0.40</td><td class='chk'><input type='checkbox' class='wk1' aria-label='สัปดาห์ 1'></td><td class='chk'><input type='checkbox' class='wk2' aria-label='สัปดาห์ 2'></td><td class='chk'><input type='checkbox' class='wk3' aria-label='สัปดาห์ 3'></td><td class='chk'><input type='checkbox' class='wk4' aria-label='สัปดาห์ 4'></td><td class='chk'><input type='checkbox' class='wk5' aria-label='สัปดาห์ 5'></td><td class='note dim'>เป้าเดือน ฿0.35 (ก.ค. ฿0.55)</td></tr><tr><th scope='row'>ฮุกแบบใหม่ที่ทดสอบ</th><td class='tgt'>≥ 2 แบบ (แบบละ ≥ 3 คลิป)</td><td class='chk'><input type='checkbox' class='wk1' aria-label='สัปดาห์ 1'></td><td class='chk'><input type='checkbox' class='wk2' aria-label='สัปดาห์ 2'></td><td class='chk'><input type='checkbox' class='wk3' aria-label='สัปดาห์ 3'></td><td class='chk'><input type='checkbox' class='wk4' aria-label='สัปดาห์ 4'></td><td class='chk'><input type='checkbox' class='wk5' aria-label='สัปดาห์ 5'></td><td class='note dim'>เป้าเดือน 6 แบบ (KPI E2)</td></tr><tr><th scope='row'>คลิปฟอร์แมต &#x27;เปรียบเทียบ&#x27;</th><td class='tgt'>≥ 4 คลิป</td><td class='chk'><input type='checkbox' class='wk1' aria-label='สัปดาห์ 1'></td><td class='chk'><input type='checkbox' class='wk2' aria-label='สัปดาห์ 2'></td><td class='chk'><input type='checkbox' class='wk3' aria-label='สัปดาห์ 3'></td><td class='chk'><input type='checkbox' class='wk4' aria-label='สัปดาห์ 4'></td><td class='chk'><input type='checkbox' class='wk5' aria-label='สัปดาห์ 5'></td><td class='note dim'>15% ของ 28 คลิป (KPI E3)</td></tr><tr><th scope='row'>คลิปที่ทำวิวถึง 10,000</th><td class='tgt'>≥ 6 คลิป</td><td class='chk'><input type='checkbox' class='wk1' aria-label='สัปดาห์ 1'></td><td class='chk'><input type='checkbox' class='wk2' aria-label='สัปดาห์ 2'></td><td class='chk'><input type='checkbox' class='wk3' aria-label='สัปดาห์ 3'></td><td class='chk'><input type='checkbox' class='wk4' aria-label='สัปดาห์ 4'></td><td class='chk'><input type='checkbox' class='wk5' aria-label='สัปดาห์ 5'></td><td class='note dim'>hit rate 25% × 28 คลิป</td></tr><tr><th scope='row'>คลิปส่งเข้าคลังแอด</th><td class='tgt'>≥ 4 คลิป</td><td class='chk'><input type='checkbox' class='wk1' aria-label='สัปดาห์ 1'></td><td class='chk'><input type='checkbox' class='wk2' aria-label='สัปดาห์ 2'></td><td class='chk'><input type='checkbox' class='wk3' aria-label='สัปดาห์ 3'></td><td class='chk'><input type='checkbox' class='wk4' aria-label='สัปดาห์ 4'></td><td class='chk'><input type='checkbox' class='wk5' aria-label='สัปดาห์ 5'></td><td class='note dim'>เป้าเดือน 16 คลิป ÷ 4.3</td></tr><tr><th scope='row'>ต่อยอดคลิป Top-3 ของสัปดาห์ก่อน</th><td class='tgt'>≥ 2 เวอร์ชัน</td><td class='chk'><input type='checkbox' class='wk1' aria-label='สัปดาห์ 1'></td><td class='chk'><input type='checkbox' class='wk2' aria-label='สัปดาห์ 2'></td><td class='chk'><input type='checkbox' class='wk3' aria-label='สัปดาห์ 3'></td><td class='chk'><input type='checkbox' class='wk4' aria-label='สัปดาห์ 4'></td><td class='chk'><input type='checkbox' class='wk5' aria-label='สัปดาห์ 5'></td><td class='note dim'>KPI E4</td></tr><tr><th scope='row'>บันทึก Test log ของฮุก/ฟอร์แมตที่ทดลอง</th><td class='tgt'>ครบทุกอัน</td><td class='chk'><input type='checkbox' class='wk1' aria-label='สัปดาห์ 1'></td><td class='chk'><input type='checkbox' class='wk2' aria-label='สัปดาห์ 2'></td><td class='chk'><input type='checkbox' class='wk3' aria-label='สัปดาห์ 3'></td><td class='chk'><input type='checkbox' class='wk4' aria-label='สัปดาห์ 4'></td><td class='chk'><input type='checkbox' class='wk5' aria-label='สัปดาห์ 5'></td><td class='note dim'>KPI E5</td></tr></tbody>
+  </table></div>
+  <div class="wkscore" id="wkscore"></div>
+
+  <h3>วาระประชุมวันจันทร์ 30 นาที</h3>
+  <div class="tablewrap"><table>
+    <thead><tr><th>ช่วงเวลา</th><th>หัวข้อ</th><th>สิ่งที่ต้องได้ออกมา</th></tr></thead>
+    <tbody><tr><td class='wk'>0–5 นาที</td><th scope='row' class='act'>อ่านตัวเลขจากเช็กลิสต์รายสัปดาห์</th><td class='note'>ติ๊กครบทุกช่อง · ข้อไหนไม่ผ่านให้ทำเครื่องหมายไว้ ยังไม่ต้องอธิบาย</td></tr><tr><td class='wk'>5–15 นาที</td><th scope='row' class='act'>เปิดดูคลิป Top 3 และ Bottom 3 พร้อมกราฟ retention ของแต่ละคลิป</th><td class='note'>★ คำถามบังคับ: &#x27;คนหลุดที่วินาทีไหน และก่อนหน้านั้นภาพเป็นอะไร&#x27; — จดเป็นประโยคเดียวเก็บเข้า Test log</td></tr><tr><td class='wk'>15–20 นาที</td><th scope='row' class='act'>ผลการทดสอบฮุกและฟอร์แมต</th><td class='note'>ฮุกที่ครบ 3 คลิปแล้ว: scale หรือ kill · เกณฑ์ kill = hold rate ต่ำกว่า 6%</td></tr><tr><td class='wk'>20–25 นาที</td><th scope='row' class='act'>สถานะครีเอทีฟแอด</th><td class='note'>ดู CTR + CPC สัปดาห์ล่าสุด · CTR ตกเกิน 20% หรือ CPC เกิน ฿0.45 = เปลี่ยนครีเอทีฟทันที</td></tr><tr><td class='wk'>25–30 นาที</td><th scope='row' class='act'>ตั้ง One Metric That Matters ของสัปดาห์ + ล็อกวันถ่าย batch</th><td class='note'>เดือนแรกแนะนำให้เลือก hold rate เป็นตัวหลัก เพราะเป็นคอขวดที่ชัดที่สุด</td></tr></tbody>
+  </table></div>
+                </div>
+            </div>
+
+            <div class="section-card" id="kpiSec5">
+                <div class="section-header">
+                    <h2><span class="material-icons-round">analytics</span>★ ข้อมูลออร์แกนิกทั้งช่อง (TikTok Studio) — ทุกคลิป ปักและไม่ปัก</h2>
+                </div>
+                <div class="kpi-body">
+<p class="lead">แหล่งใหม่ 29 ก.ค. 2026 · CSV รายวัน 209 วัน (31 ธ.ค. 2025 – 27 ก.ค. 2026) ของ @j.s.sport_shop
+  — ต่างจากตารางถัดไปที่มาจาก Shop API ซึ่งเห็นเฉพาะคลิปที่ปักตะกร้า</p>
+  <div class="tablewrap"><table>
+    <thead><tr><th>เดือน</th><th class="num">วัน</th><th class="num">วิวรวม</th><th class="num">วิว/วัน</th>
+    <th class="num">ER</th><th class="num">แชร์/1k</th><th class="num">ไลก์/1k</th><th class="num">คอม/1k</th><th class="num">โปรไฟล์/1k</th></tr></thead>
+    <tbody><tr class=""><th scope='row'>ม.ค. 2026</th><td class='num'>31</td><td class='num'>2,666,709</td><td class='num'><b>86,023</b> <span class='sbar' style='width:17px'></span></td><td class='num'>1.06%</td><td class='num'>0.47</td><td class='num'>10.02</td><td class='num'>0.094</td><td class='num'>3.57</td></tr><tr class=""><th scope='row'>ก.พ. 2026</th><td class='num'>28</td><td class='num'>6,965,808</td><td class='num'><b>248,779</b> <span class='sbar' style='width:50px'></span></td><td class='num'>0.65%</td><td class='num'>0.51</td><td class='num'>5.92</td><td class='num'>0.050</td><td class='num'>2.65</td></tr><tr class=""><th scope='row'>มี.ค. 2026</th><td class='num'>31</td><td class='num'>2,962,802</td><td class='num'><b>95,574</b> <span class='sbar' style='width:19px'></span></td><td class='num'>0.79%</td><td class='num'>0.66</td><td class='num'>7.18</td><td class='num'>0.056</td><td class='num'>3.44</td></tr><tr class=""><th scope='row'>เม.ย. 2026</th><td class='num'>30</td><td class='num'>1,962,143</td><td class='num'><b>65,405</b> <span class='sbar' style='width:13px'></span></td><td class='num'>1.01%</td><td class='num'>0.48</td><td class='num'>9.51</td><td class='num'>0.081</td><td class='num'>4.52</td></tr><tr class=""><th scope='row'>พ.ค. 2026</th><td class='num'>31</td><td class='num'>1,933,303</td><td class='num'><b>62,365</b> <span class='sbar' style='width:13px'></span></td><td class='num'>0.96%</td><td class='num'>1.02</td><td class='num'>8.51</td><td class='num'>0.080</td><td class='num'>5.76</td></tr><tr class=""><th scope='row'>มิ.ย. 2026</th><td class='num'>30</td><td class='num'>2,288,264</td><td class='num'><b>76,275</b> <span class='sbar' style='width:15px'></span></td><td class='num'>1.12%</td><td class='num'>0.82</td><td class='num'>10.32</td><td class='num'>0.079</td><td class='num'>5.11</td></tr><tr class="hi"><th scope='row'>ก.ค. 2026 (1–27)</th><td class='num'>27</td><td class='num'>3,285,996</td><td class='num'><b>121,704</b> <span class='sbar' style='width:24px'></span></td><td class='num'>1.29%</td><td class='num'>1.43</td><td class='num'>11.24</td><td class='num'>0.205</td><td class='num'>5.61</td></tr></tbody>
+  </table></div>
+  <h3>สิ่งที่ข้อมูลชุดนี้เปลี่ยนไปจากข้อสรุปเดิม</h3>
+  <div class='sfind'><h4>ก.ค. คือเดือนที่ดีที่สุด ไม่ใช่แย่ที่สุด</h4><p class='sev'>วิวทั้งช่อง 121,703/วัน สูงกว่า พ.ค. 95% · ER 1.29% สูงสุดในรอบ 7 เดือน · แชร์/1,000 วิว 1.43 สูงสุด · ทุกตัวชี้วัดการมีส่วนร่วมดีที่สุด</p><p class='note'>ข้อสรุปเดิมที่ว่า &#x27;ก.ค. เร่งปริมาณแล้วคุณภาพพัง&#x27; มาจากข้อมูล API ซึ่งเห็นเฉพาะคลิปที่ปักตะกร้า — และ ก.ค. มีคลิปตัดไลฟ์ 106 คลิป (วิวเฉลี่ย 212) ปักตะกร้าอยู่ในกองนั้น จึงถ่วง median ลง ขณะที่คลิปจริงกลับทำผลงานดีที่สุด</p></div><div class='sfind'><h4>คลิปตัดไลฟ์คือตัวถ่วง ไม่ใช่ปริมาณ</h4><p class='sev'>ช่องรับวิวได้ 3.29M ใน 27 วัน พร้อมกับผลิต 4.58 คลิป/วัน โดย ER ไม่ตก — แปลว่าปริมาณระดับนี้ช่องรับไหว</p><p class='note'>เพดานคลิปตัดไลฟ์ (KPI A6) จึงสำคัญกว่าการจำกัดปริมาณ · แก้จุดยืนเดิม: ไม่ต้องกลัวการผลิต 4 คลิป/วัน แต่ต้องกลัวการเอาคลิปตัดไลฟ์มานับเป็นคลิป</p></div><div class='sfind'><h4>ก.พ. 2026 คือเพดานที่พิสูจน์แล้ว</h4><p class='sev'>6.97M วิวใน 28 วัน (248,778/วัน) และนิ่งมาก (CV 0.13) — แต่ ER ต่ำสุดที่ 0.65% และโปรไฟล์วิวต่อ 1,000 วิว เหลือ 2.64 (ต่ำสุด)</p><p class='note'>วิวเยอะไม่ได้แปลว่าคนสนใจช่อง · ก.พ. ได้วิวกว้างแต่ตื้น · ปัจจุบันวิวน้อยกว่าครึ่งแต่คนสนใจช่องมากกว่า 2 เท่า — จึงต้องวัด ER (D1) และแชร์ (B5) คู่กับวิว (B1) เสมอ ไม่ใช่วัดวิวอย่างเดียว</p></div><div class='sfind'><h4>วันพฤหัสบดี ER สูงสุด · วันอังคารวิวสูงสุด</h4><p class='sev'>90 วันล่าสุด: พฤ. ER 1.46% (สูงกว่าค่าเฉลี่ยราว 40%) · อ. median 97,251 วิว · พ. ต่ำสุดทั้งวิวและ ER</p><p class='note'>ใช้จัดคิวคอนเทนต์: คลิปที่ตั้งใจให้เกิดการมีส่วนร่วม/แชร์ ลงพฤหัส · คลิปที่หวังวิวกว้าง ลงอังคาร · วันพุธเหมาะกับคลิปทดลอง เพราะเสียหายน้อยสุดถ้าพลาด</p></div><div class='sfind'><h4>ความสม่ำเสมอดีขึ้นชัดเจน</h4><p class='sev'>ค่าความผันผวนรายวัน (CV) ม.ค. 1.03 → เม.ย. 0.66 → มิ.ย. 0.42 → ก.ค. 0.22</p><p class='note'>เดือนแรก ๆ วิวมาจากคลิปดังไม่กี่ตัว (max/median 7.9 เท่า) · ก.ค. เหลือ 1.4 เท่า = ช่องมีฐานวิวประจำแล้ว ไม่ต้องรอคลิปแตก — เป็นสัญญาณว่าระบบการผลิตเริ่มทำงาน</p></div>
+  <p class="note dim" style="margin-top:10px">ยังขาด: ไฟล์ export แท็บ <b>Content</b> (ข้อมูลรายคลิป) — ต้องใช้รีเบสไลน์ KPI B2 median วิว, B3 hit rate, B4 คลิป ≥100K ซึ่งตอนนี้ยังใช้ฐานเก่าจากคลิปปักตะกร้าอยู่</p>
+                </div>
+            </div>
+
+            <div class="section-card" id="kpiSec6">
+                <div class="section-header">
+                    <h2><span class="material-icons-round">video_library</span>★ ผลงานรายคลิปจริง 252 คลิป (TikTok Studio → โพสต์)</h2>
+                </div>
+                <div class="kpi-body">
+<p class="lead">ดึงรายการโพสต์ทั้งหมดของ @j.s.sport_shop เดือน พ.ค.–ก.ค. 2026 ออกมานับเอง — ทุกคลิป ไม่ใช่เฉพาะคลิปที่ปักตะกร้า
+  <br><span class="note dim">นี่คือชุดข้อมูลที่ใช้รีเบสไลน์ KPI B2 (median วิว), B3 (hit rate), B4 (คลิป ≥100K) และ A2 (คลิปช่อง JS)</span></p>
+  <div class="tablewrap"><table>
+    <thead><tr><th>เดือน</th><th class="num">คลิป</th><th class="num">คลิป/วัน</th><th class="num">วิวรวม</th>
+    <th class="num">median</th><th class="num">mean</th><th class="num">≥10K</th><th class="num">≥50K</th><th class="num">≥100K</th><th class="num">ไลก์/1k</th></tr></thead>
+    <tbody><tr class=""><th scope='row'>พ.ค. 2026</th><td class='num'>85</td><td class='num'>2.74</td><td class='num'>1,019,360</td><td class='num'><b>1,902</b></td><td class='num'>11,992</td><td class='num'>18.8%</td><td class='num'>4.7%</td><td class='num'>3</td><td class='num'>9.39</td></tr><tr class=""><th scope='row'>มิ.ย. 2026</th><td class='num'>79</td><td class='num'>2.63</td><td class='num'>2,351,486</td><td class='num'><b>2,865</b></td><td class='num'>29,765</td><td class='num'>21.5%</td><td class='num'>11.4%</td><td class='num'>5</td><td class='num'>12.60</td></tr><tr class=""><th scope='row'>ก.ค. 2026 (1–29)</th><td class='num'>88</td><td class='num'>3.03</td><td class='num'>1,207,507</td><td class='num'><b>2,238</b></td><td class='num'>13,721</td><td class='num'>22.7%</td><td class='num'>9.1%</td><td class='num'>2</td><td class='num'>13.15</td></tr><tr class="hi"><th scope='row'>รวม / ฐานตั้งเป้า</th><td class='num'>252</td><td class='num'>2.80</td><td class='num'>4,578,353</td><td class='num'><b>2,238</b></td><td class='num'>18,168</td><td class='num'>21.0%</td><td class='num'>8.3%</td><td class='num'>10</td><td class='num'>12.03</td></tr></tbody>
+  </table></div>
+
+  <h3>★ ความยาวคลิป vs ผลงาน — ข้อสรุปเดิมกลับด้าน</h3>
+  <div class="tablewrap"><table>
+    <thead><tr><th>ช่วงความยาว</th><th class="num">n</th><th class="num">median วิว</th><th class="num">mean วิว</th>
+    <th class="num">≥10K</th><th class="num">ไลก์/1k</th><th>อ่านผล</th></tr></thead>
+    <tbody><tr class="lo"><th scope='row'>≤ 15 วินาที</th><td class='num'>51</td><td class='num'><b>1,872</b></td><td class='num'>10,925</td><td class='num'>15.7%</td><td class='num'>7.17</td><td class='note'>✕ แย่ที่สุดทั้ง median และ hit rate — สั้นเกินจนไม่มีอะไรให้จำ</td></tr><tr class=""><th scope='row'>15–25 วินาที</th><td class='num'>108</td><td class='num'><b>2,082</b></td><td class='num'>23,576</td><td class='num'>19.4%</td><td class='num'>10.66</td><td class='note'>ช่วงที่เราผลิตมากที่สุด (43%) แต่ผลงานกลาง ๆ</td></tr><tr class="hi"><th scope='row'>25–40 วินาที</th><td class='num'>46</td><td class='num'><b>3,353</b></td><td class='num'>14,991</td><td class='num'>26.1%</td><td class='num'>14.17</td><td class='note'>★ median สูงสุด + hit rate ดี — ควรเพิ่มสัดส่วนเป็นช่วงหลัก</td></tr><tr class=""><th scope='row'>40–70 วินาที</th><td class='num'>29</td><td class='num'><b>2,543</b></td><td class='num'>15,857</td><td class='num'>17.2%</td><td class='num'>9.60</td><td class='note'>กลาง ๆ ไม่ได้เปรียบ</td></tr><tr class="hi"><th scope='row'>&gt; 70 วินาที</th><td class='num'>18</td><td class='num'><b>2,644</b></td><td class='num'>18,079</td><td class='num'>38.9%</td><td class='num'>29.94</td><td class='note'>★ hit rate 38.9% และไลก์ต่อวิวสูงสุด 29.94 — แต่ n น้อย ให้ทดสอบเพิ่มก่อนสรุป</td></tr></tbody>
+  </table></div>
+
+  <h3>สิ่งที่ข้อมูลชุดนี้เปลี่ยน</h3>
+  <div class='sfind'><h4>★ ตัวเลข median ก.ค. ที่เคยรายงานว่า 288 วิว นั้นผิด — ค่าจริงคือ 2,238</h4><p class='sev'>จากคลิปจริง 88 ตัวที่โพสต์ใน ก.ค. median = 2,238 วิว · hit rate ≥10K = 22.7% สูงสุดในรอบ 3 เดือน</p><p class='note'>ตัวเลขเดิมมาจาก Shop API ซึ่งเห็นเฉพาะคลิปที่ปักตะกร้า และมีคลิปตัดไลฟ์ปนอยู่จำนวนมาก · ข้อสรุป &#x27;เร่งปริมาณแล้วคุณภาพพัง&#x27; จึงตกไปทั้งหมด — ก.ค. ดีขึ้นทั้ง median, hit rate และไลก์ต่อวิว</p></div><div class='sfind'><h4>★ ทีมผลิตเกือบ 3 คลิป/วันอยู่แล้ว ไม่ใช่ 1.9</h4><p class='sev'>ช่อง JS: พ.ค. 85 · มิ.ย. 79 · ก.ค. 88 คลิป = 2.63–3.03 คลิป/วัน (ฐานเดิมที่บันทึกไว้คือ 55 คลิป/เดือน)</p><p class='note'>เป้า 3 คลิป/วัน (90 คลิป) จึงห่างจากของจริงแค่ 2–11 คลิป · โจทย์ที่แท้จริงคือความสม่ำเสมอรายวันและคุณภาพต่อคลิป ไม่ใช่การเพิ่มปริมาณ</p></div><div class='sfind'><h4>★ ความยาวคลิป — ข้อสรุปเดิมกลับด้าน</h4><p class='sev'>คลิป ≤15 วินาที (n=51) median 1,872 วิว hit 15.7% ไลก์ 7.17/1k = แย่ที่สุด · คลิป 25–40 วินาที (n=46) median 3,353 hit 26.1% ไลก์ 14.17/1k = ดีที่สุด</p><p class='note'>เดิมเคยตั้งสมมติฐานจากตัวอย่าง 36 คลิปว่า &#x27;ยิ่งสั้นยิ่งดี&#x27; ซึ่งผิด · ตอนนี้เราผลิตช่วง 15–25 วินาทีมากที่สุด (43%) ซึ่งเป็นช่วงผลงานกลาง ๆ — ให้ย้ายน้ำหนักไป 25–40 วินาที และทดสอบคลิปยาว &gt;70 วินาทีเพิ่ม</p></div><div class='sfind'><h4>วิวกระจุกตัวสูงมาก</h4><p class='sev'>คลิป 10% บนสุดกินวิว 76.4% ของวิวทั้งหมด · P25 = 1,226 วิว · P50 = 2,238 · P75 = 8,947 · P90 = 43,700</p><p class='note'>จึงต้องใช้ median (B2) ไม่ใช่ค่าเฉลี่ย เป็นตัวชี้วัด · และเป็นเหตุผลที่ E4 (ต่อยอดคลิปที่ชนะ) สำคัญ — คลิปที่แตกไม่กี่ตัวเป็นตัวกำหนดผลทั้งเดือน</p></div>
+                </div>
+            </div>
+
+            <div class="section-card" id="kpiSec7">
+                <div class="section-header">
+                    <h2><span class="material-icons-round">emoji_events</span>★ โปรไฟล์คลิปที่ชนะ — 15 อันดับตลอดกาลของช่อง</h2>
+                </div>
+                <div class="kpi-body">
+<p class="lead">จาก TikTok Studio → Analytics → Content (29 ก.ค. 2026) · ทุกคลิปในตารางนี้ทำวิวเกิน 346,000
+  <br><span class="note dim">⚠ ไฟล์นี้ให้เฉพาะ 15 อันดับ ไม่ใช่คลิปทุกตัว จึงยังรีเบสไลน์ B2 median และ B3 hit rate ไม่ได้ — แต่ใช้เป็น "แบบของคลิปที่ชนะ" ได้</span></p>
+  <div class="tablewrap"><table>
+    <thead><tr><th class="num">#</th><th>คลิป</th><th class="num">โพสต์</th><th class="num">วิว</th>
+    <th class="num">ไลก์/1k</th><th class="num">คอม/1k</th><th class="num">แชร์/1k</th><th class="num">ER</th></tr></thead>
+    <tbody><tr class=""><td class='num'>1</td><th scope='row' style='font-weight:600;font-size:12.5px'>Pan Legenda Collection ใหม่ เจอกันแน่นอนที่ เจ.เอส.สปอร์ต</th><td class='num small'>27 มิ.ย. 2026</td><td class='num'><b>1,080,274</b> <span class='sbar' style='width:44px'></span></td><td class='num'>11.96</td><td class='num'>0.033</td><td class='num'>1.67</td><td class='num'>1.37%</td></tr><tr class=""><td class='num'>2</td><th scope='row' style='font-weight:600;font-size:12.5px'>สตั๊ดใหม่ไม่ต้องแพงก็เทพได้ Wingz Meta ราคาเบาแต่สปีดเกินราคา</th><td class='num small'>24 ม.ค. 2026</td><td class='num'><b>981,410</b> <span class='sbar' style='width:40px'></span></td><td class='num'>4.45</td><td class='num'>0.021</td><td class='num'>0.40</td><td class='num'>0.49%</td></tr><tr class=""><td class='num'>3</td><th scope='row' style='font-weight:600;font-size:12.5px'>ลดจริงไม่จกตา 4.4 นี้ เที่ยงตรงแน่นอน</th><td class='num small'>3 เม.ย. 2026</td><td class='num'><b>761,304</b> <span class='sbar' style='width:31px'></span></td><td class='num'>4.77</td><td class='num'>0.064</td><td class='num'>0.30</td><td class='num'>0.51%</td></tr><tr class=""><td class='num'>4</td><th scope='row' style='font-weight:600;font-size:12.5px'>มาแล้ววว รองเท้าฟุตซอล Pan รุ่น Nitro (ไซส์ 33–45)</th><td class='num small'>1 ก.ค. 2026</td><td class='num'><b>681,921</b> <span class='sbar' style='width:28px'></span></td><td class='num'>4.01</td><td class='num'>0.091</td><td class='num'>0.45</td><td class='num'>0.46%</td></tr><tr class=""><td class='num'>5</td><th scope='row' style='font-weight:600;font-size:12.5px'>รีวิวผู้ใช้จริง รองเท้าสตั๊ด Zeta Supernova ZWIFT พื้นหนึบ ทนทาน</th><td class='num small'>18 ก.พ. 2026</td><td class='num'><b>673,201</b> <span class='sbar' style='width:27px'></span></td><td class='num'>4.34</td><td class='num'>0.009</td><td class='num'>0.19</td><td class='num'>0.45%</td></tr><tr class=""><td class='num'>6</td><th scope='row' style='font-weight:600;font-size:12.5px'>เพิ่มสีใหม่มาอีกแล้วจ้า ใส่ก่อนหล่อก่อน Pan Nitro</th><td class='num small'>5 ก.พ. 2026</td><td class='num'><b>659,926</b> <span class='sbar' style='width:27px'></span></td><td class='num'>4.96</td><td class='num'>0.011</td><td class='num'>0.66</td><td class='num'>0.56%</td></tr><tr class=""><td class='num'>7</td><th scope='row' style='font-weight:600;font-size:12.5px'>เติมสีใหม่ให้แล้วจ้าาาา Pan Nitro ฟุตซอลสัมผัสนุ่ม สบายเท้า</th><td class='num small'>19 พ.ย. 2025</td><td class='num'><b>629,108</b> <span class='sbar' style='width:26px'></span></td><td class='num'>7.08</td><td class='num'>0.064</td><td class='num'>1.01</td><td class='num'>0.82%</td></tr><tr class=""><td class='num'>8</td><th scope='row' style='font-weight:600;font-size:12.5px'>นักฟุตซอลต้องจัด!! Wingz DESALA V.2 อัปเปอร์นุ่ม กระชับเท้า</th><td class='num small'>5 ก.พ. 2026</td><td class='num'><b>623,494</b> <span class='sbar' style='width:25px'></span></td><td class='num'>5.03</td><td class='num'>0.006</td><td class='num'>0.55</td><td class='num'>0.56%</td></tr><tr class=""><td class='num'>9</td><th scope='row' style='font-weight:600;font-size:12.5px'>พื้นหนึบ จบทุกจังหวะพลิก! Wingz Saga Corsa</th><td class='num small'>23 ม.ค. 2026</td><td class='num'><b>578,983</b> <span class='sbar' style='width:24px'></span></td><td class='num'>3.01</td><td class='num'>0.017</td><td class='num'>0.36</td><td class='num'>0.34%</td></tr><tr class=""><td class='num'>10</td><th scope='row' style='font-weight:600;font-size:12.5px'>Pan Legenda สัมผัสนุ่มสบายเท้า คอนโทรลบอลดีเยี่ยม</th><td class='num small'>10 ม.ค. 2026</td><td class='num'><b>561,226</b> <span class='sbar' style='width:23px'></span></td><td class='num'>5.34</td><td class='num'>0.011</td><td class='num'>0.51</td><td class='num'>0.59%</td></tr><tr class="hi"><td class='num'>11</td><th scope='row' style='font-weight:600;font-size:12.5px'>มาฟังโค้ชแจ้ สโมสรหนองบัวพิชญ เอฟซี รีวิว PAN SUPER SONIC</th><td class='num small'>8 พ.ย. 2025</td><td class='num'><b>503,174</b> <span class='sbar' style='width:20px'></span></td><td class='num'>12.46</td><td class='num'>0.022</td><td class='num'>0.23</td><td class='num'>1.27%</td></tr><tr class=""><td class='num'>12</td><th scope='row' style='font-weight:600;font-size:12.5px'>พร้อมกันรึยังคะ ใหม่ล่าสุด ราคาเบาสุด</th><td class='num small'>21 ม.ค. 2026</td><td class='num'><b>480,277</b> <span class='sbar' style='width:20px'></span></td><td class='num'>1.54</td><td class='num'>0.002</td><td class='num'>0.20</td><td class='num'>0.17%</td></tr><tr class=""><td class='num'>13</td><th scope='row' style='font-weight:600;font-size:12.5px'>ใส่แล้วนิ่ง ถือแล้วสวย Wingz Meta สตั๊ดเข้าใหม่</th><td class='num small'>23 ม.ค. 2026</td><td class='num'><b>445,566</b> <span class='sbar' style='width:18px'></span></td><td class='num'>6.93</td><td class='num'>0.085</td><td class='num'>0.33</td><td class='num'>0.74%</td></tr><tr class="hi"><td class='num'>14</td><th scope='row' style='font-weight:600;font-size:12.5px'>Wingz Mugen Pro มีให้เลือกถึง 6 สีแล้วน๊าา</th><td class='num small'>27 มิ.ย. 2026</td><td class='num'><b>428,565</b> <span class='sbar' style='width:17px'></span></td><td class='num'>5.01</td><td class='num'>0.240</td><td class='num'>0.91</td><td class='num'>0.62%</td></tr><tr class=""><td class='num'>15</td><th scope='row' style='font-weight:600;font-size:12.5px'>มัดใจใครไม่ได้หรอก เป็นคนเท่ห์ไม่ใช่เชือก Pan Syrus</th><td class='num small'>9 ส.ค. 2025</td><td class='num'><b>346,224</b> <span class='sbar' style='width:14px'></span></td><td class='num'>6.18</td><td class='num'>0.104</td><td class='num'>0.53</td><td class='num'>0.68%</td></tr></tbody>
+  </table></div>
+  <h3>อ่านผล — และสิ่งที่เอาไปทดสอบได้ทันที</h3>
+  <div class='sfind'><h4>ฟอร์แมตที่ทำวิวระดับล้านมีแบบเดียว: ของใหม่ / สีใหม่ / มาใหม่</h4><p class='sev'>12 ใน 15 คลิปคือการประกาศสินค้าใหม่ สีใหม่ หรือของเข้าใหม่ · อีก 3 คลิปคือ รีวิวผู้ใช้จริง 1 · โปรลดราคา 1 · โค้ชรีวิว 1</p><p class='note'>ตรงกับข้อมูล API ที่ฟอร์แมต &#x27;สินค้าใหม่/สีใหม่&#x27; ทำวิวดีที่สุด — ให้คงเป็นเสาหลักต่อไป และวางแผนคิวของเข้าใหม่ล่วงหน้าเป็นปฏิทิน ไม่ใช่รอของมาแล้วค่อยถ่าย</p></div><div class='sfind'><h4>แต่คลิปวิวล้านกลับมี ER แย่ที่สุด</h4><p class='sev'>คลิป 15 อันดับรวมกัน ER 0.66% ต่ำกว่าค่าเฉลี่ยทั้งช่อง 0.97% · ตัวที่วิว 480,277 มี ER แค่ 0.17% (ไลก์ 742 คน จากคนดูเกือบครึ่งล้าน)</p><p class='note'>วิวเยอะแปลว่า TikTok ดันไปหาคนนอกกลุ่ม ซึ่งดูผ่านแล้วผ่านเลย · ยืนยันว่าห้ามวัดวิวอย่างเดียว ต้องดู D1 (ER) และ B5 (แชร์) คู่กันเสมอ</p></div><div class='sfind'><h4>★ 2 คลิปที่แหกกฎ — คนจริงและตัวเลือก</h4><p class='sev'>อันดับ 11 &#x27;โค้ชแจ้รีวิว&#x27; ไลก์ 12.46 ต่อ 1,000 วิว = สูงสุดของทั้ง 15 คลิป (สูงกว่าค่ากลาง 2.5 เท่า) · อันดับ 14 &#x27;Mugen Pro มี 6 สีให้เลือก&#x27; คอมเมนต์ 0.240 ต่อ 1,000 วิว = สูงสุด สูงกว่าค่ากลาง 6 เท่า</p><p class='note'>★ นี่คือฮุก 2 แบบที่ควรเอาไปทดสอบใน KPI E2 ทันที: (1) ให้คนจริงที่มีตำแหน่งพูด — โค้ช นักเตะ ลูกค้าประจำ (2) เปิดคลิปด้วยตัวเลือกให้คนตอบ — &#x27;มี 6 สี เลือกสีไหน&#x27; ทำให้คนพิมพ์คอมเมนต์ ซึ่งเป็นสัญญาณที่อัลกอริทึมให้น้ำหนักสูง</p></div><div class='sfind'><h4>แชร์กระจุกอยู่ที่คลิปเปิดตัวคอลเลกชัน</h4><p class='sev'>อันดับ 1 (Pan Legenda Collection) แชร์ 1.67 ต่อ 1,000 วิว · อันดับ 7 (เติมสีใหม่ Pan Nitro) 1.01 · ทั้งสองเป็นคลิปแบบ &#x27;ของใหม่ทั้งชุด&#x27; ไม่ใช่สินค้าเดี่ยว</p><p class='note'>คนแชร์เพราะอยากบอกเพื่อนว่ามีของใหม่เข้า — คลิปสินค้าเดี่ยวแชร์น้อยกว่าครึ่ง · ถ้าอยากดัน B5 (แชร์/1,000 วิว) ให้ทำคลิปรวมคอลเลกชันเดือนละ 2–3 ตัว แทนที่จะแยกถ่ายทีละรุ่น</p></div><div class='sfind'><h4>คลิปเก่าจากปี 2025 ยังอยู่ใน 15 อันดับ</h4><p class='sev'>3 ใน 15 คลิปโพสต์ตั้งแต่ ส.ค.–พ.ย. 2025 และยังทำวิวสะสมได้ 346K–629K</p><p class='note'>ยืนยันว่าคลิปมีหางยาว วิวไม่ได้จบใน 7 วัน — เป็นเหตุผลที่ KPI ปิดคะแนนวันที่ 10 ของเดือนถัดไป และเป็นเหตุผลว่าทำไม B1 (วิวรวมทั้งช่อง) ถึงรวมวิวที่ไหลเข้าคลิปเก่าด้วย</p></div>
+                </div>
+            </div>
+
+            <div class="section-card" id="kpiSec8">
+                <div class="section-header">
+                    <h2><span class="material-icons-round">storefront</span>Baseline ข้อมูลจริงของร้าน</h2>
+                </div>
+                <div class="kpi-body">
+<p class="lead">ดึงจาก TikTok Shop Partner API และ TikTok Business API — ทุกตัวเลขวัดได้จริง</p>
+
+  <h3>คลิปช่องตัวเอง (@j.s.sport_shop + @mesport80) ที่ผูกร้าน JS</h3>
+  <div class="tablewrap"><table>
+    <thead><tr><th>ตัวชี้วัด</th><th class="num">พ.ค. 2026</th><th class="num">มิ.ย. 2026</th><th class="num">ก.ค. 2026 (1–24)</th><th class="num">ฐานที่ใช้ตั้งเป้า</th></tr></thead>
+    <tbody><tr><th scope='row'>จำนวนคลิปผลิตใหม่ (ไม่รวมตัดไลฟ์)</th><td class='num'>108</td><td class='num'>69</td><td class='num'>110</td><td class='num'>96</td></tr><tr><th scope='row'>จำนวนคลิปตัดไลฟ์ / รีโพสต์</th><td class='num'>57</td><td class='num'>0</td><td class='num'>106</td><td class='num'>54</td></tr><tr><th scope='row'>วิวรวม (คลิปผลิตใหม่)</th><td class='num'>1,865,133</td><td class='num'>1,215,625</td><td class='num'>652,387</td><td class='num'>1,244,382</td></tr><tr><th scope='row'>Median วิวต่อคลิป (เฉพาะคลิปปักตะกร้า)</th><td class='num'>1,095</td><td class='num'>1,773</td><td class='num'>288</td><td class='num'>1,038</td></tr><tr><th scope='row'>สัดส่วนคลิป ≥ 10,000 วิว</th><td class='num'>22.2%</td><td class='num'>30.4%</td><td class='num'>8.18%</td><td class='num'>18.8%</td></tr><tr><th scope='row'>สัดส่วนคลิป ≥ 50,000 วิว</th><td class='num'>10.2%</td><td class='num'>11.6%</td><td class='num'>4.55%</td><td class='num'>8.36%</td></tr><tr><th scope='row'>Engagement Rate (ไลก์+คอม+แชร์ / วิว)</th><td class='num'>0.74%</td><td class='num'>0.98%</td><td class='num'>1.04%</td><td class='num'>0.87%</td></tr><tr><th scope='row'>Weighted CTR (คลิก/อิมเพรสชันสินค้า)</th><td class='num'>5.57%</td><td class='num'>6.03%</td><td class='num'>6.52%</td><td class='num'>5.98%</td></tr></tbody>
+  </table></div>
+  <p class="note dim" style="margin-top:8px">ตัวเลข ก.ค. วัด ณ 24 ก.ค. คลิปจึงมีเวลาสะสมวิวสั้นกว่าเดือนอื่น — ค่าจริงน่าจะสูงกว่าที่แสดงเล็กน้อย</p>
+
+  <h3>★ ครีเอทีฟระดับวิดีโอ (TikTok Ads API) — ชุดข้อมูลใหม่</h3>
+  <div class="tablewrap"><table>
+    <thead><tr><th>ตัวชี้วัดครีเอทีฟ</th><th class="num">พ.ค. 2026</th><th class="num">มิ.ย. 2026</th><th class="num">ก.ค. (1–24)</th><th class="num">ฐานตั้งเป้า</th><th>อ่านผล</th></tr></thead>
+    <tbody><tr class="lo"><th scope='row'>Hook rate = 2 วิ ÷ อิมเพรสชัน (นิยามมาตรฐาน TikTok)</th><td class='num'>25.8%</td><td class='num'>24.9%</td><td class='num'>23.3%</td><td class='num'>24.5%</td><td class='note'>★ เกณฑ์สากล: ต่ำกว่า 25% = Poor · เราอยู่ที่ 24.5% และ ก.ค. เหลือ 23.3% = หลุดเกณฑ์แล้ว</td></tr><tr class="lo"><th scope='row'>Hold rate = ดู 25% ของคลิป ÷ 2 วิ (นิยามมาตรฐาน)</th><td class='num'>36.7%</td><td class='num'>29.2%</td><td class='num'>24.7%</td><td class='num'>29.5%</td><td class='note'>★ เกณฑ์สากล: 20–40% = Average · เราร่วงจาก 36.7% เหลือ 24.7% กำลังไหลลงหา Poor (&lt;20%)</td></tr><tr class=""><th scope='row'>Deep hold = 6 วิ ÷ 2 วิ</th><td class='num'>38.0%</td><td class='num'>36.0%</td><td class='num'>25.3%</td><td class='num'>32.2%</td><td class='note'>คนที่สนใจตอนแรก 4 ใน 5 หนีก่อนวินาทีที่ 6</td></tr><tr class=""><th scope='row'>ดูถึงครึ่งเรื่อง = p50 ÷ 2 วิ</th><td class='num'>16.7%</td><td class='num'>14.3%</td><td class='num'>10.1%</td><td class='num'>13.3%</td><td class='note'>ร่วง 40% — เนื้อกลางคลิปไม่มีน้ำหนักพอให้อยู่ต่อ</td></tr><tr class=""><th scope='row'>ดูจบทั้งคลิป (p100 ÷ play)</th><td class='num'>1.10%</td><td class='num'>1.00%</td><td class='num'>0.70%</td><td class='num'>0.89%</td><td class='note'>ต่ำมากทุกเดือน — คลิปยาวเกินหรือจบไม่คุ้มให้ดูต่อ</td></tr><tr class=""><th scope='row'>CTR แอด</th><td class='num'>6.77%</td><td class='num'>4.90%</td><td class='num'>2.48%</td><td class='num'>4.37%</td><td class='note'>ร่วง 63% ใน 2 เดือน ขณะอิมเพรสชันเพิ่ม 59%</td></tr><tr class="lo"><th scope='row'>CPC (ต้นทุนต่อคลิก)</th><td class='num'>฿0.263</td><td class='num'>฿0.361</td><td class='num'>฿0.549</td><td class='num'>฿0.366</td><td class='note'>★ แพงขึ้น 112% ทั้งที่ CPM ถูกลง 24% — ครีเอทีฟล้า ไม่ใช่ค่าโฆษณาแพงขึ้น</td></tr><tr class=""><th scope='row'>CPM (ต้นทุนต่อ 1,000 อิมเพรสชัน)</th><td class='num'>฿17.8</td><td class='num'>฿17.7</td><td class='num'>฿13.6</td><td class='num'>฿16.0</td><td class='note'>ลดลง 24% — ค่าสื่อไม่ใช่ปัญหา (ตัวนี้ไม่ใช่ KPI ของคอนเทนต์)</td></tr><tr class=""><th scope='row'>จำนวนครีเอทีฟที่หมุนใช้จริง</th><td class='num'>23</td><td class='num'>30</td><td class='num'>22</td><td class='num'>25</td><td class='note'>จากคลังสะสม 61 ตัว — วัตถุดิบไม่พอหมุน</td></tr></tbody>
+  </table></div>
+  <p class="note dim" style="margin-top:8px">วัดจากครีเอทีฟที่ยิงแอดจริง 23 / 30 / 22 ตัว — เป็นตัวแทนที่ดีเพราะเป็นคลิปที่ทีมคัดว่าดีที่สุดแล้ว · คลิปออร์แกนิกไม่มีข้อมูล watch-time ผ่าน API ต้องดูรายตัวใน Seller Center</p>
+
+  <h3>ครีเอทีฟแอด (เฉพาะตัวเลขฝั่งครีเอทีฟ — งบ ROI CPO อยู่ในไฟล์ฝ่ายบริหาร)</h3>
+  <div class="tablewrap"><table>
+    <thead><tr><th>ตัวชี้วัด</th><th class="num">พ.ค. 2026</th><th class="num">มิ.ย. 2026</th><th class="num">ก.ค. 2026 (1–24)</th></tr></thead>
+    <tbody><tr><th scope='row'>Auction — จำนวนครีเอทีฟที่มีการใช้จ่าย</th><td class='num'>23</td><td class='num'>30</td><td class='num'>22</td></tr><tr><th scope='row'>Auction — CTR</th><td class='num'>6.77%</td><td class='num'>4.90%</td><td class='num'>2.48%</td></tr><tr><th scope='row'>Auction — Impressions</th><td class='num'>1,335,046</td><td class='num'>1,514,382</td><td class='num'>2,121,310</td></tr></tbody>
+  </table></div>
+                </div>
+            </div>
+
+            <div class="section-card" id="kpiSec9">
+                <div class="section-header">
+                    <h2><span class="material-icons-round">compare_arrows</span>เทียบ Benchmark ตลาด 2026</h2>
+                </div>
+                <div class="kpi-body">
+<p class="lead">สรุปสั้น: เราชนะเรื่องปริมาณและการปิดการขาย แต่แพ้เรื่องคุณภาพครีเอทีฟ — KPI ชุดนี้จึงให้น้ำหนักปริมาณ 18 คะแนน และครีเอทีฟ (hook / hold / CTR / CPC) 42 คะแนน</p>
+  <div class="tablewrap"><table>
+    <thead><tr><th>ตัวชี้วัด</th><th>ร้านเรา</th><th>Benchmark ตลาด</th><th>สถานะ</th><th>อ่านผลอย่างไร</th></tr></thead>
+    <tbody><tr><th scope='row'>จำนวนโพสต์/เดือน</th><td class='mono'>96–166 คลิป</td><td class='mono dim'>16–23 โพสต์ (บัญชี 10K–1M ผู้ติดตาม)</td><td><span class='pill good'>สูงกว่ามาก</span></td><td class='note'>ปริมาณไม่ใช่ปัญหา — เราผลิตมากกว่าค่ากลาง 4–7 เท่า</td></tr><tr><th scope='row'>Median วิวต่อคลิป</th><td class='mono'>2,238 วิว</td><td class='mono dim'>3,240 วิว (บัญชี 10–50K ผู้ติดตาม)</td><td><span class='pill bad'>ต่ำกว่า 3 เท่า</span></td><td class='note'>คลิปส่วนใหญ่ไม่ถูกดันเข้า FYP — คุณภาพ/ฮุกคือคอขวด</td></tr><tr><th scope='row'>Engagement Rate (ต่อวิว)</th><td class='mono'>0.87%</td><td class='mono dim'>3.85% (ค่าเฉลี่ยแพลตฟอร์ม Q2/2026)</td><td><span class='pill bad'>ต่ำกว่า 4.4 เท่า</span></td><td class='note'>จุดอ่อนใหญ่สุด — คนดูแล้วไม่มีปฏิสัมพันธ์ = สัญญาณลบต่ออัลกอ</td></tr><tr><th scope='row'>CTR คลิป → สินค้า</th><td class='mono'>5.98% (ช่องเรา) / 7.1–7.4% (ทั้งร้าน)</td><td class='mono dim'>2–3% ขึ้นไป = ดีพอที่จะยิงแอด</td><td><span class='pill good'>สูงกว่า 2–3 เท่า</span></td><td class='note'>คนที่ดูจนจบสนใจซื้อจริง — ของดี แต่คนดูน้อยเกินไป</td></tr><tr><th scope='row'>CTR แอด</th><td class='mono'>2.48% (ก.ค.) ลดจาก 6.77% (พ.ค.)</td><td class='mono dim'>Sports &amp; Outdoors 0.52% · Apparel 0.69%</td><td><span class='pill warn'>สูงกว่าเกณฑ์ แต่กำลังร่วง</span></td><td class='note'>Creative fatigue ชัดเจน — CTR ร่วง 63% ใน 2 เดือน ขณะอิมเพรสชันเพิ่ม 59%</td></tr><tr><th scope='row'>Hook rate (2 วิ ÷ อิมเพรสชัน)</th><td class='mono'>24.46% (ก.ค. 23.29%)</td><td class='mono dim'>Poor &lt;25% · Average 25–30% · Good 30–40% · Excellent 40%+</td><td><span class='pill good'>หลุดเกณฑ์ Poor</span></td><td class='note'>★ ฮุกของเราต่ำกว่าเกณฑ์ขั้นต่ำของอุตสาหกรรมแล้ว — 3 วินาทีแรกคืองานด่วนที่สุด</td></tr><tr><th scope='row'>Hold rate (ดู 25% ÷ 2 วิ)</th><td class='mono'>29.5% (พ.ค. 36.7% → ก.ค. 24.7%)</td><td class='mono dim'>Poor &lt;20% · Average 20–40% · Good 40–60% · Excellent 60%+</td><td><span class='pill good'>อยู่กลุ่ม Average แต่กำลังไหลลง</span></td><td class='note'>★ ร่วง 12 จุดใน 2 เดือน ถ้าเทรนด์เดิมอีก 2 เดือนจะหลุดเป็น Poor</td></tr><tr><th scope='row'>CPC ครีเอทีฟแอด</th><td class='mono'>฿0.366 (ก.ค. ฿0.549)</td><td class='mono dim'>ไม่มีเกณฑ์กลางสำหรับตลาดไทย — ใช้ผลงานตัวเองเป็นฐาน</td><td><span class='pill good'>แย่ลง 112%</span></td><td class='note'>CPM ลด 24% แต่ CPC เพิ่ม 112% = ต้นทุนที่แพงขึ้นมาจากครีเอทีฟล้วน</td></tr></tbody>
+  </table></div>
+                </div>
+            </div>
+
+            <div class="section-card" id="kpiSec10">
+                <div class="section-header">
+                    <h2><span class="material-icons-round">category</span>ผลงานแยกตามฟอร์แมตคอนเทนต์</h2>
+                </div>
+                <div class="kpi-body">
+<p class="lead">คลิปช่องตัวเอง พ.ค.–ก.ค. 2026 · จัดกลุ่มจากคีย์เวิร์ดในแคปชัน (คลิปหนึ่งอยู่ได้หลายกลุ่ม)</p>
+  <div class="tablewrap"><table>
+    <thead><tr><th>ฟอร์แมต</th><th class="num">n</th><th>วิวเฉลี่ย/คลิป</th><th class="num">ER</th><th class="num">Hit ≥10K</th><th>อ่านผล / สิ่งที่ต้องทำ</th></tr></thead>
+    <tbody><tr class=''><th scope='row'>สินค้าใหม่ / สีใหม่ / มาใหม่</th><td class='num'>50</td><td class='barcell'><span class='bar' style='width:100.0%'></span><span class='barlab'>29,632</span></td><td class='num'>1.04%</td><td class='num'>44%</td><td class='note'>ตัวทำวิวดีที่สุด + hit rate สูงสุด — ควรคงไว้เป็นเสาหลัก</td></tr><tr class=''><th scope='row'>รีวิว / แกะกล่อง</th><td class='num'>75</td><td class='barcell'><span class='bar' style='width:90.7%'></span><span class='barlab'>26,881</span></td><td class='num'>0.89%</td><td class='num'>33%</td><td class='note'>วิวดี แต่ปิดการขายอ่อน — ต้องเติม CTA + ปักตะกร้าให้ตรงรุ่น</td></tr><tr class=''><th scope='row'>ไซซ์ / ฟิต / เลือกเบอร์</th><td class='num'>187</td><td class='barcell'><span class='bar' style='width:65.2%'></span><span class='barlab'>19,307</span></td><td class='num'>0.81%</td><td class='num'>27%</td><td class='note'>ผลิตเยอะสุด (65%) ผลกลาง ๆ — เสี่ยงคอนเทนต์ซ้ำจนคนเบื่อ</td></tr><tr class=''><th scope='row'>โปรโมชัน / ลดราคา</th><td class='num'>38</td><td class='barcell'><span class='bar' style='width:58.2%'></span><span class='barlab'>17,242</span></td><td class='num'>0.71%</td><td class='num'>26%</td><td class='note'>ER ต่ำสุดที่ 0.71% — คลิปลดราคาไม่ได้ทำให้คนมีส่วนร่วมมากขึ้น</td></tr><tr class='hi'><th scope='row'>เปรียบเทียบ / อธิบายความต่าง</th><td class='num'>14</td><td class='barcell'><span class='bar' style='width:48.7%'></span><span class='barlab'>14,431</span></td><td class='num'>3.15%</td><td class='num'>36%</td><td class='note'>★ ER 3.15% สูงกว่าค่าเฉลี่ยช่อง 3.6 เท่า แต่ผลิตแค่ 4.9% — ช่องว่างใหญ่สุด</td></tr><tr class=''><th scope='row'>สอน / ทิปส์ / ดูแลรองเท้า</th><td class='num'>26</td><td class='barcell'><span class='bar' style='width:30.2%'></span><span class='barlab'>8,949</span></td><td class='num'>1.20%</td><td class='num'>19%</td><td class='note'>ER ดี แต่ไม่ทำเงิน — ใช้เป็นคอนเทนต์สร้างฐาน ไม่ใช่ตัวขาย</td></tr><tr class='lo'><th scope='row'>คลิปตัดไลฟ์ / รีโพสต์ไลฟ์</th><td class='num'>163</td><td class='barcell'><span class='bar' style='width:1.2%'></span><span class='barlab'>212</span></td><td class='num'>0.24%</td><td class='num'>0%</td><td class='note'>✕ 36% ของคลิปทั้งหมด แต่วิวเฉลี่ยแค่ 212 — งานเปล่า</td></tr></tbody>
+  </table></div>
+  <h3>สัดส่วนที่แนะนำสำหรับเดือนที่ 1 (จาก 120 คลิป)</h3>
+  <div class="tablewrap"><table>
+    <thead><tr><th>ฟอร์แมต</th><th class="num">สัดส่วน</th><th class="num">จำนวน</th><th>เหตุผล</th></tr></thead>
+    <tbody>
+      <tr><th scope="row">สินค้าใหม่ / สีใหม่</th><td class="num">25%</td><td class="num">≈28</td><td class="note">hit rate สูงสุด 44% — เสาหลักของช่อง</td></tr>
+      <tr><th scope="row">เปรียบเทียบ / อธิบายความต่าง</th><td class="num">15%</td><td class="num">≈17</td><td class="note">ER สูงสุด 3.15% · ปัจจุบันทำแค่ 4.9% (KPI E3)</td></tr>
+      <tr><th scope="row">ไซซ์ / ฟิต / เลือกเบอร์</th><td class="num">20%</td><td class="num">≈22</td><td class="note">ลดจาก 65% เดิม เพื่อกันคนดูเบื่อ</td></tr>
+      <tr><th scope="row">รีวิว / แกะกล่อง (เติม CTA)</th><td class="num">15%</td><td class="num">≈17</td><td class="note">วิวดีอยู่แล้ว ต้องแก้ที่ฮุกและการดึงคนอยู่</td></tr>
+      <tr><th scope="row">ฟอร์แมตทดลองใหม่</th><td class="num">15%</td><td class="num">≈17</td><td class="note">3 ฟอร์แมต × 5 คลิป (KPI D1)</td></tr>
+      <tr><th scope="row">สอน / ทิปส์ / สร้างฐาน</th><td class="num">10%</td><td class="num">≈11</td><td class="note">ER ดี ใช้เลี้ยงคอมมูนิตี้</td></tr>
+    </tbody>
+  </table></div>
+                </div>
+            </div>
+
+            <div class="section-card" id="kpiSec11">
+                <div class="section-header">
+                    <h2><span class="material-icons-round">gpp_maybe</span>กติกา (Guardrails)</h2>
+                </div>
+                <div class="kpi-body">
+<p class="lead">KPI ที่ไม่มีกติกาจะถูกเล่นเสมอ — ข้อเหล่านี้กันไม่ให้ตัวเลขสวยแต่ธุรกิจแย่ลง</p>
+  <ul class="guards"><li><strong>ห้ามลงคลิปย้อนหลังรวบยอดเพื่อให้ครบโควตารายวัน — วันไหนไม่ครบคือไม่ครบ</strong><span>โควตา 4 คลิป/วันมีไว้เพื่อความสม่ำเสมอ ไม่ใช่ยอดรวม · ก.ค. มีวันที่ลงทีเดียว 21 คลิป แล้ววิวเฉลี่ยต่อคลิปตกลง เพราะคลิปแย่งกันเองในฟีด</span></li><li><strong>ห้ามนับคลิปตัดไลฟ์ รีโพสต์ สไลด์ภาพนิ่ง หรือคลิปที่ลบ/ซ่อนภายใน 14 วัน เป็นคลิปผลิตใหม่ (A1)</strong><span>กัน KPI ปริมาณถูกปั่นด้วยงานที่ไม่สร้างผล — คลิปตัดไลฟ์ 163 คลิปทำวิวเฉลี่ยแค่ 212 วิว</span></li><li><strong>ห้ามซื้อวิว ซื้อไลก์ หรือใช้บัญชีปั่นเอนเกจ</strong><span>เอนเกจปลอมทำให้อัลกอเรียนรู้ผู้ชมผิดกลุ่ม และเสี่ยงถูกจำกัดการมองเห็นทั้งช่อง</span></li><li><strong>ห้ามใช้ตัวเลขปลายทางเป็นเหตุผลตำหนิฝ่ายคอนเทนต์ — ทั้งหมดย้ายไปเป็น KPI ฝ่ายบริหารแล้ว</strong><span>ผลลัพธ์ปลายทาง = วิว × CTR × อัตราปิดการขาย × มูลค่าต่อบิล ซึ่งคอนเทนต์คุมได้แค่ 2 ตัวแรก · ถ้ากดดันด้วยตัวเลขปลายทาง ทีมจะแห่ทำคลิปลดราคา ซึ่งข้อมูลชี้ว่ามี ER ต่ำสุดที่ 0.71%</span></li><li><strong>ห้ามบังคับปักตะกร้าทุกคลิปเพื่อให้ตัวเลขสวย</strong><span>A5 นับเป็น &#x27;จำนวนคลิป&#x27; ไม่ใช่ &#x27;%&#x27; โดยตั้งใจ — ปักครบทุกคลิปไม่ได้คะแนนเพิ่ม และคลิปที่ไม่ปักคือพื้นที่ทดลองฮุกใหม่ที่ทำให้ KPI กลุ่ม C ขยับ</span></li><li><strong>ห้ามยืดคลิปให้ยาวเพื่อดัน watch time รวม</strong><span>KPI ใช้ &#x27;อัตราส่วน&#x27; (hold rate, 6s/2s, p50) ไม่ใช่วินาทีรวม — คลิปยาวที่คนดูไม่จบจะทำให้ตัวเลขแย่ลง ไม่ใช่ดีขึ้น</span></li><li><strong>คลิปที่ยิงแอดอยู่ ต้องไม่ถูกลบ/แก้ไขโดยไม่แจ้งฝ่ายแอด</strong><span>ครีเอทีฟที่ถูกลบทำให้แอดหยุดกลางคัน และเสีย learning phase ทั้งชุด</span></li><li><strong>Vanity metric (ผู้ติดตาม, ยอดไลก์รวม) ไม่ถูกใช้ตัดสิน KPI เดือนนี้</strong><span>ผู้ติดตามโตช้าและถูกซื้อได้ ในขณะที่ CTR / hold rate / แชร์ สะท้อนคุณภาพครีเอทีฟจริง</span></li></ul>
+                </div>
+            </div>
+
+            <div class="section-card" id="kpiSec12">
+                <div class="section-header">
+                    <h2><span class="material-icons-round">warning_amber</span>ความเสี่ยงและวิธีรับมือ</h2>
+                </div>
+                <div class="kpi-body">
+<div class="tablewrap"><table>
+    <thead><tr><th>ความเสี่ยง</th><th>เกิดจากอะไร</th><th>วิธีรับมือ</th></tr></thead>
+    <tbody><tr><th scope='row'>★ เอาคลิปตัดไลฟ์มาเติมโควตา 4 คลิป/วัน</th><td class='note'>คลิปตัดไลฟ์ทำวิวเฉลี่ยแค่ 212 และ ก.ค. มีถึง 106 คลิป — เป็นตัวที่ทำให้ median ของเฉพาะ &#x27;คลิปที่ปักตะกร้า&#x27; ร่วงเหลือ 288 ขณะที่ median ของคลิปจริงทั้งหมดคือ 2,238 และวิวทั้งช่องขึ้นสูงสุดในรอบ 7 เดือน</td><td class='note'>A6 เพดานคลิปตัดไลฟ์ 40 คลิป เกินหักคะแนนรวม 5 · และ A1 ไม่นับคลิปตัดไลฟ์เป็นคลิปผลิตใหม่ · ใช้ B2 median กับ B3 hit rate เป็นเบรกคู่ (12 คะแนน เท่ากับน้ำหนักปริมาณ A1+A2+A3 พอดี)</td></tr><tr><th scope='row'>หมดแรงส่งจากฟุตบอลโลก 2026 (11 มิ.ย.–19 ก.ค.)</th><td class='note'>มิ.ย. เป็นเดือนที่ดีที่สุดของทุกตัวชี้วัดฝั่ง Shop API ส่วนหนึ่งมาจากกระแสบอลโลก ส.ค. จะไม่มีตัวช่วยนี้ · แต่ข้อมูล Studio แสดงว่า ก.ค. (ช่วงบอลโลกจบ 19 ก.ค.) ยังทำวิวได้สูงกว่า มิ.ย. 60% จึงไม่ใช่แรงส่งจากบอลโลกล้วน</td><td class='note'>ตั้ง Min ให้ต่ำกว่าระดับ ก.ค. โดยตั้งใจ · หาธีมทดแทน เช่น เปิดฤดูกาลลีกไทย, ฟุตบอลนักเรียน, เตรียมกีฬาสี · ดูสัปดาห์ที่ 21–27 ก.ค. (หลังบอลโลกจบ) เป็นตัวชี้: วิวลดเหลือ 627,529 จาก 1,001,538 = −37%</td></tr><tr><th scope='row'>★ วัดวิวอย่างเดียวแล้วหลงทาง</th><td class='note'>ก.พ. 2026 ทำวิว 6.97M (สูงสุด) แต่ ER เหลือ 0.65% และโปรไฟล์วิวต่อ 1,000 วิว เหลือ 2.64 (ต่ำสุดทั้งคู่) — วิวกว้างแต่ตื้น ไม่แปลงเป็นความสนใจในช่อง</td><td class='note'>จึงตั้ง B1 (วิว) น้ำหนักแค่ 3 แต่ให้ D1 (ER) 5 และ B5 (แชร์/1,000 วิว) 3 — วิวต้องมาพร้อมคุณภาพ ถ้า B1 ถึงเป้าแต่ D1 กับ B5 ตก ให้ถือว่าเดือนนั้นไม่ผ่านแม้คะแนนรวมจะพอ</td></tr><tr><th scope='row'>ทีมเล็กและไม่ได้ทำคอนเทนต์เต็มเวลา</th><td class='note'>เจ๊มลเป็นผู้ลงคลิปหลัก โดยอะตอมและภูมิใจช่วยเป็นครั้งคราว — เป้าที่สูงเกินจริงจะทำให้เลิกใช้ระบบ</td><td class='note'>เดือน 1 ตั้ง A1 ที่ 110 คลิป (เท่าเดิม) แล้วย้ายน้ำหนักไปที่คุณภาพแทน · ถ่ายแบบ batch 1 วัน/สัปดาห์</td></tr><tr><th scope='row'>ตัวเลข ก.ค. ยังสะสมวิวไม่เต็ม</th><td class='note'>คลิป ก.ค. วัด ณ 24 ก.ค. จึงมีเวลาสะสมวิวสั้นกว่าคลิป พ.ค.–มิ.ย. ตัวเลข ก.ค. จึงต่ำกว่าความจริงบางส่วน</td><td class='note'>ใช้ พ.ค.–มิ.ย. เป็นฐานหลัก · เดือนที่ 2 ให้รีแคลิเบรตด้วยข้อมูลที่วัดแบบเดียวกันทุกเดือน</td></tr><tr><th scope='row'>KPI ถูกเล่นด้วยการเพิ่มปริมาณ</th><td class='note'>ก.ค. ผลิต 216 คลิป (รวมตัดไลฟ์) แต่ median วิวต่อคลิปต่ำสุด — ปริมาณล้วนไม่ได้ผล</td><td class='note'>น้ำหนักปริมาณเหลือ 20 คะแนนจาก 100 · มี guardrail เพดานคลิปตัดไลฟ์ที่หักคะแนนรวมได้</td></tr></tbody>
+  </table></div>
+                </div>
+            </div>
+
+            <div class="section-card" id="kpiSec13">
+                <div class="section-header">
+                    <h2><span class="material-icons-round">calendar_view_week</span>จังหวะงานและแผน 4 สัปดาห์แรก</h2>
+                </div>
+                <div class="kpi-body">
+<h3>จังหวะประจำเดือน</h3>
+  <div class="tablewrap"><table>
+    <thead><tr><th>ความถี่</th><th>สิ่งที่ต้องทำ</th><th class="num">ผู้รับผิดชอบ</th></tr></thead>
+    <tbody><tr><td class='wk'>ทุกวัน (ก่อน 21:00)</td><th scope='row' class='act'>ลงคลิปครบ 4 ตัว (JS 3 + ME 1) ปักตะกร้า ≥ 3 · บันทึก Clip Tracker · ตอบคอมเมนต์คลิปวันนี้</th><td class='num dim'>ทีมคอนเทนต์</td></tr><tr><td class='wk'>ทุกวันจันทร์ 30 นาที</td><th scope='row' class='act'>ประชุมรีวิวสัปดาห์ตามวาระ 5 ช่วง พร้อมติ๊กเช็กลิสต์รายสัปดาห์ครบทุกช่อง</th><td class='num dim'>ทีม + ผู้บริหาร</td></tr><tr><td class='wk'>ทุกวันจันทร์ (ท้ายประชุม)</td><th scope='row' class='act'>ตั้ง One Metric That Matters ของสัปดาห์ + ล็อกวันถ่าย batch 1 วัน</th><td class='num dim'>หัวหน้าทีม</td></tr><tr><td class='wk'>ทุกวันพฤหัส</td><th scope='row' class='act'>เช็ก CTR แอดกลางสัปดาห์ — ถ้าตกเกิน 20% จากสัปดาห์ก่อน เปลี่ยนครีเอทีฟทันที ไม่ต้องรอจันทร์</th><td class='num dim'>ฝ่ายแอด</td></tr><tr><td class='wk'>วันที่ 10 ของเดือนถัดไป</td><th scope='row' class='act'>ปิดคะแนน KPI (ให้คลิปปลายเดือนมีเวลาสะสมวิวอย่างน้อย 10 วัน)</th><td class='num dim'>ผู้บริหาร</td></tr><tr><td class='wk'>วันที่ 12 ของเดือนถัดไป</td><th scope='row' class='act'>รีแคลิเบรตเป้าเดือนถัดไปจากผลจริง</th><td class='num dim'>ผู้บริหาร</td></tr></tbody>
+  </table></div>
+  <h3>แผนลงมือ 4 สัปดาห์แรก</h3>
+  <div class="tablewrap"><table>
+    <thead><tr><th>ช่วงเวลา</th><th>สิ่งที่ต้องทำ</th><th>อ้างอิงจากข้อมูลอะไร</th></tr></thead>
+    <tbody><tr><td class='wk'>ก่อนเริ่มเดือน</td><th scope='row' class='act'>เพิ่มคอลัมน์ใน Clip Tracker: ช่อง / ปักตะกร้า (ใช่-ไม่ใช่) / ฟอร์แมต / เป็นคลิปทดลองหรือไม่ / ส่งเข้าคลังแอดหรือไม่</th><td class='note dim'>ตัวชี้วัด A2 A3 A4 A5 D1 D2 E1 ทั้งหมดนับจาก Clip Tracker — ถ้าไม่มีคอลัมน์เหล่านี้จะให้คะแนนไม่ได้</td></tr><tr><td class='wk'>สัปดาห์ที่ 1</td><th scope='row' class='act'>ล็อกวันถ่าย batch 1 วัน/สัปดาห์ ให้ได้วัตถุดิบ 28 คลิปในคราวเดียว</th><td class='note dim'>ปัญหาไม่ใช่ผลิตไม่ได้ แต่คือไม่สม่ำเสมอ — มีแค่ 8 วัน/เดือนที่ลงครบ 4 คลิป บางวันลงทีเดียว 11–21 คลิป</td></tr><tr><td class='wk'>สัปดาห์ที่ 1</td><th scope='row' class='act'>ลดคลิปตัดไลฟ์เหลือ ≤ 9 คลิป/สัปดาห์ แล้วเอาเวลาที่ได้ไปทำคลิปเปรียบเทียบ 4 คลิป/สัปดาห์</th><td class='note dim'>คลิปตัดไลฟ์ 163 คลิป = วิวเฉลี่ย 212 · คลิปเปรียบเทียบ 14 คลิป = ER สูงสุด 3.15%</td></tr><tr><td class='wk'>สัปดาห์ที่ 2</td><th scope='row' class='act'>ดูคลิป 15 อันดับตลอดกาลของช่องเรา แล้วถอดสูตร: 3 วินาทีแรก มุมกล้อง ประโยคปิด → ทำตาม 4 คลิป</th><td class='note dim'>คลิป 15 อันดับของเราเองทำวิว 346K–1.08M = สูตรที่ใช้ได้มีอยู่แล้วในช่องเรา แค่ยังไม่ถูกถอดมาใช้ซ้ำ</td></tr><tr><td class='wk'>สัปดาห์ที่ 2</td><th scope='row' class='act'>เปิดทดลองฟอร์แมตใหม่ 2 ตัว × 5 คลิป (เช่น &#x27;ก่อน-หลังใส่จริง 1 เดือน&#x27;, &#x27;ตอบคอมเมนต์ทีละข้อ&#x27;)</th><td class='note dim'>ฟอร์แมตปัจจุบัน 65% เป็น &#x27;ไซซ์/ฟิต&#x27; ตัวเดียว — ยิ่งลงวันละ 4 คลิป ยิ่งซ้ำเร็ว</td></tr><tr><td class='wk'>สัปดาห์ที่ 3</td><th scope='row' class='act'>แก้คลิปที่วิวดีแต่ขายไม่ได้: เติม CTA + ปักตะกร้าให้ตรงรุ่น แล้วรีโพสต์เป็นเวอร์ชัน 2</th><td class='note dim'>คลิป 15 อันดับรวมกันมี ER แค่ 0.66% ต่ำกว่าค่าเฉลี่ยช่อง 0.97% — วิวเยอะแต่คนไม่มีส่วนร่วม</td></tr><tr><td class='wk'>สัปดาห์ที่ 4</td><th scope='row' class='act'>สรุป Test log + เลือกฟอร์แมตที่จะ scale เดือนหน้า 1 ตัว และ kill 1 ตัว · เช็กว่า median วิวยังไม่ต่ำกว่า 2,000</th><td class='note dim'>ทำให้การทดลองกลายเป็นความรู้สะสม และยืนยันว่าการเพิ่มปริมาณไม่ได้ทำให้คุณภาพพัง</td></tr></tbody>
+  </table></div>
+                </div>
+            </div>
+
+            <div class="section-card" id="kpiSec14">
+                <div class="section-header">
+                    <h2><span class="material-icons-round">dataset</span>แหล่งข้อมูล</h2>
+                </div>
+                <div class="kpi-body">
+<div class="tablewrap"><table>
+    <thead><tr><th>แหล่ง</th><th>Endpoint / ลิงก์</th><th>ใช้ดึงอะไร</th></tr></thead>
+    <tbody><tr><th scope='row'>TikTok Shop Partner API</th><td class='mono small'>/analytics/202409/shop_videos/performance + /{video_id}/performance</td><td class='note'>คลิประดับรายตัว: วิว ไลก์ คอมเมนต์ แชร์ CTR (ร้าน JS + ME) — เฉพาะคลิปที่ปักตะกร้า</td></tr><tr><th scope='row'>TikTok Shop Partner API</th><td class='mono small'>/analytics/202509/shop_videos/overview_performance</td><td class='note'>ภาพรวมช่องทาง VIDEO ทั้งร้าน</td></tr><tr><th scope='row'>TikTok Business API</th><td class='mono small'>/report/integrated/get/ (AUCTION_AD)</td><td class='note'>ครีเอทีฟแอดรายตัว: งบ อิมเพรสชัน CTR</td></tr><tr><th scope='row'>⚠ ฐานการวัด — อ่านก่อนใช้</th><td class='mono small'>API ของ TikTok Shop มองเห็นเฉพาะคลิปที่ปักตะกร้า</td><td class='note'>★ Baseline ทั้งหมดในไฟล์นี้คำนวณจากคลิปที่ปักตะกร้าเท่านั้น · เมื่อเปลี่ยนเป็นปักแค่ ~1 ใน 4 คลิป ต้องแยกฐานการวัด 2 แบบ (ดูตารางถัดไป)</td></tr><tr><th scope='row'>TikTok Business API</th><td class='mono small'>/report/integrated/get/ (AUCTION_AD) + metrics video_watched_2s / video_views_p25 / p50 / p100</td><td class='note'>★ ข้อมูลครีเอทีฟ: hook rate, hold rate, deep hold, CTR, CPC, CPM รายเดือน</td></tr><tr><th scope='row'>rule1</th><td class='mono small'>Hook rate: what it is, how to calculate it, and what good looks like — rule1.ai/articles/hook-rate</td><td class='note'>เกณฑ์ hook rate TikTok 2026: Poor &lt;25% · Average 25–30% · Good 30–40% · Excellent 40%+</td></tr><tr><th scope='row'>Heylect</th><td class='mono small'>What Is a Good Hold Rate on TikTok? 2026 Benchmarks &amp; Formula — heylect.com/blog/what-is-a-good-hold-rate</td><td class='note'>เกณฑ์ hold rate 2026: Poor &lt;20% · Average 20–40% · Good 40–60% · Excellent 60%+ (สูตร = p25 ÷ 2 วิ)</td></tr><tr><th scope='row'>Socialinsider</th><td class='mono small'>2026 TikTok Benchmarks — socialinsider.io/social-media-benchmarks/tiktok</td><td class='note'>ER ต่อวิว 3.85% · โพสต์/เดือน 16–23 · วิวเฉลี่ยต่อโพสต์ตามขนาดบัญชี</td></tr><tr><th scope='row'>Hamster Garage</th><td class='mono small'>TikTok Shop Affiliate KPIs: 2026 Glossary + Benchmarks</td><td class='note'>CTR organic 2–3%+ ถือว่าดีพอจะยิงแอด · blended ROAS median 2.1–2.9x, top 3.8–5.2x</td></tr><tr><th scope='row'>Triple Whale / Influee</th><td class='mono small'>TikTok Ads Benchmarks 2026</td><td class='note'>Sports &amp; Outdoors: CTR 0.52% CVR 1.49% ROAS 1.39 · Apparel: CTR 0.69% ROAS 2.49</td></tr></tbody>
+  </table></div>
+                </div>
+            </div>
+
+            <p class="kpi-footer">จัดทำจากข้อมูล API จริงของร้าน JS Sport · เดือนที่ 2 ให้รีแคลิเบรตเป้าใหม่จากผลจริงที่วัดด้วยวิธีเดียวกัน</p>
         </div>
     </div>
 
@@ -2189,14 +2710,182 @@
             }
         });
 
+
+        // ============ TABS ============
+        function setTab(name) {
+            document.querySelectorAll('.tab-panel').forEach(p => p.classList.toggle('active', p.id === 'tab' + name));
+            document.querySelectorAll('.tab-btn').forEach(b => {
+                const on = b.dataset.tab === name;
+                b.classList.toggle('active', on);
+                b.setAttribute('aria-selected', on);
+            });
+            document.querySelectorAll('.clips-only').forEach(el => { el.style.display = name === 'Clips' ? '' : 'none'; });
+            try { localStorage.setItem('clipTracker.tab', name); } catch (e) {}
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        function initTab() {
+            let saved = 'Clips';
+            try { saved = localStorage.getItem('clipTracker.tab') || 'Clips'; } catch (e) {}
+            setTab(saved === 'Kpi' ? 'Kpi' : 'Clips');
+            window.scrollTo({ top: 0 });
+        }
+        function kpiJump(n) {
+            const el = document.getElementById('kpiSec' + n);
+            if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
         // ============ INIT ============
         (function init() {
             const now = new Date();
             calYear = now.getFullYear();
             calMonth = now.getMonth();
+            initTab();
             renderCreatorSelect(); // ต้องมีตัวเลือกคนทำตั้งแต่แรก แม้ยังไม่เชื่อมต่อ server
             render(); // แสดง UI ทันที ไม่ต้องรอ server (ข้อมูลจริงจะซิงค์เข้ามาเอง)
         })();
+    </script>
+    <!-- KPI DASHBOARD LOGIC -->
+    <script>
+    (function () {
+
+const KPI = [{"id": "A1", "grp": "A. ปริมาณ & วินัยรายวัน", "name": "คลิปผลิตใหม่รวมทั้งเดือน", "defn": "คลิปถ่าย/ตัดใหม่ที่โพสต์ในเดือน (2 ช่องรวมกัน) — ไม่นับคลิปตัดไลฟ์ รีโพสต์ สไลด์ภาพนิ่ง", "base": 96, "min": 100, "tgt": 120, "str": 140, "unit": "คลิป", "wt": 5, "dir": "up", "why": "เกณฑ์ผู้บริหาร 4 คลิป/วัน × 30 วัน = 120 · ฐานจริง 96/เดือน · ก.ค. ทำได้ 4.58/วันแล้ว"}, {"id": "A2", "grp": "A. ปริมาณ & วินัยรายวัน", "name": "คลิปช่อง @j.s.sport_shop", "defn": "คลิปผลิตใหม่ของช่อง JS เท่านั้น", "base": 84, "min": 78, "tgt": 90, "str": 100, "unit": "คลิป", "wt": 4, "dir": "up", "why": "★ รีเบสไลน์จากรายการโพสต์จริง: พ.ค. 85 · มิ.ย. 79 · ก.ค. 88 คลิป = 2.63–3.03 คลิป/วัน (ฐาน 84) — ของเดิม 55 ต่ำกว่าจริงมาก เพราะนับเฉพาะคลิปที่ปักตะกร้า · ทีมเกือบถึง 3 คลิป/วันอยู่แล้ว งานที่เหลือคือความสม่ำเสมอ ไม่ใช่การเร่งปริมาณ"}, {"id": "A3", "grp": "A. ปริมาณ & วินัยรายวัน", "name": "คลิปช่อง @mesport80", "defn": "คลิปผลิตใหม่ของช่อง ME เท่านั้น", "base": 40, "min": 26, "tgt": 30, "str": 40, "unit": "คลิป", "wt": 2, "dir": "up", "why": "เกณฑ์ 1 คลิป/วัน = 30 · ฐาน 48/31/42 — ช่องนี้ทำเกินเป้าอยู่แล้ว 1 คลิปคือขั้นต่ำไม่ใช่เพดาน"}, {"id": "A4", "grp": "A. ปริมาณ & วินัยรายวัน", "name": "วันที่ทำครบโควตา (≥ 4 คลิป)", "defn": "จำนวนวันในเดือนที่มีคลิปผลิตใหม่ขึ้นครบ 4 คลิป", "base": 8, "min": 15, "tgt": 22, "str": 26, "unit": "วัน", "wt": 4, "dir": "up", "why": "ฐานเฉลี่ย 8 วัน/เดือน — บางวันลง 0–1 คลิป บางวันลงทีเดียว 11–21 คลิป"}, {"id": "A5", "grp": "A. ปริมาณ & วินัยรายวัน", "name": "จำนวนคลิปที่ปักตะกร้า", "defn": "นับจำนวนคลิปที่มีสินค้าติดในเดือน (นับจาก Clip Tracker) — ไม่ใช่อัตราส่วน เพราะการปักเยอะไม่ได้ดีกว่า", "base": null, "min": 24, "tgt": 32, "str": 45, "unit": "คลิป", "wt": 2, "dir": "up", "why": "เกณฑ์ผู้บริหาร: JS 3 คลิปมีปัก 1 คลิป บางวันไม่มีเลยก็ได้ → ราว 1 คลิป/วัน = 30 คลิป/เดือน · ตั้งเป็นจำนวนไม่ใช่ % เพื่อไม่ให้ตีความว่า 'ปักยิ่งเยอะยิ่งดี'"}, {"id": "A6", "grp": "A. ปริมาณ & วินัยรายวัน", "name": "เพดานคลิปตัดไลฟ์", "defn": "จำนวนคลิปตัดไลฟ์/รีโพสต์ที่ลงได้ — เกินเพดานหักคะแนนรวมอีก 5 คะแนน", "base": 54, "min": 40, "tgt": 30, "str": 20, "unit": "คลิป", "wt": 1, "dir": "down", "why": "163 คลิปตัดไลฟ์ใน 3 เดือน วิวเฉลี่ย 212 — และไม่นับรวมใน A1"}, {"id": "B1", "grp": "B. Reach", "name": "วิวรวมทั้งช่อง JS (Video Views)", "defn": "★ ผลรวม Video Views รายวันของ @j.s.sport_shop จาก TikTok Studio → Analytics → Overview (รวมวิวที่ไหลเข้าคลิปเก่าด้วย) — กรอกรายวันในชีทบันทึกรายวัน", "base": 2645000, "min": 2400000, "tgt": 3100000, "str": 3900000, "unit": "วิว", "wt": 3, "dir": "up", "why": "★ รีเบสไลน์ 29 ก.ค. จาก Studio CSV จริง: พ.ค. 62,364/วัน · มิ.ย. 76,275/วัน · ก.ค. 121,703/วัน → ฐาน 85,313/วัน = 2.645M/เดือน (ของเดิม 1.24M มาจากคลิปที่ปักตะกร้าเท่านั้น = ต่ำกว่าจริง 2 เท่า) · Target 100K/วัน · Stretch = รักษาระดับ ก.ค. ไว้ได้"}, {"id": "B2", "grp": "B. Reach", "name": "Median วิวต่อคลิป", "defn": "ค่ากลางของวิวต่อคลิป (ไม่ใช่ค่าเฉลี่ย เพราะคลิปดัง 10% กินวิวรวม 88%)", "base": 2238, "min": 2000, "tgt": 2600, "str": 3400, "unit": "วิว", "wt": 6, "dir": "up", "why": "★ รีเบสไลน์ 29 ก.ค. จากคลิปจริง 252 ตัวใน TikTok Studio: พ.ค. 1,902 · มิ.ย. 2,865 · ก.ค. 2,238 (ฐาน 2,238) — ของเดิม 1,038 ต่ำกว่าจริง 2.2 เท่า เพราะนับเฉพาะคลิปที่ปักตะกร้า · ตัวเลข ก.ค. 288 ที่เคยรายงานไปนั้นผิด ค่าจริงคือ 2,238"}, {"id": "B3", "grp": "B. Reach", "name": "Hit rate ≥ 10,000 วิว", "defn": "สัดส่วนคลิปผลิตใหม่ที่ทำวิวถึง 10,000 ขึ้นไป", "base": 0.2103, "min": 0.2, "tgt": 0.25, "str": 0.32, "unit": "%", "wt": 3, "dir": "up", "why": "★ รีเบสไลน์จากคลิปจริง 252 ตัว: พ.ค. 18.8% · มิ.ย. 21.5% · ก.ค. 22.7% (ฐาน 21.0%) — ก.ค. ดีที่สุด ไม่ใช่ 8.2% อย่างที่เคยรายงาน"}, {"id": "B4", "grp": "B. Reach", "name": "คลิปที่ทำวิวถึง 100,000", "defn": "จำนวนคลิปผลิตใหม่ที่ทำวิวทะลุแสน (นับจากรายการโพสต์ใน TikTok Studio)", "base": 3.3, "min": 3, "tgt": 5, "str": 7, "unit": "คลิป", "wt": 2, "dir": "up", "why": "★ รีเบสไลน์: 10 คลิปใน 3 เดือน = 3.3/เดือน (พ.ค. 3 · มิ.ย. 5 · ก.ค. 2) — คลิประดับนี้คือตัวที่เอาไปยิงแอดแล้วคุ้มที่สุด"}, {"id": "B5", "grp": "B. Reach", "name": "แชร์ต่อ 1,000 วิว", "defn": "★ Shares ÷ Video Views × 1,000 จาก Studio Overview — แชร์คือสัญญาณที่อัลกอริทึม TikTok ให้น้ำหนักสูงสุดในการปล่อยวิวรอบถัดไป", "base": 1.135, "min": 1.1, "tgt": 1.4, "str": 1.8, "unit": "ครั้ง", "wt": 3, "dir": "up", "why": "★ ตัวชี้วัดใหม่ 29 ก.ค. — ฐานจริงจาก Studio: ม.ค. 0.47 · เม.ย. 0.48 · พ.ค. 1.02 · มิ.ย. 0.82 · ก.ค. 1.43 (ดีที่สุด) · ทีมคุมได้ตรง ๆ ผ่านการออกแบบคลิปให้ 'ส่งต่อได้' และมาก่อนวิว ไม่ใช่ตามหลัง"}, {"id": "C1", "grp": "C. Creative — ฮุก & ดึงคนอยู่", "name": "Hook rate (2 วิ ÷ อิมเพรสชัน)", "defn": "video_watched_2s ÷ impressions ของครีเอทีฟที่ยิงแอดทั้งเดือน — นิยามมาตรฐานของ TikTok", "base": 0.2446, "min": 0.25, "tgt": 0.3, "str": 0.35, "unit": "%", "wt": 6, "dir": "up", "why": "★ เกณฑ์สากล: <25% = Poor · 25–30% = Average · 30–40% = Good · เราอยู่ 24.5% และ ก.ค. เหลือ 23.3% = หลุดเกณฑ์ · Min 25% คือแค่กลับเข้าเกณฑ์"}, {"id": "C2", "grp": "C. Creative — ฮุก & ดึงคนอยู่", "name": "Hold rate (ดู 25% ของคลิป ÷ 2 วิ)", "defn": "video_views_p25 ÷ video_watched_2s — นิยามมาตรฐานที่ทีม performance ใช้กัน", "base": 0.295, "min": 0.3, "tgt": 0.4, "str": 0.5, "unit": "%", "wt": 8, "dir": "up", "why": "★ ตัวชี้วัดสำคัญที่สุดของเดือนนี้ · เกณฑ์สากล: <20% = Poor · 20–40% = Average · 40–60% = Good · เราร่วง 36.7% → 24.7% กำลังไหลลงหา Poor"}, {"id": "C3", "grp": "C. Creative — ฮุก & ดึงคนอยู่", "name": "Deep hold (6 วิ ÷ 2 วิ)", "defn": "video_watched_6s ÷ video_watched_2s — คนที่สนใจตอนแรกอยู่ต่อถึงวินาทีที่ 6 กี่ %", "base": 0.322, "min": 0.32, "tgt": 0.38, "str": 0.45, "unit": "%", "wt": 5, "dir": "up", "why": "ร่วงจาก 38.0% เหลือ 25.3% = คนที่สนใจ 4 ใน 5 หนีก่อนวินาทีที่ 6 · Target 38% คือกลับไประดับ พ.ค."}, {"id": "C4", "grp": "C. Creative — ฮุก & ดึงคนอยู่", "name": "ดูถึงครึ่งเรื่อง (p50 ÷ 2 วิ)", "defn": "video_views_p50 ÷ video_watched_2s", "base": 0.133, "min": 0.13, "tgt": 0.17, "str": 0.22, "unit": "%", "wt": 5, "dir": "up", "why": "ฐาน 13.3% · พ.ค. ทำได้ 16.7% · ตัวนี้บอกว่าเนื้อกลางคลิปมีน้ำหนักพอให้อยู่ต่อไหม"}, {"id": "D1", "grp": "D. Creative → ความสนใจ", "name": "Engagement Rate", "defn": "★ (ไลก์ + คอมเมนต์ + แชร์) ÷ Video Views ทั้งช่อง JS จาก Studio Overview", "base": 0.01153, "min": 0.011, "tgt": 0.013, "str": 0.015, "unit": "%", "wt": 5, "dir": "up", "why": "★ รีเบสไลน์ 29 ก.ค. จาก Studio CSV จริง: พ.ค. 0.96% · มิ.ย. 1.12% · ก.ค. 1.29% (ฐานถ่วงน้ำหนัก 1.15%) — ของเดิม 0.87% ต่ำกว่าจริงเพราะนับเฉพาะคลิปที่ปักตะกร้า · ค่าเฉลี่ยแพลตฟอร์ม 3.85% ยังห่างมาก แต่เทรนด์เราขึ้น 3 เดือนติด"}, {"id": "D2", "grp": "D. Creative → ความสนใจ", "name": "CTR คลิป → สินค้า (organic)", "defn": "คลิกสินค้า ÷ อิมเพรสชันสินค้า ถ่วงน้ำหนักด้วยวิวที่ผูกสินค้า", "base": 0.0598, "min": 0.06, "tgt": 0.068, "str": 0.075, "unit": "%", "wt": 6, "dir": "up", "why": "ช่องเรา 5.98% vs ค่าเฉลี่ยทั้งร้าน 7.1–7.4% — ตัวนี้คือ 'ครีเอทีฟทำให้อยากกดดูสินค้าไหม' ยังไม่ใช่การขาย"}, {"id": "D3", "grp": "D. Creative → ความสนใจ", "name": "CTR ครีเอทีฟแอด", "defn": "CTR เฉลี่ยของแอด auction ทั้งเดือน — วัดฝีมือครีเอทีฟล้วน ไม่มีผลจากราคา", "base": 0.0437, "min": 0.04, "tgt": 0.05, "str": 0.065, "unit": "%", "wt": 4, "dir": "up", "why": "ฐาน 4.37% · ก.ค. ร่วงเหลือ 2.48% · เกณฑ์ Sports & Outdoors อยู่ที่ 0.52% เราสูงกว่ามากแต่เทรนด์ลง"}, {"id": "D4", "grp": "D. Creative → ความสนใจ", "name": "CPC (ต้นทุนต่อคลิก)", "defn": "งบแอด ÷ คลิก — ยิ่งต่ำยิ่งดี · ตัวนี้บอกว่าครีเอทีฟทำงานคุ้มเงินแค่ไหน", "base": 0.366, "min": 0.45, "tgt": 0.35, "str": 0.26, "unit": "฿", "wt": 2, "dir": "down", "why": "★ CPC แพงขึ้น 112% (฿0.26→฿0.55) ทั้งที่ CPM ถูกลง 24% = พิสูจน์ว่าปัญหาคือครีเอทีฟ ไม่ใช่ค่าสื่อ"}, {"id": "E1", "grp": "E. ทดลอง & ฟอร์แมตใหม่", "name": "ฟอร์แมตใหม่ที่ทดลองครบชุด", "defn": "ฟอร์แมตที่ไม่เคยทำมาก่อน และผลิตครบ ≥ 5 คลิปในเดือน (น้อยกว่านี้ตัดสินไม่ได้)", "base": 0, "min": 2, "tgt": 3, "str": 4, "unit": "ฟอร์แมต", "wt": 4, "dir": "up", "why": "ปัจจุบันวนอยู่ 6 ฟอร์แมตเดิม โดย 65% เป็น 'ไซซ์/ฟิต' — ยิ่งลงวันละ 4 คลิป ยิ่งซ้ำเร็ว"}, {"id": "E2", "grp": "E. ทดลอง & ฟอร์แมตใหม่", "name": "ฮุก 3 วินาทีแรกแบบใหม่ที่ทดสอบ", "defn": "จำนวนรูปแบบฮุกที่ไม่เคยใช้ และทดสอบครบ ≥ 3 คลิปต่อแบบ (เช่น ถามคำถาม / โชว์ผลลัพธ์ก่อน / เสียงจริงจากสนาม)", "base": null, "min": 4, "tgt": 6, "str": 8, "unit": "แบบ", "wt": 5, "dir": "up", "why": "★ ตัวนี้คือกลไกที่จะทำให้ C1–C3 ขยับจริง — hold rate จะไม่ดีขึ้นถ้าไม่มีฮุกใหม่เข้ามาทดสอบ"}, {"id": "E3", "grp": "E. ทดลอง & ฟอร์แมตใหม่", "name": "สัดส่วนคลิป 'เปรียบเทียบ/อธิบายความต่าง'", "defn": "คลิปที่เอาสินค้า 2 ตัวขึ้นไปมาเทียบ หรืออธิบายว่าต่างกันยังไง ÷ คลิปผลิตใหม่", "base": 0.049, "min": 0.1, "tgt": 0.15, "str": 0.2, "unit": "%", "wt": 3, "dir": "up", "why": "ฟอร์แมตนี้ ER 3.15% (สูงสุด 3.6 เท่า) เพราะมีเหตุผลให้ดูจนจบ — ตรงกับปัญหา hold rate พอดี"}, {"id": "E4", "grp": "E. ทดลอง & ฟอร์แมตใหม่", "name": "Winner replication", "defn": "คลิป Top-3 ของสัปดาห์ก่อน ต้องถูกทำซ้ำ/ต่อยอด ≥ 2 เวอร์ชันทุกสัปดาห์ (ผ่าน = ครบทั้ง 4 สัปดาห์)", "base": null, "min": 1, "tgt": 1, "str": 1, "unit": "ผ่าน", "wt": 1, "dir": "pass", "why": "คลิปดังกินวิวรวม 88% — การไม่ต่อยอดคลิปที่ติดคือการทิ้งของฟรี"}, {"id": "E5", "grp": "E. ทดลอง & ฟอร์แมตใหม่", "name": "Test log ครบถ้วน", "defn": "ทุกฮุก/ฟอร์แมตที่ทดลองต้องบันทึก: สมมติฐาน / ฮุกที่ใช้ / hold rate 7 วัน / ตัดสินใจ scale หรือ kill", "base": null, "min": 1, "tgt": 1, "str": 1, "unit": "ผ่าน", "wt": 1, "dir": "pass", "why": "ไม่มีบันทึก = ทดลองแล้วไม่ได้ความรู้ ทำซ้ำความผิดเดิมทุกเดือน"}, {"id": "F1", "grp": "F. คลังครีเอทีฟสำหรับแอด", "name": "คลิปส่งเข้าคลังแอด", "defn": "คลิปใหม่ที่ส่งให้ฝ่ายแอดพร้อมใช้ (มีสิทธิ์ Spark / ไม่ติดลิขสิทธิ์เพลง / ยาว ≥ 15 วิ) — ≥ 4 คลิป/สัปดาห์", "base": null, "min": 12, "tgt": 16, "str": 22, "unit": "คลิป", "wt": 3, "dir": "up", "why": "คลังสะสม 61 ตัว แต่หมุนใช้จริงแค่ 22–30 ตัว/เดือน = วัตถุดิบไม่พอ ทำให้ครีเอทีฟล้า"}, {"id": "F2", "grp": "F. คลังครีเอทีฟสำหรับแอด", "name": "Creative freshness", "defn": "สัดส่วนครีเอทีฟที่มีการใช้จ่ายในเดือน ซึ่งเป็นคลิปอายุ ≤ 30 วัน", "base": null, "min": 0.35, "tgt": 0.5, "str": 0.65, "unit": "%", "wt": 2, "dir": "up", "why": "หมุนครีเอทีฟช้าคือสาเหตุตรงของ CTR ร่วง 63% และ CPC แพงขึ้น 112%"}, {"id": "F3", "grp": "F. คลังครีเอทีฟสำหรับแอด", "name": "Creative hit rate", "defn": "สัดส่วนคลิปที่ทดสอบยิง (งบทดสอบ ฿500/คลิป) แล้วทำ hold rate ≥ 10% และ CTR ≥ 4%", "base": null, "min": 0.2, "tgt": 0.3, "str": 0.4, "unit": "%", "wt": 1, "dir": "up", "why": "เปลี่ยนเกณฑ์คัดจากผลตอบแทนแอด (ขึ้นกับราคา) มาเป็น hold rate + CTR (ขึ้นกับครีเอทีฟล้วน)"}, {"id": "G1", "grp": "G. ระบบ & ประชุม", "name": "ประชุมวันจันทร์ครบทุกสัปดาห์", "defn": "ประชุม 30 นาทีทุกวันจันทร์ พร้อมติ๊กเช็กลิสต์รายสัปดาห์ครบทุกช่อง (ผ่าน = ครบทุกสัปดาห์ในเดือน)", "base": null, "min": 1, "tgt": 1, "str": 1, "unit": "ผ่าน", "wt": 2, "dir": "pass", "why": "ระบบ KPI ที่ไม่มีจังหวะทบทวนจะกลายเป็นตัวเลขที่ดูตอนสิ้นเดือนแล้วแก้อะไรไม่ทัน"}, {"id": "G2", "grp": "G. ระบบ & ประชุม", "name": "Clip Tracker อัปเดตครบ", "defn": "ทุกคลิปถูกบันทึกพร้อมแท็กฮุก/ฟอร์แมต/ช่อง/ปักตะกร้า ภายในวันที่ลง (ผ่าน = ขาดไม่เกิน 3 วัน)", "base": null, "min": 1, "tgt": 1, "str": 1, "unit": "ผ่าน", "wt": 2, "dir": "pass", "why": "ตัวชี้วัด A1–A6 E1–E3 นับจาก Clip Tracker ทั้งหมด — ถ้าไม่บันทึกก็ให้คะแนนไม่ได้"}];
+const fmtVal = (v,u) => v===null||v===undefined ? "—"
+  : u==="%" ? (v*100).toFixed(v<0.10?2:1)+"%"
+  : u==="฿" ? "฿"+Number(v).toLocaleString(undefined,{maximumFractionDigits: (v<100 && !Number.isInteger(v))?1:0})
+  : Number(v).toLocaleString();
+
+const host = document.getElementById("kpitables");
+const groups = [...new Set(KPI.map(k=>k.grp))];
+groups.forEach(g => {
+  const items = KPI.filter(k=>k.grp===g);
+  const wt = items.reduce((s,k)=>s+k.wt,0);
+  const div = document.createElement("div");
+  div.className = "kpigrp";
+  div.innerHTML = `<h3>${g} <span class="dim" style="font-weight:400">— น้ำหนักรวม ${wt} คะแนน</span></h3>
+  <div class="tablewrap"><table><thead><tr>
+    <th style="width:52px">รหัส</th><th>ตัวชี้วัด</th><th>Min · Target · Stretch</th>
+    <th class="num" style="width:64px">น้ำหนัก</th><th style="width:130px">ผลจริง</th>
+    <th class="num" style="width:74px">% สำเร็จ</th><th class="num" style="width:66px">คะแนน</th>
+  </tr></thead><tbody>${items.map(k=>`
+    <tr>
+      <td><strong>${k.id}</strong></td>
+      <td><strong>${k.name}</strong><div class="why">${k.defn}</div><div class="why" style="margin-top:3px;font-style:italic">${k.why}</div></td>
+      <td class="ladder">${k.dir==="pass" ? "ผ่าน = 1 / ไม่ผ่าน = 0"
+        : `${fmtVal(k.min,k.unit)} · <b>${fmtVal(k.tgt,k.unit)}</b> · ${fmtVal(k["str"],k.unit)}`}
+        <div class="why">ฐานปัจจุบัน: ${fmtVal(k.base,k.unit)}</div></td>
+      <td class="num">${k.wt}</td>
+      <td><input type="number" step="any" id="in_${k.id}" aria-label="ผลจริง ${k.name}"></td>
+      <td class="num" id="pc_${k.id}">—</td>
+      <td class="num" id="pt_${k.id}">—</td>
+    </tr>`).join("")}</tbody></table></div>`;
+  host.appendChild(div);
+});
+
+function pctOf(k, a) {
+  if (a === null || Number.isNaN(a)) return null;
+  if (k.dir === "pass") return a >= 1 ? 1 : 0;
+  if (k.dir === "up") {
+    if (a < k.min) return 0;
+    if (a < k.tgt) return 0.6 + 0.25*(a-k.min)/(k.tgt-k.min);
+    if (a < k["str"]) return 0.85 + 0.15*(a-k.tgt)/(k["str"]-k.tgt);
+    return 1;
+  }
+  if (a > k.min) return 0;
+  if (a > k.tgt) return 0.6 + 0.25*(k.min-a)/(k.min-k.tgt);
+  if (a > k["str"]) return 0.85 + 0.15*(k.tgt-a)/(k.tgt-k["str"]);
+  return 1;
+}
+
+const bars = document.getElementById("grpbars");
+bars.innerHTML = groups.map(g => {
+  const wt = KPI.filter(k=>k.grp===g).reduce((s,k)=>s+k.wt,0);
+  return `<div class="grpbar"><span>${g}</span><span class="track"><span class="fill" id="bar_${g.charCodeAt(0)}" style="width:0%"></span></span><span class="num" id="gs_${g.charCodeAt(0)}">0 / ${wt}</span></div>`;
+}).join("");
+
+function recalc() {
+  let total = 0, penalty = 0;
+  const byGrp = {};
+  KPI.forEach(k => {
+    const el = document.getElementById("in_"+k.id);
+    const raw = el.value.trim();
+    const a = raw === "" ? null : parseFloat(raw);
+    const p = pctOf(k, a);
+    const pts = p === null ? 0 : p * k.wt;
+    document.getElementById("pc_"+k.id).textContent = p === null ? "—" : (p*100).toFixed(0)+"%";
+    document.getElementById("pt_"+k.id).textContent = p === null ? "—" : pts.toFixed(2);
+    total += pts;
+    byGrp[k.grp] = (byGrp[k.grp]||0) + pts;
+    if (k.id === "A6" && a !== null && a > k.min) penalty = -5;
+  });
+  const net = Math.max(0, total + penalty);
+  document.getElementById("score").innerHTML = net.toFixed(1) + '<small> / 100</small>';
+  const gEl = document.getElementById("grade");
+  const anyInput = KPI.some(k => document.getElementById("in_"+k.id).value.trim() !== "");
+  gEl.textContent = !anyInput ? "รอกรอกผล"
+    : (net >= 85 ? "ดีเยี่ยม" : net >= 70 ? "ผ่าน" : net >= 55 ? "ต้องปรับปรุง" : "ไม่ผ่าน");
+  if (penalty && anyInput) gEl.textContent += " · หัก 5 คะแนน (คลิปตัดไลฟ์เกินเพดาน)";
+  groups.forEach(g => {
+    const wt = KPI.filter(k=>k.grp===g).reduce((s,k)=>s+k.wt,0);
+    const v = byGrp[g] || 0;
+    document.getElementById("bar_"+g.charCodeAt(0)).style.width = (v/wt*100).toFixed(1)+"%";
+    document.getElementById("gs_"+g.charCodeAt(0)).textContent = v.toFixed(1)+" / "+wt;
+  });
+}
+const WK_TOTAL = 14;
+function wkRecalc() {
+  const host = document.getElementById("wkscore");
+  host.innerHTML = [1,2,3,4,5].map(w => {
+    const n = document.querySelectorAll(".wk"+w+":checked").length;
+    return `<div class="${n>=9?'pass':''}"><b>${n}/${WK_TOTAL}</b>สัปดาห์ ${w}</div>`;
+  }).join("");
+}
+document.querySelectorAll('#tabKpi input[type=checkbox]').forEach(c => c.addEventListener("change", wkRecalc));
+wkRecalc();
+KPI.forEach(k => document.getElementById("in_"+k.id).addEventListener("input", recalc));
+
+// ---- persist what the team fills in (per browser) ----
+const KPI_STORE = 'clipTracker.kpi.aug2026';
+function kpiCollect() {
+    const data = { inputs: {}, checks: [] };
+    KPI.forEach(k => {
+        const el = document.getElementById('in_' + k.id);
+        if (el && el.value.trim() !== '') data.inputs[k.id] = el.value.trim();
+    });
+    document.querySelectorAll('#tabKpi input[type=checkbox]').forEach((c, i) => { if (c.checked) data.checks.push(i); });
+    return data;
+}
+function kpiSave() {
+    try { localStorage.setItem(KPI_STORE, JSON.stringify(kpiCollect())); } catch (e) {}
+}
+function kpiRestore() {
+    let data;
+    try { data = JSON.parse(localStorage.getItem(KPI_STORE) || 'null'); } catch (e) { return; }
+    if (!data) return;
+    Object.entries(data.inputs || {}).forEach(([id, v]) => {
+        const el = document.getElementById('in_' + id);
+        if (el) el.value = v;
+    });
+    const boxes = document.querySelectorAll('#tabKpi input[type=checkbox]');
+    (data.checks || []).forEach(i => { if (boxes[i]) boxes[i].checked = true; });
+}
+window.kpiReset = function () {
+    document.querySelectorAll('#tabKpi input[type=number]').forEach(el => { el.value = ''; });
+    document.querySelectorAll('#tabKpi input[type=checkbox]').forEach(c => { c.checked = false; });
+    try { localStorage.removeItem(KPI_STORE); } catch (e) {}
+    recalc(); wkRecalc();
+    if (typeof showToast === 'function') showToast('ล้างผลที่กรอกแล้ว', 'info');
+};
+KPI.forEach(k => {
+    const el = document.getElementById('in_' + k.id);
+    if (el) el.addEventListener('input', kpiSave);
+});
+document.querySelectorAll('#tabKpi input[type=checkbox]').forEach(c => c.addEventListener('change', kpiSave));
+
+kpiRestore();
+wkRecalc();
+recalc();
+
+    })();
     </script>
 </body>
 </html>
