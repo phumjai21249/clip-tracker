@@ -1,0 +1,121 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-08-26T00:00:00.000Z",
+  "title": "Design System: Clip Tracker",
+  "extensions": {
+    "colorMeta": {
+      "brand": { "role": "primary", "displayName": "Brand Violet", "canonical": "#6d4de0", "tonalRamp": ["#221645", "#341f6e", "#472994", "#5b3bd6", "#6d4de0", "#8b72f2", "#b3a2f8", "#e0d8fc"] },
+      "bg": { "role": "neutral", "displayName": "Canvas", "canonical": "#f4f6fa", "tonalRamp": ["#0e1117", "#161b24", "#1d2330", "#252c3b", "#e9edf3", "#f1f4f8", "#f4f6fa", "#ffffff"] },
+      "status-idle": { "role": "status", "displayName": "Idle Slate", "canonical": "#64748b", "tonalRamp": ["#1e2532", "#334155", "#475569", "#64748b", "#94a3b8", "#cbd5e1", "#e2e8f0", "#f1f5f9"] },
+      "status-filming": { "role": "status", "displayName": "Filming Amber", "canonical": "#e79009", "tonalRamp": ["#3a2408", "#7a4c0f", "#a05e03", "#e79009", "#f5a623", "#fbc55e", "#fdd98f", "#fef3d9"] },
+      "status-editing": { "role": "status", "displayName": "Editing Blue", "canonical": "#2f74e0", "tonalRamp": ["#0e1f3d", "#123259", "#1d5bbf", "#2f74e0", "#5b95f0", "#8cb5f5", "#bcd4fa", "#e7effc"] },
+      "status-done": { "role": "status", "displayName": "Done Green", "canonical": "#0e9f6e", "tonalRamp": ["#0a1f18", "#0f3324", "#076e4c", "#0e9f6e", "#2fbd8b", "#5fd7ab", "#a4ecd0", "#e2f7ef"] },
+      "status-uploaded": { "role": "status", "displayName": "Uploaded Violet", "canonical": "#8b5cf6", "tonalRamp": ["#1d1533", "#2a1f45", "#4c3a8a", "#6d4de0", "#8b5cf6", "#a78bfa", "#c4b0fc", "#f0eafd"] },
+      "cyan": { "role": "channel", "displayName": "JS SPORT SHOP Cyan", "canonical": "#0e8fa3", "tonalRamp": ["#08262b", "#0d3c44", "#0e8fa3", "#38c1d6", "#6ed4e3", "#a3e5ee", "#cdf1f6", "#e8fafc"] },
+      "rose": { "role": "channel", "displayName": "Me SPORT Rose", "canonical": "#d63369", "tonalRamp": ["#2e0a17", "#4f1327", "#d63369", "#f06797", "#f491b6", "#f8bdd2", "#fbdbe6", "#fdf0f4"] },
+      "warning": { "role": "channel", "displayName": "เสื้อปุ๋ย Amber", "canonical": "#e79009", "tonalRamp": ["#3a2408", "#7a4c0f", "#a05e03", "#e79009", "#f5a623", "#fbc55e", "#fdd98f", "#fef3d9"] },
+      "success": { "role": "channel", "displayName": "โฟมขัดรองเท้า Green", "canonical": "#0e9f6e", "tonalRamp": ["#0a1f18", "#0f3324", "#076e4c", "#0e9f6e", "#2fbd8b", "#5fd7ab", "#a4ecd0", "#e2f7ef"] },
+      "logo-gradient-start": { "role": "accent", "displayName": "Logo Gradient Start", "canonical": "#7c5cf0", "tonalRamp": ["#241a4d", "#382a75", "#5a3fb8", "#7c5cf0", "#9678f4", "#b39bf8", "#d0c1fb", "#ede6fd"] },
+      "logo-gradient-end": { "role": "accent", "displayName": "Logo Gradient End", "canonical": "#a855f7", "tonalRamp": ["#2f1a4d", "#472875", "#7530c9", "#a855f7", "#bc7ef9", "#d1a7fb", "#e5d0fd", "#f7edfe"] }
+    },
+    "typographyMeta": {
+      "page-title": { "displayName": "Page Title", "purpose": "The single app header, 'Clip Tracker'." },
+      "section-title": { "displayName": "Section Title", "purpose": "Calendar / table / KPI section headers, paired with a Material icon." },
+      "stat-number": { "displayName": "Stat Number", "purpose": "Tabular-figure counts: the 5 stat cards, the KPI big score." },
+      "body": { "displayName": "Body", "purpose": "Table cells, form inputs, card copy." },
+      "label": { "displayName": "Label", "purpose": "Badges, chips, table headers, filter pills." }
+    },
+    "shadows": [
+      { "name": "shadow-sm", "value": "0 1px 2px rgba(16,24,40,.05)", "purpose": "Default resting elevation for any card, chip, or button." },
+      { "name": "shadow-md", "value": "0 4px 12px -2px rgba(16,24,40,.08), 0 2px 4px -2px rgba(16,24,40,.04)", "purpose": "Stat-card hover state only." },
+      { "name": "shadow-lg", "value": "0 20px 40px -12px rgba(16,24,40,.18)", "purpose": "Modals and the day-view panel." },
+      { "name": "toggle-knob-shadow", "value": "0 1px 3px rgba(0,0,0,.3)", "purpose": "Structural shadow selling the toggle-switch knob as a physical object; independent of the elevation scale." }
+    ],
+    "motion": [
+      { "name": "t-fast", "value": "0.15s cubic-bezier(0.4, 0, 0.2, 1)", "purpose": "Micro-interactions: hover, dropdown open, badge state change." },
+      { "name": "t-smooth", "value": "0.25s cubic-bezier(0.4, 0, 0.2, 1)", "purpose": "Theme swap, modal open/close, toggle-switch slide." }
+    ],
+    "breakpoints": [
+      { "name": "tablet", "value": "1024px" },
+      { "name": "mobile", "value": "768px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Main call-to-action, e.g. 'เพิ่มคลิปใหม่'.",
+      "html": "<button class=\"ds-btn-primary\"><svg class=\"ds-icon\" viewBox=\"0 0 24 24\" width=\"18\" height=\"18\" fill=\"currentColor\"><path d=\"M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z\"/></svg>เพิ่มคลิปใหม่</button>",
+      "css": ".ds-btn-primary { display:inline-flex; align-items:center; gap:8px; padding:10px 18px; border:1px solid var(--brand, #6d4de0); border-radius:8px; background:var(--brand, #6d4de0); color:#fff; font-weight:600; font-size:0.87rem; cursor:pointer; box-shadow:0 2px 8px -2px rgba(109,77,224,0.5); transition:background .15s cubic-bezier(0.4,0,0.2,1); } .ds-btn-primary:hover, .ds-btn-primary:focus-visible { background:var(--brand-strong, #5b3bd6); border-color:var(--brand-strong, #5b3bd6); } .ds-btn-primary:focus-visible { outline:2px solid var(--brand, #6d4de0); outline-offset:2px; }"
+    },
+    {
+      "name": "Ghost Button",
+      "kind": "button",
+      "refersTo": "button-ghost",
+      "description": "Secondary action, e.g. 'ยกเลิก', 'ตั้งค่าทีม'.",
+      "html": "<button class=\"ds-btn-ghost\">ยกเลิก</button>",
+      "css": ".ds-btn-ghost { padding:10px 18px; border:1px solid var(--border, #e3e8ef); border-radius:8px; background:var(--surface, #fff); color:var(--text, #1a2233); font-weight:600; font-size:0.87rem; cursor:pointer; transition:background .15s cubic-bezier(0.4,0,0.2,1), border-color .15s; } .ds-btn-ghost:hover { background:var(--surface-2, #f1f4f8); border-color:var(--border-strong, #d3dae4); }"
+    },
+    {
+      "name": "Status Badge",
+      "kind": "chip",
+      "refersTo": "status-badge-done",
+      "description": "Clip status pill with a colored dot, e.g. 'อัปลงไดร์ฟแล้ว'.",
+      "html": "<button class=\"ds-status-badge\"><span class=\"ds-dot\"></span>อัปลงไดร์ฟแล้ว</button>",
+      "css": ".ds-status-badge { display:inline-flex; align-items:center; gap:7px; padding:6px 13px; border-radius:9999px; border:1px solid transparent; background:#e2f7ef; color:#076e4c; font-weight:700; font-size:0.78rem; cursor:pointer; } .ds-dot { width:7px; height:7px; border-radius:50%; background:#0e9f6e; } .ds-status-badge:hover { filter:brightness(0.97); }"
+    },
+    {
+      "name": "Channel Tag",
+      "kind": "chip",
+      "refersTo": "channel-tag",
+      "description": "Which content channel a clip belongs to — color-only differentiation, no background per channel.",
+      "html": "<span class=\"ds-channel-tag ds-channel-js\">JS SPORT SHOP</span>",
+      "css": ".ds-channel-tag { display:inline-flex; align-items:center; padding:4px 11px; border-radius:9999px; font-size:0.76rem; font-weight:700; background:var(--surface-2, #f1f4f8); border:1px solid var(--border, #e3e8ef); } .ds-channel-js { color:var(--cyan, #0e8fa3); } .ds-channel-me { color:var(--rose, #d63369); }"
+    },
+    {
+      "name": "Content Link Chip",
+      "kind": "chip",
+      "refersTo": null,
+      "description": "Named reference link on a clip (script doc, drive folder). Opens in a new tab.",
+      "html": "<a class=\"ds-link-chip\" href=\"#\"><svg class=\"ds-icon\" viewBox=\"0 0 24 24\" width=\"13\" height=\"13\" fill=\"currentColor\"><path d=\"M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z\"/></svg>สคริปต์เต็ม</a>",
+      "css": ".ds-link-chip { display:inline-flex; align-items:center; gap:4px; max-width:190px; padding:3px 10px 3px 8px; border-radius:9999px; background:var(--brand-soft, #efeafd); color:var(--brand-text, #5b3bd6); border:1px solid transparent; font-size:0.72rem; font-weight:700; text-decoration:none; } .ds-link-chip:hover { border-color:var(--brand, #6d4de0); }"
+    },
+    {
+      "name": "Toggle Switch",
+      "kind": "input",
+      "refersTo": null,
+      "description": "'อัปลง TikTok แล้ว' on/off control.",
+      "html": "<button class=\"ds-toggle\" aria-pressed=\"false\"><span class=\"ds-toggle-track\"><span class=\"ds-toggle-knob\"></span></span>ยังไม่อัปลง TikTok</button>",
+      "css": ".ds-toggle { display:inline-flex; align-items:center; gap:8px; background:none; border:none; cursor:pointer; font-size:0.78rem; font-weight:600; color:var(--text-2, #5b6678); } .ds-toggle-track { position:relative; width:40px; height:22px; border-radius:9999px; background:var(--surface-3, #e9edf3); border:1px solid var(--border-strong, #d3dae4); } .ds-toggle-knob { position:absolute; top:2px; left:2px; width:16px; height:16px; border-radius:50%; background:#fff; box-shadow:0 1px 3px rgba(0,0,0,.3); transition:transform .25s cubic-bezier(0.4,0,0.2,1); } .ds-toggle[aria-pressed='true'] .ds-toggle-track { background:var(--status-done, #0e9f6e); border-color:var(--status-done, #0e9f6e); } .ds-toggle[aria-pressed='true'] .ds-toggle-knob { transform:translateX(18px); }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Ops Whiteboard",
+    "overview": "Clip Tracker is the shared production board a small TikTok content team keeps open all day — one tab, real-time, everyone watching the same numbers move. The system reads as a clean SaaS ops dashboard, not a marketing surface: dense information (stat cards, calendar, a sortable table), generous but not decorative surfaces, and color that is functional first — status and channel meaning before brand expression. It ships light and dark, both first-class, because the team checks this board at a desk in the morning and on a phone at night.\n\nThe rejected world is the glassmorphism/blur dashboard and the flat monochrome ops tool (à la Invest Hub, a sibling project in this workspace with a black, zero-radius, mono-numeral aesthetic) — Clip Tracker is warmer and rounder than that on purpose: it's a team-facing collaboration tool, not a solo trading terminal.",
+    "keyCharacteristics": [
+      "Soft, rounded surfaces (8–16px radius) on a light neutral canvas, or a near-black canvas in dark mode",
+      "One brand accent (violet, #6d4de0), used sparingly — status and channel colors carry most of the meaning",
+      "Thai-first typography: Noto Sans Thai leads every stack, Manrope is the numeral/Latin partner",
+      "Real-time sync indicator and online badge are always visible — this is built to be watched, not just visited"
+    ],
+    "rules": [
+      { "name": "The Status-Owns-Color Rule", "body": "Status colors (idle/filming/editing/done/uploaded) are reserved for clip status only. No other UI element borrows a status color.", "section": "colors" },
+      { "name": "The Channel Palette Rule", "body": "Content channels get their own four-color set (cyan, rose, warning-amber, success-green). Reusing --warning/--success hues for channel identity is intentional since channel tags live in a different visual context than toasts/status.", "section": "colors" },
+      { "name": "The Gradient Accent Rule", "body": "Flat color is the default everywhere except two deliberate exceptions, both 135° two-color gradients: person avatars and the single app-logo icon badge. Don't extend gradients to any other component.", "section": "colors" },
+      { "name": "The One-Nudge Rule", "body": "Hover states get exactly one physical response — a shadow step up or a 1px lift — never both plus a color shift.", "section": "elevation" }
+    ],
+    "dos": [
+      "Do keep every new status, channel, or badge color inside its owning palette",
+      "Do default new numeric displays to the Manrope/tabular .num treatment",
+      "Do keep every interactive surface on the documented radius scale (8/12/16/9999px)",
+      "Do ship both light and dark values together for any new color"
+    ],
+    "donts": [
+      "Don't add drop shadows beyond the documented shadow-sm/md/lg scale",
+      "Don't introduce a second brand accent",
+      "Don't borrow Invest Hub's zero-radius, blur-free, mono-numeral aesthetic here",
+      "Don't treat every font-size as a violation — the working range is documented as a range, not a fixed ramp"
+    ]
+  }
+}
