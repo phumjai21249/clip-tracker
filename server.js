@@ -33,7 +33,8 @@ if (!admin.apps.length) {
     });
 }
 const db = admin.firestore();
-const clipsRef = db.collection('clipTracker').doc('clips');
+const clipsRef = db.collection('clipTracker').doc('clips'); // legacy whole-array doc — frozen after migration, kept as a rollback snapshot
+const clipsItemsRef = clipsRef.collection('items'); // source of truth: one Firestore doc per clip
 const teamRef = db.collection('clipTracker').doc('team');
 
 // ============ INITIAL DATA ============
@@ -64,15 +65,37 @@ function getDefaultTeam() {
     };
 }
 
+// One doc per clip beats one giant array doc: two people editing at once can
+// no longer clobber each other's clips (each write only ever touches its own
+// document). This seeds clipsItemsRef from whatever the legacy array holds,
+// exactly once, the first time the server sees an empty items collection.
+async function migrateClipsToPerDocIfNeeded(legacyClips) {
+    const itemsSnap = await clipsItemsRef.limit(1).get();
+    if (!itemsSnap.empty) return; // already migrated — never re-run, never re-clobber
+    if (!legacyClips || legacyClips.length === 0) return;
+    const batch = db.batch();
+    legacyClips.forEach((clip, i) => {
+        const { coverImage, id, ...rest } = clip;
+        if (!id) return;
+        // Preserve original list order: the array was newest-first (unshift),
+        // so the first item gets the highest _seq.
+        batch.set(clipsItemsRef.doc(id), { ...rest, _seq: legacyClips.length - i });
+    });
+    await batch.commit();
+    console.log(`✅ Migrated ${legacyClips.length} clips to per-document storage`);
+}
+
 // Initialize data in Firestore if empty and handle migration
 async function initDB() {
     try {
         const clipsDoc = await clipsRef.get();
+        let clipsData;
         if (!clipsDoc.exists) {
-            await clipsRef.set({ data: getDefaultClips() });
+            clipsData = getDefaultClips();
+            await clipsRef.set({ data: clipsData });
         } else {
             // Check if there are coverImages inside the clipsDoc data, and migrate them to clipCovers if needed
-            const clipsData = clipsDoc.data().data || [];
+            clipsData = clipsDoc.data().data || [];
             const hasLegacyCovers = clipsData.some(c => c.coverImage);
             if (hasLegacyCovers) {
                 console.log("Migrating legacy cover images to clipCovers collection...");
@@ -86,14 +109,16 @@ async function initDB() {
                 await batch.commit();
 
                 // Strip coverImages from the main document to free up space
-                const cleanClips = clipsData.map(clip => {
+                clipsData = clipsData.map(clip => {
                     const { coverImage, ...rest } = clip;
                     return rest;
                 });
-                await clipsRef.set({ data: cleanClips });
+                await clipsRef.set({ data: clipsData });
                 console.log("✅ Migration completed successfully!");
             }
         }
+        await migrateClipsToPerDocIfNeeded(clipsData);
+
         const teamDoc = await teamRef.get();
         if (!teamDoc.exists) {
             await teamRef.set({ data: getDefaultTeam() });
@@ -104,6 +129,42 @@ async function initDB() {
     }
 }
 initDB();
+
+// ---- per-clip storage helpers (source of truth) ----
+async function getAllClips() {
+    const [itemsSnap, coversSnap] = await Promise.all([
+        clipsItemsRef.orderBy('_seq', 'desc').get(),
+        db.collection('clipCovers').get()
+    ]);
+    const covers = {};
+    coversSnap.forEach(doc => { covers[doc.id] = doc.data().coverImage; });
+    return itemsSnap.docs.map(doc => {
+        const { _seq, ...clip } = doc.data();
+        return { ...clip, id: doc.id, coverImage: covers[doc.id] || "" };
+    });
+}
+
+async function upsertClip(clip) {
+    const { coverImage, id, ...rest } = clip;
+    if (!id) return;
+    const ref = clipsItemsRef.doc(id);
+    const existing = await ref.get();
+    // Keep the clip's original position stable across edits; only brand-new
+    // clips get a fresh (always-highest) _seq so they sort to the front.
+    const seq = existing.exists && typeof existing.data()._seq === 'number' ? existing.data()._seq : Date.now();
+    await ref.set({ ...rest, _seq: seq });
+    if (coverImage) {
+        await db.collection('clipCovers').doc(id).set({ coverImage });
+    } else if (existing.exists) {
+        await db.collection('clipCovers').doc(id).delete().catch(() => {});
+    }
+}
+
+async function deleteClip(id) {
+    if (!id) return;
+    await clipsItemsRef.doc(id).delete();
+    await db.collection('clipCovers').doc(id).delete().catch(() => {});
+}
 
 // ============ SERVE STATIC ============
 app.use(express.static(path.join(__dirname, 'public')));
@@ -116,78 +177,47 @@ io.on('connection', (socket) => {
     io.emit('online:count', onlineCount);
     console.log(`✅ User connected (${onlineCount} online)`);
 
-    // Send current data to new connection (merged with separate cover images)
+    // Send current data to new connection
     Promise.all([
-        clipsRef.get(),
-        db.collection('clipCovers').get(),
+        getAllClips(),
         teamRef.get()
-    ]).then(([clipsDoc, coversSnapshot, teamDoc]) => {
-        const covers = {};
-        coversSnapshot.forEach(doc => {
-            covers[doc.id] = doc.data().coverImage;
-        });
-        
-        const clips = clipsDoc.exists ? clipsDoc.data().data : [];
-        const mergedClips = clips.map(clip => ({
-            ...clip,
-            coverImage: covers[clip.id] || ""
-        }));
-
+    ]).then(([clips, teamDoc]) => {
         socket.emit('init:data', {
-            clips: mergedClips,
+            clips,
             team: teamDoc.exists ? teamDoc.data().data : getDefaultTeam()
         });
     }).catch(e => console.error("Error loading init data:", e));
 
-    // ---- CLIPS ----
+    // ---- CLIPS (one clip per write — see upsertClip/deleteClip) ----
+    socket.on('clip:save', async (clip) => {
+        try {
+            await upsertClip(clip);
+            socket.broadcast.emit('clip:saved', clip);
+        } catch (e) { console.error("Firebase save error (clip:save):", e); }
+    });
+
+    socket.on('clip:delete', async (id) => {
+        try {
+            await deleteClip(id);
+            socket.broadcast.emit('clip:deleted', id);
+        } catch (e) { console.error("Firebase save error (clip:delete):", e); }
+    });
+
+    // ---- Legacy whole-array event ----
+    // Kept only so a browser tab that still has the old page cached (hasn't
+    // refreshed since this deploy) doesn't silently stop syncing. It upserts
+    // every clip in the payload but never deletes — a stale/incomplete array
+    // can no longer wipe out clips the sender's tab simply doesn't know about
+    // yet, which was the actual cause of clips disappearing during long
+    // sessions. Delete still needs a client on the new clip:delete event.
     socket.on('clips:update', async (updatedClips) => {
         try {
-            // 1. Extract coverImages and strip them from clips array
-            const clipsToSave = [];
-            const coversToUpdate = [];
-            const idsInUpdated = new Set();
-
-            updatedClips.forEach(clip => {
-                idsInUpdated.add(clip.id);
-                const { coverImage, ...rest } = clip;
-                clipsToSave.push(rest);
-                
-                if (coverImage) {
-                    coversToUpdate.push({ id: clip.id, coverImage });
-                }
-            });
-
-            // 2. Save main clips document
-            await clipsRef.set({ data: clipsToSave });
-
-            // 3. Write covers to separate documents
-            if (coversToUpdate.length > 0) {
-                const batch = db.batch();
-                coversToUpdate.forEach(item => {
-                    const ref = db.collection('clipCovers').doc(item.id);
-                    batch.set(ref, { coverImage: item.coverImage });
-                });
-                await batch.commit();
+            for (const clip of updatedClips) {
+                await upsertClip(clip);
             }
-
-            // 4. Cleanup deleted clips or removed cover images
-            const coversSnapshot = await db.collection('clipCovers').get();
-            const deleteBatch = db.batch();
-            let hasDeletes = false;
-            coversSnapshot.forEach(doc => {
-                const clip = updatedClips.find(c => c.id === doc.id);
-                if (!clip || !clip.coverImage) {
-                    deleteBatch.delete(doc.ref);
-                    hasDeletes = true;
-                }
-            });
-            if (hasDeletes) {
-                await deleteBatch.commit();
-            }
-
-            // 5. Broadcast the original updatedClips (with coverImage inside) to other clients
-            socket.broadcast.emit('clips:updated', updatedClips);
-        } catch (e) { console.error("Firebase save error (clips):", e); }
+            const fresh = await getAllClips();
+            io.emit('clips:updated', fresh);
+        } catch (e) { console.error("Firebase save error (clips:update, legacy):", e); }
     });
 
     // ---- TEAM ----
