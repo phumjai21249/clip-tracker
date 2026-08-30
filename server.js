@@ -127,8 +127,11 @@ async function initDB() {
     } catch (e) {
         console.error("Error initializing Firestore:", e);
     }
-    await backfillHasCoverOnce();
+    // Listeners first so the board can serve as soon as possible; the backfill
+    // is a one-off tidy-up and must never delay or block them.
     startClipsListener();
+    startTeamListener();
+    backfillHasCoverOnce();
 }
 // Started at the bottom of this file, once the cache bindings below exist.
 
@@ -155,6 +158,22 @@ function snapshotToClips(snap) {
         const { _seq, hasCover, ...clip } = doc.data();
         return { ...clip, id: doc.id, hasCover: !!hasCover };
     });
+}
+
+// The team document is one small, rarely-changing record, but reading it per
+// connection is still a per-connection Firestore read — the last one on the
+// connect path, and enough on its own to fail every connection once the daily
+// quota is gone. Same treatment as the clips.
+let teamCache = null;
+
+function startTeamListener() {
+    teamRef.onSnapshot(
+        doc => { teamCache = doc.exists ? doc.data().data : getDefaultTeam(); },
+        err => {
+            console.error('team listener error:', err.message);
+            setTimeout(startTeamListener, 60000);
+        }
+    );
 }
 
 function startClipsListener() {
@@ -302,6 +321,7 @@ app.get('/__diag', async (req, res) => {
         clips: clipsCache.length,
         withCover: clipsCache.filter(c => c.hasCover).length,
         payloadKB: Math.round(JSON.stringify(clipsCache).length / 1024),
+        teamReady: !!teamCache,
         lastError: clipsCacheError ? clipsCacheError.message : null
     };
 
@@ -341,14 +361,12 @@ io.on('connection', (socket) => {
     io.emit('online:count', onlineCount);
     console.log(`✅ User connected (${onlineCount} online)`);
 
-    // Send current data to new connection
-    Promise.all([
-        getAllClips(),
-        teamRef.get()
-    ]).then(([clips, teamDoc]) => {
+    // Send current data to new connection — both sides come from the live
+    // caches, so a connection costs zero Firestore reads.
+    getAllClips().then(clips => {
         socket.emit('init:data', {
             clips,
-            team: teamDoc.exists ? teamDoc.data().data : getDefaultTeam()
+            team: teamCache || getDefaultTeam()
         });
     }).catch(e => {
         // Never fail silently here: before this, a rejected read left the client
