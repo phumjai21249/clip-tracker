@@ -249,6 +249,22 @@ io.on('connection', (socket) => {
         socket.emit('init:error', { message: String(e && e.message || e), code: (e && e.code) || null });
     });
 
+    // ---- DIAGNOSTIC: is payload size the reason init:data never lands? ----
+    // Emits the same clip set twice over the same socket: a tiny meta packet
+    // (proves the handler ran and the socket is writable) followed by the
+    // payload itself, either with or without cover images. Size is the only
+    // variable between the two modes.
+    socket.on('diag:emit', async (mode) => {
+        try {
+            const all = await getAllClips();
+            const payload = mode === 'nocovers' ? all.map(({ coverImage, ...rest }) => rest) : all;
+            socket.emit('diag:meta', { mode, count: payload.length, kb: Math.round(JSON.stringify(payload).length / 1024) });
+            socket.emit('diag:clips', payload);
+        } catch (e) {
+            socket.emit('diag:meta', { mode, error: String(e && e.message || e) });
+        }
+    });
+
     // ---- CLIPS (one clip per write — see upsertClip/deleteClip) ----
     socket.on('clip:save', async (clip) => {
         try {
