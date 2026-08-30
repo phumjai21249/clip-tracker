@@ -131,6 +131,7 @@ async function initDB() {
     // is a one-off tidy-up and must never delay or block them.
     startClipsListener();
     startTeamListener();
+    startCoversListener();
     backfillHasCoverOnce();
 }
 // Started at the bottom of this file, once the cache bindings below exist.
@@ -172,6 +173,38 @@ function startTeamListener() {
         err => {
             console.error('team listener error:', err.message);
             setTimeout(startTeamListener, 60000);
+        }
+    );
+}
+
+// Cover bytes, decoded once and held in memory. Serving them straight from
+// Firestore meant one document read per image per page load (~113), which is
+// how a page view could still exhaust the daily quota even after the images
+// left the socket payload. One listener pays for them at boot and then only
+// when an image actually changes.
+const coverCache = new Map(); // id -> { buf, type }
+let coversCacheReady = false;
+
+function decodeCover(dataUrl) {
+    const m = /^data:(image\/[a-z.+-]+);base64,(.+)$/i.exec(dataUrl || '');
+    return m ? { buf: Buffer.from(m[2], 'base64'), type: m[1] } : null;
+}
+
+function startCoversListener() {
+    db.collection('clipCovers').onSnapshot(
+        snap => {
+            snap.docChanges().forEach(ch => {
+                if (ch.type === 'removed') { coverCache.delete(ch.doc.id); return; }
+                const decoded = decodeCover(ch.doc.data().coverImage);
+                if (decoded) coverCache.set(ch.doc.id, decoded);
+                else coverCache.delete(ch.doc.id);
+            });
+            coversCacheReady = true;
+            console.log(`🖼️  cover cache: ${coverCache.size} images`);
+        },
+        err => {
+            console.error('covers listener error:', err.message);
+            setTimeout(startCoversListener, 60000);
         }
     );
 }
@@ -289,24 +322,20 @@ async function deleteClip(id) {
 // Served per image over plain HTTP so the browser caches them and only fetches
 // what it actually renders, instead of every client receiving all of them up
 // front through the socket.
-app.get('/cover/:id', async (req, res) => {
-    try {
-        const doc = await db.collection('clipCovers').doc(req.params.id).get();
-        if (!doc.exists) return res.status(404).end();
-        const dataUrl = doc.data().coverImage || '';
-        const m = /^data:(image\/[a-z.+-]+);base64,(.+)$/i.exec(dataUrl);
-        if (!m) return res.status(404).end();
-        const body = Buffer.from(m[2], 'base64');
-        // Requests carry ?v=<coverVersion>, so a given URL's bytes never change
-        // and can be cached hard; replacing a cover changes the URL.
-        res.set('Content-Type', m[1]);
-        res.set('Cache-Control', req.query.v ? 'public, max-age=31536000, immutable' : 'public, max-age=60');
-        res.set('Content-Length', String(body.length));
-        res.end(body);
-    } catch (e) {
-        console.error('cover fetch failed', req.params.id, e.message);
-        res.status(500).end();
+app.get('/cover/:id', (req, res) => {
+    const hit = coverCache.get(req.params.id);
+    if (!hit) {
+        // Distinguish "no such cover" from "the cache has not loaded yet", so a
+        // client can retry rather than caching a miss.
+        if (!coversCacheReady) return res.status(503).set('Retry-After', '10').end();
+        return res.status(404).end();
     }
+    // Requests carry ?v=<coverVersion>, so a given URL's bytes never change and
+    // can be cached hard; replacing a cover changes the URL.
+    res.set('Content-Type', hit.type);
+    res.set('Cache-Control', req.query.v ? 'public, max-age=31536000, immutable' : 'public, max-age=300');
+    res.set('Content-Length', String(hit.buf.length));
+    res.end(hit.buf);
 });
 
 // ============ DIAGNOSTICS ============
@@ -335,6 +364,9 @@ app.get('/__diag', async (req, res) => {
         withCover: clipsCache.filter(c => c.hasCover).length,
         payloadKB: Math.round(JSON.stringify(clipsCache).length / 1024),
         teamReady: !!teamCache,
+        coversReady: coversCacheReady,
+        coversCached: coverCache.size,
+        coverBytesMB: Math.round([...coverCache.values()].reduce((s, c) => s + c.buf.length, 0) / 1048576 * 10) / 10,
         lastError: clipsCacheError ? clipsCacheError.message : null
     };
     out.backfill = lastBackfillResult;
