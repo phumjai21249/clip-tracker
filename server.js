@@ -166,6 +166,62 @@ async function deleteClip(id) {
     await db.collection('clipCovers').doc(id).delete().catch(() => {});
 }
 
+// ============ DIAGNOSTICS ============
+// Times each Firestore read the connection path depends on, in isolation, so a
+// failure or a slow query can be attributed to one specific call instead of
+// disappearing into the connection handler's catch. Reports sizes and counts
+// only — never clip content.
+app.get('/__diag', async (req, res) => {
+    const out = { ok: true, node: process.version, steps: {} };
+    const step = async (name, fn) => {
+        const t = Date.now();
+        try {
+            out.steps[name] = Object.assign({ ms: Date.now() - t }, await fn());
+            out.steps[name].ms = Date.now() - t;
+        } catch (e) {
+            out.ok = false;
+            out.steps[name] = { ms: Date.now() - t, error: e.message, code: e.code || null };
+        }
+    };
+
+    await step('legacyArrayDoc', async () => {
+        const d = await clipsRef.get();
+        return { exists: d.exists, arrayLen: d.exists ? (d.data().data || []).length : 0 };
+    });
+    await step('itemsUnordered', async () => {
+        const s = await clipsItemsRef.get();
+        return { count: s.size };
+    });
+    await step('itemsOrderedBySeq', async () => {
+        const s = await clipsItemsRef.orderBy('_seq', 'desc').get();
+        let missingSeq = 0;
+        s.forEach(d => { if (typeof d.data()._seq !== 'number') missingSeq++; });
+        return { count: s.size, missingSeq };
+    });
+    await step('covers', async () => {
+        const s = await db.collection('clipCovers').get();
+        let bytes = 0, biggest = 0;
+        s.forEach(d => {
+            const c = d.data().coverImage;
+            if (typeof c === 'string') { bytes += c.length; if (c.length > biggest) biggest = c.length; }
+        });
+        return { count: s.size, totalKB: Math.round(bytes / 1024), biggestKB: Math.round(biggest / 1024) };
+    });
+    await step('team', async () => {
+        const d = await teamRef.get();
+        return { exists: d.exists };
+    });
+    await step('getAllClipsEndToEnd', async () => {
+        const all = await getAllClips();
+        return { count: all.length, payloadKB: Math.round(JSON.stringify(all).length / 1024) };
+    });
+
+    const m = process.memoryUsage();
+    out.memory = { rssMB: Math.round(m.rss / 1048576), heapUsedMB: Math.round(m.heapUsed / 1048576) };
+    out.uptimeSec = Math.round(process.uptime());
+    res.json(out);
+});
+
 // ============ SERVE STATIC ============
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -186,7 +242,12 @@ io.on('connection', (socket) => {
             clips,
             team: teamDoc.exists ? teamDoc.data().data : getDefaultTeam()
         });
-    }).catch(e => console.error("Error loading init data:", e));
+    }).catch(e => {
+        // Never fail silently here: before this, a rejected read left the client
+        // connected but permanently empty with no way to tell why.
+        console.error("Error loading init data:", e);
+        socket.emit('init:error', { message: String(e && e.message || e), code: (e && e.code) || null });
+    });
 
     // ---- CLIPS (one clip per write — see upsertClip/deleteClip) ----
     socket.on('clip:save', async (clip) => {
