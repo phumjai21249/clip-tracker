@@ -1884,6 +1884,10 @@
         let openDropdownId = null;
         let calYear, calMonth;
         let expandedDescs = new Set();
+        // What the open modal intends to do with the clip's cover:
+        // 'none' (no cover) · 'keep' (leave the stored one alone) ·
+        // 'new' (replace with the picked file) · 'removed' (delete it).
+        let coverState = 'none';
         const BLANK_IMG = 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==';
 
         function statusColor(key) {
@@ -1920,7 +1924,9 @@
             socket.on('clips:updated', (newClips) => { clips = newClips; render(); showSyncIndicator(); });
             socket.on('clip:saved', (clip) => {
                 const i = clips.findIndex(c => c.id === clip.id);
-                if (i >= 0) clips[i] = clip; else clips.unshift(clip);
+                // Merge rather than replace: the server omits hasCover/coverVersion
+                // when the cover did not change, and this keeps the values we have.
+                if (i >= 0) clips[i] = { ...clips[i], ...clip }; else clips.unshift(clip);
                 render(); showSyncIndicator();
             });
             socket.on('clip:deleted', (id) => {
@@ -2166,8 +2172,8 @@
                 const stColor = statusColor(clip.status);
                 const chInfo = channelInfo(clip.channel);
                 let thumbHtml = '';
-                if (clip.coverImage) {
-                    thumbHtml = `<img class="dv-clip-thumb" src="${clip.coverImage}" alt="ปก" loading="lazy">`;
+                if (coverUrl(clip)) {
+                    thumbHtml = `<img class="dv-clip-thumb" src="${coverUrl(clip)}" alt="ปก" loading="lazy">`;
                 } else {
                     const initials = (clip.title || 'VD').split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
                     thumbHtml = `<div class="dv-clip-thumb-placeholder">${escHtml(initials)}</div>`;
@@ -2197,7 +2203,7 @@
 
         function calAddClip(dateStr) {
             editingClipId = null;
-            removeCover();
+            clearCoverField(); coverState = 'none';
             document.getElementById('modalTitle').textContent = 'เพิ่มคลิปใหม่';
             document.getElementById('clipName').value = '';
             document.getElementById('clipDesc').value = '';
@@ -2218,7 +2224,7 @@
             tt.querySelector('.tt-title').textContent = clip.title;
             tt.querySelector('.tt-desc').textContent = clip.desc || '';
             const ttCover = tt.querySelector('.tt-cover');
-            if (clip.coverImage) { ttCover.src = clip.coverImage; ttCover.style.display = 'block'; }
+            if (coverUrl(clip)) { ttCover.src = coverUrl(clip); ttCover.style.display = 'block'; }
             else { ttCover.style.display = 'none'; ttCover.src = BLANK_IMG; }
             tt.querySelector('.tt-meta').innerHTML = `
                 <span style="color:${statusColor(clip.status)}">● ${st ? st.label : clip.status}</span>
@@ -2316,9 +2322,18 @@
                 </a>`).join('')}</div>`;
         }
 
+        // Cover images are fetched per image over HTTP (and cached by the
+        // browser) instead of arriving inside the socket payload — shipping all
+        // of them up front was 6.7MB per connection and stalled the server.
+        function coverUrl(clip) {
+            if (!clip || !clip.hasCover) return null;
+            return `/cover/${encodeURIComponent(clip.id)}${clip.coverVersion ? '?v=' + clip.coverVersion : ''}`;
+        }
+
         function coverHtml(clip) {
-            return clip.coverImage
-                ? `<img src="${clip.coverImage}" class="table-cover-img" alt="ปก" loading="lazy">`
+            const url = coverUrl(clip);
+            return url
+                ? `<img src="${url}" class="table-cover-img" alt="ปก" loading="lazy">`
                 : `<div class="fallback-cover"><span class="material-icons-round">movie</span></div>`;
         }
         function channelTag(clip) {
@@ -2545,7 +2560,7 @@
             const overlay = document.getElementById('modalOverlay');
             overlay.classList.add('open');
             if (!editing) {
-                removeCover();
+                clearCoverField(); coverState = 'none';
                 editingClipId = null;
                 document.getElementById('modalTitle').textContent = 'เพิ่มคลิปใหม่';
                 document.getElementById('clipName').value = '';
@@ -2567,7 +2582,11 @@
             const status = document.getElementById('clipStatus').value;
             const channel = document.getElementById('clipChannel').value;
             const date = document.getElementById('clipDate').value;
-            const coverImage = document.getElementById('clipCoverBase64').value;
+            // undefined = leave whatever cover is on the server alone.
+            // '' = the user explicitly removed it. A string = a new image.
+            const coverImage = coverState === 'new' ? document.getElementById('clipCoverBase64').value
+                             : coverState === 'removed' ? ''
+                             : undefined;
 
             if (!name) { showToast('กรุณาใส่ชื่อคลิป', 'warning'); return; }
             if (!creator) { showToast('กรุณาเลือกคนทำคลิป', 'warning'); return; }
@@ -2581,17 +2600,26 @@
                 if (clip) {
                     clip.title = name; clip.desc = desc; clip.creator = creator;
                     clip.status = status; clip.channel = channel; clip.date = date;
-                    clip.coverImage = coverImage;
                     clip.links = linkResult.links;
                     savedClip = clip;
                 }
                 showToast('แก้ไขคลิปเรียบร้อย', 'success');
             } else {
-                savedClip = { id: genId(), title: name, desc, creator, status, channel, uploaded: false, date, coverImage, links: linkResult.links };
+                savedClip = { id: genId(), title: name, desc, creator, status, channel, uploaded: false, date, links: linkResult.links };
                 clips.unshift(savedClip);
                 showToast('เพิ่มคลิปใหม่เรียบร้อย', 'success');
             }
-            if (savedClip) syncClipSave(savedClip);
+            if (savedClip) {
+                if (coverImage !== undefined) {
+                    // Reflect the new cover locally right away; the version bump
+                    // is what makes the cached <img> URL refetch.
+                    savedClip.hasCover = !!coverImage;
+                    savedClip.coverVersion = coverImage ? Date.now() : null;
+                }
+                // The base64 rides along on this one save only — it is never kept
+                // in the in-memory clip, so later edits stay small.
+                syncClipSave(coverImage === undefined ? savedClip : { ...savedClip, coverImage });
+            }
             closeModal(); render();
         }
 
@@ -2599,12 +2627,16 @@
             const clip = clips.find(c => c.id === clipId);
             if (!clip) return;
             editingClipId = clipId;
-            removeCover();
-            if (clip.coverImage) {
-                document.getElementById('clipCoverBase64').value = clip.coverImage;
-                document.getElementById('clipCoverPreview').src = clip.coverImage;
+            clearCoverField();
+            coverState = 'none';
+            if (coverUrl(clip)) {
+                // Preview the stored image by URL. The base64 stays on the
+                // server, so the hidden field is left empty and coverState is
+                // what tells saveClip to leave the cover untouched.
+                document.getElementById('clipCoverPreview').src = coverUrl(clip);
                 document.getElementById('clipCoverPreview').style.display = 'block';
                 document.getElementById('btnRemoveCover').style.display = 'inline-flex';
+                coverState = 'keep';
             }
             document.getElementById('modalTitle').textContent = 'แก้ไขคลิป';
             document.getElementById('clipName').value = clip.title;
@@ -2686,17 +2718,27 @@
                     document.getElementById('clipCoverPreview').src = dataUrl;
                     document.getElementById('clipCoverPreview').style.display = 'block';
                     document.getElementById('btnRemoveCover').style.display = 'inline-flex';
+                    coverState = 'new';
                 };
                 img.src = evt.target.result;
             };
             reader.readAsDataURL(file);
         }
-        function removeCover() {
+        // Blanks the cover field without expressing intent — used when the form
+        // is being (re)populated.
+        function clearCoverField() {
             document.getElementById('clipCover').value = '';
             document.getElementById('clipCoverBase64').value = '';
             document.getElementById('clipCoverPreview').src = BLANK_IMG;
             document.getElementById('clipCoverPreview').style.display = 'none';
             document.getElementById('btnRemoveCover').style.display = 'none';
+        }
+        // The user pressed "ลบรูปปก" — that IS intent, so record it. The form no
+        // longer holds the existing image, so without this the save would look
+        // identical to "leave the cover alone".
+        function removeCover() {
+            clearCoverField();
+            coverState = editingClipId ? 'removed' : 'none';
         }
         function formatDate(dateStr) {
             if (!dateStr) return '-';

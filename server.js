@@ -131,33 +131,56 @@ async function initDB() {
 initDB();
 
 // ---- per-clip storage helpers (source of truth) ----
+
+// Monotonic so two clips created in the same millisecond still get a stable,
+// distinct order instead of tying on Date.now().
+let lastSeq = 0;
+function nextSeq() { lastSeq = Math.max(Date.now(), lastSeq + 1); return lastSeq; }
+
+// Cover images are deliberately NOT part of this payload. Reading all of them
+// on every connection was ~6.7MB and 419 document reads, which saturated the
+// instance and left init:data undeliverable. The id-only projection tells the
+// client which clips have a cover; the bytes are fetched per image over HTTP
+// (GET /cover/:id) where the browser can cache them.
 async function getAllClips() {
-    const [itemsSnap, coversSnap] = await Promise.all([
+    const [itemsSnap, coverIdsSnap] = await Promise.all([
         clipsItemsRef.orderBy('_seq', 'desc').get(),
-        db.collection('clipCovers').get()
+        db.collection('clipCovers').select().get()
     ]);
-    const covers = {};
-    coversSnap.forEach(doc => { covers[doc.id] = doc.data().coverImage; });
+    const withCover = new Set(coverIdsSnap.docs.map(d => d.id));
     return itemsSnap.docs.map(doc => {
         const { _seq, ...clip } = doc.data();
-        return { ...clip, id: doc.id, coverImage: covers[doc.id] || "" };
+        return { ...clip, id: doc.id, hasCover: withCover.has(doc.id) };
     });
 }
 
 async function upsertClip(clip) {
-    const { coverImage, id, ...rest } = clip;
+    const { coverImage, hasCover, id, ...rest } = clip;
     if (!id) return;
     const ref = clipsItemsRef.doc(id);
     const existing = await ref.get();
+    const prev = existing.exists ? existing.data() : null;
     // Keep the clip's original position stable across edits; only brand-new
     // clips get a fresh (always-highest) _seq so they sort to the front.
-    const seq = existing.exists && typeof existing.data()._seq === 'number' ? existing.data()._seq : Date.now();
-    await ref.set({ ...rest, _seq: seq });
-    if (coverImage) {
-        await db.collection('clipCovers').doc(id).set({ coverImage });
-    } else if (existing.exists) {
-        await db.collection('clipCovers').doc(id).delete().catch(() => {});
+    const seq = prev && typeof prev._seq === 'number' ? prev._seq : nextSeq();
+    const doc = { ...rest, _seq: seq };
+
+    if (coverImage === undefined) {
+        // "Leave the cover as it is." The client no longer holds the base64,
+        // so an absent field must never be read as "remove the cover".
+        if (prev && prev.coverVersion) doc.coverVersion = prev.coverVersion;
+        await ref.set(doc);
+        return { coverChanged: false };
     }
+    if (coverImage) {
+        doc.coverVersion = nextSeq(); // cache-buster for /cover/:id?v=
+        await ref.set(doc);
+        await db.collection('clipCovers').doc(id).set({ coverImage });
+        return { coverChanged: true, hasCover: true, coverVersion: doc.coverVersion };
+    }
+    await ref.set(doc);
+    await db.collection('clipCovers').doc(id).delete().catch(() => {});
+    return { coverChanged: true, hasCover: false, coverVersion: null };
 }
 
 async function deleteClip(id) {
@@ -165,6 +188,30 @@ async function deleteClip(id) {
     await clipsItemsRef.doc(id).delete();
     await db.collection('clipCovers').doc(id).delete().catch(() => {});
 }
+
+// ============ COVER IMAGES ============
+// Served per image over plain HTTP so the browser caches them and only fetches
+// what it actually renders, instead of every client receiving all of them up
+// front through the socket.
+app.get('/cover/:id', async (req, res) => {
+    try {
+        const doc = await db.collection('clipCovers').doc(req.params.id).get();
+        if (!doc.exists) return res.status(404).end();
+        const dataUrl = doc.data().coverImage || '';
+        const m = /^data:(image\/[a-z.+-]+);base64,(.+)$/i.exec(dataUrl);
+        if (!m) return res.status(404).end();
+        const body = Buffer.from(m[2], 'base64');
+        // Requests carry ?v=<coverVersion>, so a given URL's bytes never change
+        // and can be cached hard; replacing a cover changes the URL.
+        res.set('Content-Type', m[1]);
+        res.set('Cache-Control', req.query.v ? 'public, max-age=31536000, immutable' : 'public, max-age=60');
+        res.set('Content-Length', String(body.length));
+        res.end(body);
+    } catch (e) {
+        console.error('cover fetch failed', req.params.id, e.message);
+        res.status(500).end();
+    }
+});
 
 // ============ DIAGNOSTICS ============
 // Times each Firestore read the connection path depends on, in isolation, so a
@@ -198,15 +245,23 @@ app.get('/__diag', async (req, res) => {
         s.forEach(d => { if (typeof d.data()._seq !== 'number') missingSeq++; });
         return { count: s.size, missingSeq };
     });
-    await step('covers', async () => {
-        const s = await db.collection('clipCovers').get();
-        let bytes = 0, biggest = 0;
-        s.forEach(d => {
-            const c = d.data().coverImage;
-            if (typeof c === 'string') { bytes += c.length; if (c.length > biggest) biggest = c.length; }
-        });
-        return { count: s.size, totalKB: Math.round(bytes / 1024), biggestKB: Math.round(biggest / 1024) };
+    await step('coverIdsOnly', async () => {
+        const s = await db.collection('clipCovers').select().get();
+        return { count: s.size };
     });
+    // Reading every cover's bytes is the exact load that used to stall this
+    // instance, so it stays behind ?deep=1 rather than running on every hit.
+    if (req.query.deep) {
+        await step('coversDeep', async () => {
+            const s = await db.collection('clipCovers').get();
+            let bytes = 0, biggest = 0;
+            s.forEach(d => {
+                const c = d.data().coverImage;
+                if (typeof c === 'string') { bytes += c.length; if (c.length > biggest) biggest = c.length; }
+            });
+            return { count: s.size, totalKB: Math.round(bytes / 1024), biggestKB: Math.round(biggest / 1024) };
+        });
+    }
     await step('team', async () => {
         const d = await teamRef.get();
         return { exists: d.exists };
@@ -249,27 +304,20 @@ io.on('connection', (socket) => {
         socket.emit('init:error', { message: String(e && e.message || e), code: (e && e.code) || null });
     });
 
-    // ---- DIAGNOSTIC: is payload size the reason init:data never lands? ----
-    // Emits the same clip set twice over the same socket: a tiny meta packet
-    // (proves the handler ran and the socket is writable) followed by the
-    // payload itself, either with or without cover images. Size is the only
-    // variable between the two modes.
-    socket.on('diag:emit', async (mode) => {
-        try {
-            const all = await getAllClips();
-            const payload = mode === 'nocovers' ? all.map(({ coverImage, ...rest }) => rest) : all;
-            socket.emit('diag:meta', { mode, count: payload.length, kb: Math.round(JSON.stringify(payload).length / 1024) });
-            socket.emit('diag:clips', payload);
-        } catch (e) {
-            socket.emit('diag:meta', { mode, error: String(e && e.message || e) });
-        }
-    });
-
     // ---- CLIPS (one clip per write — see upsertClip/deleteClip) ----
     socket.on('clip:save', async (clip) => {
         try {
-            await upsertClip(clip);
-            socket.broadcast.emit('clip:saved', clip);
+            const r = await upsertClip(clip);
+            // Broadcast without the base64: other clients fetch the image from
+            // /cover/:id like everyone else. hasCover is only included when the
+            // cover actually changed, so receivers merge and keep their own
+            // value otherwise.
+            const { coverImage, ...rest } = clip;
+            if (r && r.coverChanged) {
+                rest.hasCover = r.hasCover;
+                rest.coverVersion = r.coverVersion;
+            }
+            socket.broadcast.emit('clip:saved', rest);
         } catch (e) { console.error("Firebase save error (clip:save):", e); }
     });
 
