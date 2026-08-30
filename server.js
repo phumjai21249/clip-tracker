@@ -127,8 +127,10 @@ async function initDB() {
     } catch (e) {
         console.error("Error initializing Firestore:", e);
     }
+    await backfillHasCoverOnce();
+    startClipsListener();
 }
-initDB();
+// Started at the bottom of this file, once the cache bindings below exist.
 
 // ---- per-clip storage helpers (source of truth) ----
 
@@ -137,21 +139,55 @@ initDB();
 let lastSeq = 0;
 function nextSeq() { lastSeq = Math.max(Date.now(), lastSeq + 1); return lastSeq; }
 
-// Cover images are deliberately NOT part of this payload. Reading all of them
-// on every connection was ~6.7MB and 419 document reads, which saturated the
-// instance and left init:data undeliverable. The id-only projection tells the
-// client which clips have a cover; the bytes are fetched per image over HTTP
-// (GET /cover/:id) where the browser can cache them.
-async function getAllClips() {
-    const [itemsSnap, coverIdsSnap] = await Promise.all([
-        clipsItemsRef.orderBy('_seq', 'desc').get(),
-        db.collection('clipCovers').select().get()
-    ]);
-    const withCover = new Set(coverIdsSnap.docs.map(d => d.id));
-    return itemsSnap.docs.map(doc => {
-        const { _seq, ...clip } = doc.data();
-        return { ...clip, id: doc.id, hasCover: withCover.has(doc.id) };
+// ---- live in-memory clip cache ----
+// Serving connections straight from Firestore cost one document read per clip
+// per connection (~419), which exhausted the daily free-tier read quota and
+// took the whole board down. A single snapshot listener pays that cost once at
+// boot and then only for documents that actually change, so a client
+// connecting costs zero reads.
+let clipsCache = [];
+let clipsCacheReady = false;
+let clipsCacheError = null;
+const cacheWaiters = [];
+
+function snapshotToClips(snap) {
+    return snap.docs.map(doc => {
+        const { _seq, hasCover, ...clip } = doc.data();
+        return { ...clip, id: doc.id, hasCover: !!hasCover };
     });
+}
+
+function startClipsListener() {
+    clipsItemsRef.orderBy('_seq', 'desc').onSnapshot(
+        snap => {
+            clipsCache = snapshotToClips(snap);
+            clipsCacheReady = true;
+            clipsCacheError = null;
+            while (cacheWaiters.length) cacheWaiters.shift()();
+            console.log(`📥 clip cache updated: ${clipsCache.length} clips`);
+        },
+        err => {
+            clipsCacheError = err;
+            console.error('clips listener error:', err.message);
+            // Quota exhaustion and transient gRPC drops both land here; retry
+            // rather than leaving the process permanently blind.
+            setTimeout(startClipsListener, 60000);
+        }
+    );
+}
+
+// Cover images are deliberately NOT part of this payload. Shipping them was
+// ~6.7MB per connection; clients fetch each one from GET /cover/:id instead,
+// where the browser caches it.
+async function getAllClips() {
+    if (clipsCacheReady) return clipsCache;
+    if (clipsCacheError) throw clipsCacheError;
+    // First connection(s) after boot wait for the listener's initial snapshot.
+    await new Promise((resolve, reject) => {
+        const timer = setTimeout(() => reject(new Error('clip cache not ready')), 20000);
+        cacheWaiters.push(() => { clearTimeout(timer); resolve(); });
+    });
+    return clipsCache;
 }
 
 async function upsertClip(clip) {
@@ -169,18 +205,46 @@ async function upsertClip(clip) {
         // "Leave the cover as it is." The client no longer holds the base64,
         // so an absent field must never be read as "remove the cover".
         if (prev && prev.coverVersion) doc.coverVersion = prev.coverVersion;
+        if (prev && prev.hasCover) doc.hasCover = true;
         await ref.set(doc);
         return { coverChanged: false };
     }
     if (coverImage) {
+        doc.hasCover = true;
         doc.coverVersion = nextSeq(); // cache-buster for /cover/:id?v=
         await ref.set(doc);
         await db.collection('clipCovers').doc(id).set({ coverImage });
         return { coverChanged: true, hasCover: true, coverVersion: doc.coverVersion };
     }
+    doc.hasCover = false;
     await ref.set(doc);
     await db.collection('clipCovers').doc(id).delete().catch(() => {});
     return { coverChanged: true, hasCover: false, coverVersion: null };
+}
+
+// The hasCover flag lives on the clip document so the snapshot listener carries
+// it for free. Clips that already had covers predate the flag, so stamp them
+// once — guarded by a marker so this never runs again.
+async function backfillHasCoverOnce() {
+    const metaRef = db.collection('clipTracker').doc('meta');
+    try {
+        const meta = await metaRef.get();
+        if (meta.exists && meta.data().hasCoverBackfilled) return;
+        const coverIds = await db.collection('clipCovers').select().get();
+        for (let i = 0; i < coverIds.docs.length; i += 400) {
+            const batch = db.batch();
+            coverIds.docs.slice(i, i + 400).forEach(d => {
+                batch.set(clipsItemsRef.doc(d.id), { hasCover: true }, { merge: true });
+            });
+            await batch.commit();
+        }
+        await metaRef.set({ hasCoverBackfilled: true }, { merge: true });
+        console.log(`✅ hasCover backfilled for ${coverIds.docs.length} clips`);
+    } catch (e) {
+        // Most likely the daily read quota; try again on the next boot rather
+        // than blocking startup.
+        console.error('hasCover backfill deferred:', e.message);
+    }
 }
 
 async function deleteClip(id) {
@@ -231,45 +295,34 @@ app.get('/__diag', async (req, res) => {
         }
     };
 
-    await step('legacyArrayDoc', async () => {
-        const d = await clipsRef.get();
-        return { exists: d.exists, arrayLen: d.exists ? (d.data().data || []).length : 0 };
-    });
-    await step('itemsUnordered', async () => {
-        const s = await clipsItemsRef.get();
-        return { count: s.size };
-    });
-    await step('itemsOrderedBySeq', async () => {
-        const s = await clipsItemsRef.orderBy('_seq', 'desc').get();
-        let missingSeq = 0;
-        s.forEach(d => { if (typeof d.data()._seq !== 'number') missingSeq++; });
-        return { count: s.size, missingSeq };
-    });
-    await step('coverIdsOnly', async () => {
-        const s = await db.collection('clipCovers').select().get();
-        return { count: s.size };
-    });
-    // Reading every cover's bytes is the exact load that used to stall this
-    // instance, so it stays behind ?deep=1 rather than running on every hit.
+    // Default view is read-free: it reports the in-memory cache, so checking
+    // health never spends the read quota it exists to protect.
+    out.cache = {
+        ready: clipsCacheReady,
+        clips: clipsCache.length,
+        withCover: clipsCache.filter(c => c.hasCover).length,
+        payloadKB: Math.round(JSON.stringify(clipsCache).length / 1024),
+        lastError: clipsCacheError ? clipsCacheError.message : null
+    };
+
+    // Everything below actually hits Firestore and costs one read per document,
+    // so it stays behind ?deep=1.
     if (req.query.deep) {
-        await step('coversDeep', async () => {
-            const s = await db.collection('clipCovers').get();
-            let bytes = 0, biggest = 0;
-            s.forEach(d => {
-                const c = d.data().coverImage;
-                if (typeof c === 'string') { bytes += c.length; if (c.length > biggest) biggest = c.length; }
-            });
-            return { count: s.size, totalKB: Math.round(bytes / 1024), biggestKB: Math.round(biggest / 1024) };
+        await step('itemsOrderedBySeq', async () => {
+            const s = await clipsItemsRef.orderBy('_seq', 'desc').get();
+            let missingSeq = 0, flagged = 0;
+            s.forEach(d => { if (typeof d.data()._seq !== 'number') missingSeq++; if (d.data().hasCover) flagged++; });
+            return { count: s.size, missingSeq, hasCoverFlagged: flagged };
+        });
+        await step('coverIdsOnly', async () => {
+            const s = await db.collection('clipCovers').select().get();
+            return { count: s.size };
+        });
+        await step('team', async () => {
+            const d = await teamRef.get();
+            return { exists: d.exists };
         });
     }
-    await step('team', async () => {
-        const d = await teamRef.get();
-        return { exists: d.exists };
-    });
-    await step('getAllClipsEndToEnd', async () => {
-        const all = await getAllClips();
-        return { count: all.length, payloadKB: Math.round(JSON.stringify(all).length / 1024) };
-    });
 
     const m = process.memoryUsage();
     out.memory = { rssMB: Math.round(m.rss / 1048576), heapUsedMB: Math.round(m.heapUsed / 1048576) };
@@ -362,6 +415,10 @@ io.on('connection', (socket) => {
 });
 
 // ============ START ============
+// Kicked off here so every binding it touches (notably the clip cache) is
+// already initialised.
+initDB();
+
 server.listen(PORT, () => {
     console.log('');
     console.log('🎬 ═══════════════════════════════════════');
