@@ -244,11 +244,18 @@ async function upsertClip(clip) {
 // The hasCover flag lives on the clip document so the snapshot listener carries
 // it for free. Clips that already had covers predate the flag, so stamp them
 // once — guarded by a marker so this never runs again.
-async function backfillHasCoverOnce() {
+let lastBackfillResult = null;
+
+async function backfillHasCoverOnce({ force = false } = {}) {
     const metaRef = db.collection('clipTracker').doc('meta');
     try {
-        const meta = await metaRef.get();
-        if (meta.exists && meta.data().hasCoverBackfilled) return;
+        if (!force) {
+            const meta = await metaRef.get();
+            if (meta.exists && meta.data().hasCoverBackfilled) {
+                lastBackfillResult = { skipped: 'already done' };
+                return lastBackfillResult;
+            }
+        }
         const coverIds = await db.collection('clipCovers').select().get();
         for (let i = 0; i < coverIds.docs.length; i += 400) {
             const batch = db.batch();
@@ -258,12 +265,15 @@ async function backfillHasCoverOnce() {
             await batch.commit();
         }
         await metaRef.set({ hasCoverBackfilled: true }, { merge: true });
+        lastBackfillResult = { stamped: coverIds.docs.length };
         console.log(`✅ hasCover backfilled for ${coverIds.docs.length} clips`);
     } catch (e) {
         // Most likely the daily read quota; try again on the next boot rather
         // than blocking startup.
+        lastBackfillResult = { error: e.message, code: e.code || null };
         console.error('hasCover backfill deferred:', e.message);
     }
+    return lastBackfillResult;
 }
 
 async function deleteClip(id) {
@@ -324,6 +334,11 @@ app.get('/__diag', async (req, res) => {
         teamReady: !!teamCache,
         lastError: clipsCacheError ? clipsCacheError.message : null
     };
+    out.backfill = lastBackfillResult;
+
+    if (req.query.backfill) {
+        out.backfillRun = await backfillHasCoverOnce({ force: req.query.backfill === 'force' });
+    }
 
     // Everything below actually hits Firestore and costs one read per document,
     // so it stays behind ?deep=1.
