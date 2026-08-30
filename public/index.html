@@ -1001,6 +1001,59 @@
         .kpi-intro-head h2 { font-size: 1.15rem; font-weight: 800; letter-spacing: -0.01em; color: var(--text); }
         .kpi-intro-sub { font-size: 0.78rem; line-height: 1.65; color: var(--text-2); }
 
+        /* Month picker doubling as the score history */
+        .kpi-months {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: var(--radius-lg); padding: 14px 16px 16px; margin-bottom: 14px;
+            box-shadow: var(--shadow-sm);
+        }
+        .kpi-months-head {
+            display: flex; align-items: baseline; justify-content: space-between;
+            gap: 12px; margin-bottom: 12px;
+        }
+        .kpi-months-head h3 { font-size: 0.82rem; font-weight: 800; color: var(--text-2); }
+        .kpi-months-current { font-size: 0.82rem; font-weight: 800; color: var(--brand-text); }
+        .kpi-month-strip {
+            display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px;
+            -webkit-overflow-scrolling: touch;
+        }
+        .kpi-month-card {
+            flex: 0 0 auto; min-width: 92px;
+            display: flex; flex-direction: column; gap: 5px;
+            padding: 10px 13px 11px; cursor: pointer; outline: none;
+            background: var(--surface-2); border: 1px solid var(--border);
+            border-radius: var(--radius-md); font-family: inherit; text-align: left;
+            transition: border-color var(--t-fast), background var(--t-fast);
+        }
+        .kpi-month-card:hover { border-color: var(--border-strong); background: var(--surface-3); }
+        .kpi-month-card:focus-visible { box-shadow: 0 0 0 2px var(--bg), 0 0 0 4px var(--brand); }
+        .kpi-month-card.active { border-color: var(--brand); box-shadow: 0 0 0 1px var(--brand); background: var(--surface); }
+        .kmc-label { font-size: 0.7rem; font-weight: 700; color: var(--text-2); white-space: nowrap; }
+        .kmc-score {
+            font-size: 1.15rem; font-weight: 800; line-height: 1.1; color: var(--text);
+            font-family: 'Manrope', 'Noto Sans Thai', sans-serif; font-variant-numeric: tabular-nums;
+        }
+        .kmc-bar { display: block; height: 4px; border-radius: var(--radius-full); background: var(--surface-3); overflow: hidden; }
+        .kmc-bar i { display: block; height: 100%; border-radius: var(--radius-full); background: var(--text-3); }
+        .kpi-month-card.excellent .kmc-score { color: var(--st-done-text); }
+        .kpi-month-card.excellent .kmc-bar i { background: var(--st-done); }
+        .kpi-month-card.pass .kmc-score { color: var(--brand-text); }
+        .kpi-month-card.pass .kmc-bar i { background: var(--brand); }
+        .kpi-month-card.warn .kmc-score { color: var(--st-filming-text); }
+        .kpi-month-card.warn .kmc-bar i { background: var(--warning); }
+        .kpi-month-card.fail .kmc-score { color: var(--danger); }
+        .kpi-month-card.fail .kmc-bar i { background: var(--danger); }
+        .kpi-month-card.empty .kmc-score { color: var(--text-3); }
+
+        /* Marks the sections that are fixed reference material rather than the
+           selected month's data. */
+        .kpi-baseline-tag {
+            display: inline-flex; align-items: center; gap: 4px;
+            padding: 3px 10px; border-radius: var(--radius-full);
+            background: var(--surface-2); border: 1px solid var(--border);
+            font-size: 0.68rem; font-weight: 700; color: var(--text-2); white-space: nowrap;
+        }
+
         .kpi-nav {
             display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 22px;
         }
@@ -1336,10 +1389,20 @@
                 <div class="kpi-intro-head">
                     <h2>KPI ฝ่ายคอนเทนต์ — JS Sport Group</h2>
                     <button class="btn" onclick="kpiReset()">
-                        <span class="material-icons-round">restart_alt</span> ล้างผลที่กรอก
+                        <span class="material-icons-round">restart_alt</span> ล้างผลเดือนนี้
                     </button>
                 </div>
                 <p class="kpi-intro-sub">สิงหาคม 2026 (เดือนที่ 1) · เน้นครีเอทีฟ 42/100 คะแนน · 4 คลิป/วัน (JS 3 + ME 1) · ประชุมทุกวันจันทร์ · ยอดขาย กำไร แอด นายหน้า อยู่ในไฟล์ KPI ฝ่ายบริหารแยก · ข้อมูลจริงจาก TikTok Shop / TikTok Ads API ณ 24 ก.ค. 2026 · + TikTok Studio Overview CSV (@j.s.sport_shop) 31 ธ.ค. 2025 – 27 ก.ค. 2026 = 209 วัน</p>
+            </div>
+
+            <!-- Month picker and score history in one control: every month is
+                 visible with its score, and clicking one switches to it. -->
+            <div class="kpi-months">
+                <div class="kpi-months-head">
+                    <h3>คะแนนรายเดือน</h3>
+                    <span class="kpi-months-current num" id="kpiMonthTitle"></span>
+                </div>
+                <div class="kpi-month-strip" id="kpiMonthStrip" role="tablist" aria-label="เลือกเดือน"></div>
             </div>
 
             <div class="kpi-nav" role="navigation" aria-label="ข้ามไปยังหัวข้อ">
@@ -1396,6 +1459,7 @@
             <div class="section-card" id="kpiSec3">
                 <div class="section-header">
                     <h2><span class="material-icons-round">flag</span>เป้าหมาย 3 ระดับ — รายวัน / รายสัปดาห์ / รายเดือน</h2>
+                    <span class="kpi-baseline-tag"><span class="material-icons-round" style="font-size:13px">history_edu</span>ฐาน ส.ค. 2026</span>
                 </div>
                 <div class="kpi-body">
 <p class="lead">ตัวเลขทุกระดับสอดคล้องกัน: เป้ารายวัน × 30 = เป้าเดือน · เป้าเดือน ÷ 4.3 = เป้าสัปดาห์</p>
@@ -1441,6 +1505,7 @@
             <div class="section-card" id="kpiSec5">
                 <div class="section-header">
                     <h2><span class="material-icons-round">analytics</span>★ ข้อมูลออร์แกนิกทั้งช่อง (TikTok Studio) — ทุกคลิป ปักและไม่ปัก</h2>
+                    <span class="kpi-baseline-tag"><span class="material-icons-round" style="font-size:13px">history_edu</span>ฐาน ส.ค. 2026</span>
                 </div>
                 <div class="kpi-body">
 <p class="lead">แหล่งใหม่ 29 ก.ค. 2026 · CSV รายวัน 209 วัน (31 ธ.ค. 2025 – 27 ก.ค. 2026) ของ @j.s.sport_shop
@@ -1459,6 +1524,7 @@
             <div class="section-card" id="kpiSec6">
                 <div class="section-header">
                     <h2><span class="material-icons-round">video_library</span>★ ผลงานรายคลิปจริง 252 คลิป (TikTok Studio → โพสต์)</h2>
+                    <span class="kpi-baseline-tag"><span class="material-icons-round" style="font-size:13px">history_edu</span>ฐาน ส.ค. 2026</span>
                 </div>
                 <div class="kpi-body">
 <p class="lead">ดึงรายการโพสต์ทั้งหมดของ @j.s.sport_shop เดือน พ.ค.–ก.ค. 2026 ออกมานับเอง — ทุกคลิป ไม่ใช่เฉพาะคลิปที่ปักตะกร้า
@@ -1484,6 +1550,7 @@
             <div class="section-card" id="kpiSec7">
                 <div class="section-header">
                     <h2><span class="material-icons-round">emoji_events</span>★ โปรไฟล์คลิปที่ชนะ — 15 อันดับตลอดกาลของช่อง</h2>
+                    <span class="kpi-baseline-tag"><span class="material-icons-round" style="font-size:13px">history_edu</span>ฐาน ส.ค. 2026</span>
                 </div>
                 <div class="kpi-body">
 <p class="lead">จาก TikTok Studio → Analytics → Content (29 ก.ค. 2026) · ทุกคลิปในตารางนี้ทำวิวเกิน 346,000
@@ -1501,6 +1568,7 @@
             <div class="section-card" id="kpiSec8">
                 <div class="section-header">
                     <h2><span class="material-icons-round">storefront</span>Baseline ข้อมูลจริงของร้าน</h2>
+                    <span class="kpi-baseline-tag"><span class="material-icons-round" style="font-size:13px">history_edu</span>ฐาน ส.ค. 2026</span>
                 </div>
                 <div class="kpi-body">
 <p class="lead">ดึงจาก TikTok Shop Partner API และ TikTok Business API — ทุกตัวเลขวัดได้จริง</p>
@@ -1530,6 +1598,7 @@
             <div class="section-card" id="kpiSec9">
                 <div class="section-header">
                     <h2><span class="material-icons-round">compare_arrows</span>เทียบ Benchmark ตลาด 2026</h2>
+                    <span class="kpi-baseline-tag"><span class="material-icons-round" style="font-size:13px">history_edu</span>ฐาน ส.ค. 2026</span>
                 </div>
                 <div class="kpi-body">
 <p class="lead">สรุปสั้น: เราชนะเรื่องปริมาณและการปิดการขาย แต่แพ้เรื่องคุณภาพครีเอทีฟ — KPI ชุดนี้จึงให้น้ำหนักปริมาณ 18 คะแนน และครีเอทีฟ (hook / hold / CTR / CPC) 42 คะแนน</p>
@@ -1543,6 +1612,7 @@
             <div class="section-card" id="kpiSec10">
                 <div class="section-header">
                     <h2><span class="material-icons-round">category</span>ผลงานแยกตามฟอร์แมตคอนเทนต์</h2>
+                    <span class="kpi-baseline-tag"><span class="material-icons-round" style="font-size:13px">history_edu</span>ฐาน ส.ค. 2026</span>
                 </div>
                 <div class="kpi-body">
 <p class="lead">คลิปช่องตัวเอง พ.ค.–ก.ค. 2026 · จัดกลุ่มจากคีย์เวิร์ดในแคปชัน (คลิปหนึ่งอยู่ได้หลายกลุ่ม)</p>
@@ -1568,6 +1638,7 @@
             <div class="section-card" id="kpiSec11">
                 <div class="section-header">
                     <h2><span class="material-icons-round">gpp_maybe</span>กติกา (Guardrails)</h2>
+                    <span class="kpi-baseline-tag"><span class="material-icons-round" style="font-size:13px">history_edu</span>ฐาน ส.ค. 2026</span>
                 </div>
                 <div class="kpi-body">
 <p class="lead">KPI ที่ไม่มีกติกาจะถูกเล่นเสมอ — ข้อเหล่านี้กันไม่ให้ตัวเลขสวยแต่ธุรกิจแย่ลง</p>
@@ -1578,6 +1649,7 @@
             <div class="section-card" id="kpiSec12">
                 <div class="section-header">
                     <h2><span class="material-icons-round">warning_amber</span>ความเสี่ยงและวิธีรับมือ</h2>
+                    <span class="kpi-baseline-tag"><span class="material-icons-round" style="font-size:13px">history_edu</span>ฐาน ส.ค. 2026</span>
                 </div>
                 <div class="kpi-body">
 <div class="tablewrap"><table>
@@ -1590,6 +1662,7 @@
             <div class="section-card" id="kpiSec13">
                 <div class="section-header">
                     <h2><span class="material-icons-round">calendar_view_week</span>จังหวะงานและแผน 4 สัปดาห์แรก</h2>
+                    <span class="kpi-baseline-tag"><span class="material-icons-round" style="font-size:13px">history_edu</span>ฐาน ส.ค. 2026</span>
                 </div>
                 <div class="kpi-body">
 <h3>จังหวะประจำเดือน</h3>
@@ -1608,6 +1681,7 @@
             <div class="section-card" id="kpiSec14">
                 <div class="section-header">
                     <h2><span class="material-icons-round">dataset</span>แหล่งข้อมูล</h2>
+                    <span class="kpi-baseline-tag"><span class="material-icons-round" style="font-size:13px">history_edu</span>ฐาน ส.ค. 2026</span>
                 </div>
                 <div class="kpi-body">
 <div class="tablewrap"><table>
@@ -2612,7 +2686,7 @@
             if (savedClip) {
                 if (coverImage !== undefined) {
                     // Reflect the new cover locally right away; the version bump
-                    // is what makes the cached <img> URL refetch.
+                    // is what makes the cached image URL refetch.
                     savedClip.hasCover = !!coverImage;
                     savedClip.coverVersion = coverImage ? Date.now() : null;
                 }
@@ -2918,47 +2992,219 @@ document.querySelectorAll('#tabKpi input[type=checkbox]').forEach(c => c.addEven
 wkRecalc();
 KPI.forEach(k => document.getElementById("in_"+k.id).addEventListener("input", recalc));
 
-// ---- persist what the team fills in (per browser) ----
-const KPI_STORE = 'clipTracker.kpi.aug2026';
-function kpiCollect() {
-    const data = { inputs: {}, checks: [] };
+// ============================================================
+//  MONTHLY KPI
+//  The KPI definitions and their Min/Target/Stretch ladders are fixed (the
+//  August 2026 baseline); what varies per month is only what the team fills
+//  in — the 29 results and the 70 weekly ticks. Each month is one Firestore
+//  document, written a field at a time so two people filling different rows
+//  can never overwrite each other.
+// ============================================================
+const KPI_LEGACY_STORE = 'clipTracker.kpi.aug2026'; // single-month store this replaces
+const KPI_MONTH_PREF = 'clipTracker.kpi.month';
+const KPI_FIRST_MONTH = '2026-08';                  // the baseline month; nothing before it
+
+let kpiMonths = {};      // { '2026-08': { inputs: {A1:'120'}, checks: {'0':true} } }
+let kpiMonth = KPI_FIRST_MONTH;
+let kpiLoading = false;  // true while the form is being repopulated, so that
+                         // programmatic value changes are not echoed back out
+
+function kpiKeyOf(date) { return date.getFullYear() + '-' + String(date.getMonth() + 1).padStart(2, '0'); }
+function kpiShortLabel(key) {
+    const [y, m] = key.split('-').map(Number);
+    return THAI_MONTHS_SHORT[m - 1] + ' ' + String((y + 543) % 100).padStart(2, '0');
+}
+function kpiFullLabel(key) {
+    const [y, m] = key.split('-').map(Number);
+    return THAI_MONTHS[m - 1] + ' ' + (y + 543);
+}
+function kpiBucket(month) {
+    if (!kpiMonths[month]) kpiMonths[month] = { inputs: {}, checks: {} };
+    const b = kpiMonths[month];
+    if (!b.inputs) b.inputs = {};
+    if (!b.checks) b.checks = {};
+    return b;
+}
+
+// Baseline month → the later of (this month, the latest month with data), plus
+// one month ahead so the coming month can be planned before it starts.
+function kpiMonthList() {
+    let last = kpiKeyOf(new Date());
+    Object.keys(kpiMonths).forEach(k => { if (k > last) last = k; });
+    if (last < KPI_FIRST_MONTH) last = KPI_FIRST_MONTH;
+    let [y, m] = KPI_FIRST_MONTH.split('-').map(Number);
+    let [ey, em] = last.split('-').map(Number);
+    em += 1; if (em > 12) { em = 1; ey += 1; }
+    const out = [];
+    while (y < ey || (y === ey && m <= em)) {
+        out.push(y + '-' + String(m).padStart(2, '0'));
+        m += 1; if (m > 12) { m = 1; y += 1; }
+    }
+    return out;
+}
+
+// Same maths as recalc(), but for a month that is not currently on screen.
+function kpiScoreOf(month) {
+    const d = kpiMonths[month];
+    if (!d || !d.inputs || !Object.keys(d.inputs).length) return null;
+    let total = 0, penalty = 0;
+    KPI.forEach(k => {
+        const raw = d.inputs[k.id];
+        const a = (raw === undefined || raw === '') ? null : parseFloat(raw);
+        const p = pctOf(k, a);
+        if (p !== null) total += p * k.wt;
+        if (k.id === 'A6' && a !== null && a > k.min) penalty = -5;
+    });
+    return Math.max(0, total + penalty);
+}
+function kpiGradeClass(score) {
+    if (score === null) return 'empty';
+    if (score >= 85) return 'excellent';
+    if (score >= 70) return 'pass';
+    if (score >= 55) return 'warn';
+    return 'fail';
+}
+
+function renderKpiMonths() {
+    const host = document.getElementById('kpiMonthStrip');
+    if (!host) return;
+    host.innerHTML = kpiMonthList().map(key => {
+        const s = kpiScoreOf(key);
+        return `<button type="button" role="tab" aria-selected="${key === kpiMonth}"
+                    class="kpi-month-card ${kpiGradeClass(s)} ${key === kpiMonth ? 'active' : ''}"
+                    onclick="kpiSelectMonth('${key}')" title="${kpiFullLabel(key)}">
+                    <span class="kmc-label">${kpiShortLabel(key)}</span>
+                    <span class="kmc-score num">${s === null ? '—' : s.toFixed(1)}</span>
+                    <span class="kmc-bar"><i style="width:${s === null ? 0 : Math.min(100, s)}%"></i></span>
+                </button>`;
+    }).join('');
+    const title = document.getElementById('kpiMonthTitle');
+    if (title) title.textContent = kpiFullLabel(kpiMonth);
+}
+
+function kpiApplyMonth() {
+    kpiLoading = true;
+    const d = kpiMonths[kpiMonth] || { inputs: {}, checks: {} };
     KPI.forEach(k => {
         const el = document.getElementById('in_' + k.id);
-        if (el && el.value.trim() !== '') data.inputs[k.id] = el.value.trim();
+        if (el) el.value = (d.inputs && d.inputs[k.id] !== undefined) ? d.inputs[k.id] : '';
     });
-    document.querySelectorAll('#tabKpi input[type=checkbox]').forEach((c, i) => { if (c.checked) data.checks.push(i); });
-    return data;
-}
-function kpiSave() {
-    try { localStorage.setItem(KPI_STORE, JSON.stringify(kpiCollect())); } catch (e) {}
-}
-function kpiRestore() {
-    let data;
-    try { data = JSON.parse(localStorage.getItem(KPI_STORE) || 'null'); } catch (e) { return; }
-    if (!data) return;
-    Object.entries(data.inputs || {}).forEach(([id, v]) => {
-        const el = document.getElementById('in_' + id);
-        if (el) el.value = v;
+    document.querySelectorAll('#tabKpi input[type=checkbox]').forEach((c, i) => {
+        c.checked = !!(d.checks && d.checks[String(i)]);
     });
-    const boxes = document.querySelectorAll('#tabKpi input[type=checkbox]');
-    (data.checks || []).forEach(i => { if (boxes[i]) boxes[i].checked = true; });
+    kpiLoading = false;
+    recalc();
+    wkRecalc();
 }
-window.kpiReset = function () {
-    document.querySelectorAll('#tabKpi input[type=number]').forEach(el => { el.value = ''; });
-    document.querySelectorAll('#tabKpi input[type=checkbox]').forEach(c => { c.checked = false; });
-    try { localStorage.removeItem(KPI_STORE); } catch (e) {}
-    recalc(); wkRecalc();
-    if (typeof showToast === 'function') showToast('ล้างผลที่กรอกแล้ว', 'info');
+
+window.kpiSelectMonth = function (key) {
+    kpiMonth = key;
+    try { localStorage.setItem(KPI_MONTH_PREF, key); } catch (e) {}
+    kpiApplyMonth();
+    renderKpiMonths();
 };
+
+// One field per write, so a save never carries (and so never clobbers) fields
+// this browser has not seen.
+function kpiPush(field, key, value) {
+    if (socket) socket.emit('kpi:set', { month: kpiMonth, field, key, value });
+}
+function kpiSetField(field, key, value) {
+    if (kpiLoading) return;
+    const b = kpiBucket(kpiMonth);
+    if (value === null) delete b[field][key]; else b[field][key] = value;
+    renderKpiMonths();
+    kpiPush(field, key, value);
+}
+
+// Typing is debounced per field so a five-digit number is one write, not five.
+const kpiPending = {};
+function kpiSetFieldDebounced(field, key, value) {
+    if (kpiLoading) return;
+    const b = kpiBucket(kpiMonth);
+    if (value === null) delete b[field][key]; else b[field][key] = value;
+    renderKpiMonths();
+    const slot = field + ':' + key;
+    clearTimeout(kpiPending[slot]);
+    const month = kpiMonth;
+    kpiPending[slot] = setTimeout(() => {
+        if (socket) socket.emit('kpi:set', { month, field, key, value });
+    }, 500);
+}
+
+window.kpiReset = function () {
+    kpiMonths[kpiMonth] = { inputs: {}, checks: {} };
+    kpiApplyMonth();
+    renderKpiMonths();
+    if (socket) socket.emit('kpi:clear', kpiMonth);
+    if (typeof showToast === 'function') showToast('ล้างผล ' + kpiFullLabel(kpiMonth) + ' แล้ว', 'info');
+};
+
 KPI.forEach(k => {
     const el = document.getElementById('in_' + k.id);
-    if (el) el.addEventListener('input', kpiSave);
+    if (el) el.addEventListener('input', () => {
+        const v = el.value.trim();
+        kpiSetFieldDebounced('inputs', k.id, v === '' ? null : v);
+    });
 });
-document.querySelectorAll('#tabKpi input[type=checkbox]').forEach(c => c.addEventListener('change', kpiSave));
+document.querySelectorAll('#tabKpi input[type=checkbox]').forEach((c, i) => {
+    c.addEventListener('change', () => kpiSetField('checks', String(i), c.checked ? true : null));
+});
 
-kpiRestore();
-wkRecalc();
-recalc();
+// Anything already filled in under the old single-month key belongs to the
+// baseline month. Move it up once, then drop the local copy.
+function kpiMigrateLegacy() {
+    let old = null;
+    try { old = JSON.parse(localStorage.getItem(KPI_LEGACY_STORE) || 'null'); } catch (e) { return; }
+    if (!old) return;
+    const existing = kpiMonths[KPI_FIRST_MONTH];
+    const alreadyThere = existing &&
+        (Object.keys(existing.inputs || {}).length || Object.keys(existing.checks || {}).length);
+    if (!alreadyThere) {
+        const b = kpiBucket(KPI_FIRST_MONTH);
+        Object.entries(old.inputs || {}).forEach(([k, v]) => {
+            b.inputs[k] = v;
+            if (socket) socket.emit('kpi:set', { month: KPI_FIRST_MONTH, field: 'inputs', key: k, value: v });
+        });
+        (old.checks || []).forEach(i => {
+            b.checks[String(i)] = true;
+            if (socket) socket.emit('kpi:set', { month: KPI_FIRST_MONTH, field: 'checks', key: String(i), value: true });
+        });
+    }
+    try { localStorage.removeItem(KPI_LEGACY_STORE); } catch (e) {}
+}
+
+function kpiBoot() {
+    let saved = null;
+    try { saved = localStorage.getItem(KPI_MONTH_PREF); } catch (e) {}
+    const list = kpiMonthList();
+    const nowKey = kpiKeyOf(new Date());
+    kpiMonth = (saved && list.indexOf(saved) >= 0) ? saved
+             : (list.indexOf(nowKey) >= 0 ? nowKey : list[list.length - 1]);
+    kpiApplyMonth();
+    renderKpiMonths();
+}
+
+if (socket) {
+    socket.on('init:data', d => {
+        kpiMonths = (d && d.kpi) || {};
+        kpiMigrateLegacy();
+        kpiBoot();
+    });
+    socket.on('kpi:changed', ({ month, field, key, value }) => {
+        const b = kpiBucket(month);
+        if (value === null) delete b[field][key]; else b[field][key] = value;
+        if (month === kpiMonth) kpiApplyMonth();
+        renderKpiMonths();
+    });
+    socket.on('kpi:cleared', month => {
+        kpiMonths[month] = { inputs: {}, checks: {} };
+        if (month === kpiMonth) kpiApplyMonth();
+        renderKpiMonths();
+    });
+}
+
+kpiBoot(); // show something immediately; init:data refines it
 
     })();
     </script>

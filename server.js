@@ -36,6 +36,7 @@ const db = admin.firestore();
 const clipsRef = db.collection('clipTracker').doc('clips'); // legacy whole-array doc — frozen after migration, kept as a rollback snapshot
 const clipsItemsRef = clipsRef.collection('items'); // source of truth: one Firestore doc per clip
 const teamRef = db.collection('clipTracker').doc('team');
+const kpiMonthsRef = db.collection('clipTracker').doc('kpi').collection('months'); // one doc per YYYY-MM
 
 // ============ INITIAL DATA ============
 function getDefaultClips() {
@@ -132,6 +133,7 @@ async function initDB() {
     startClipsListener();
     startTeamListener();
     startCoversListener();
+    startKpiListener();
     backfillHasCoverOnce();
 }
 // Started at the bottom of this file, once the cache bindings below exist.
@@ -205,6 +207,29 @@ function startCoversListener() {
         err => {
             console.error('covers listener error:', err.message);
             setTimeout(startCoversListener, 60000);
+        }
+    );
+}
+
+// Monthly KPI results. Small documents, one per YYYY-MM, cached the same way
+// as everything else so opening the board costs no reads.
+let kpiCache = {};
+let kpiCacheReady = false;
+
+function startKpiListener() {
+    kpiMonthsRef.onSnapshot(
+        snap => {
+            const next = {};
+            snap.forEach(doc => {
+                const d = doc.data() || {};
+                next[doc.id] = { inputs: d.inputs || {}, checks: d.checks || {} };
+            });
+            kpiCache = next;
+            kpiCacheReady = true;
+        },
+        err => {
+            console.error('kpi listener error:', err.message);
+            setTimeout(startKpiListener, 60000);
         }
     );
 }
@@ -367,6 +392,8 @@ app.get('/__diag', async (req, res) => {
         coversReady: coversCacheReady,
         coversCached: coverCache.size,
         coverBytesMB: Math.round([...coverCache.values()].reduce((s, c) => s + c.buf.length, 0) / 1048576 * 10) / 10,
+        kpiReady: kpiCacheReady,
+        kpiMonths: Object.keys(kpiCache).sort(),
         lastError: clipsCacheError ? clipsCacheError.message : null
     };
     out.backfill = lastBackfillResult;
@@ -416,7 +443,8 @@ io.on('connection', (socket) => {
     getAllClips().then(clips => {
         socket.emit('init:data', {
             clips,
-            team: teamCache || getDefaultTeam()
+            team: teamCache || getDefaultTeam(),
+            kpi: kpiCache
         });
     }).catch(e => {
         // Never fail silently here: before this, a rejected read left the client
@@ -464,6 +492,31 @@ io.on('connection', (socket) => {
             const fresh = await getAllClips();
             io.emit('clips:updated', fresh);
         } catch (e) { console.error("Firebase save error (clips:update, legacy):", e); }
+    });
+
+    // ---- MONTHLY KPI ----
+    // One field per write, merged into the month's document, so two people
+    // filling different rows of the same month never overwrite each other.
+    socket.on('kpi:set', async (msg) => {
+        try {
+            const { month, field, key, value } = msg || {};
+            if (!/^\d{4}-\d{2}$/.test(month || '')) return;
+            if (field !== 'inputs' && field !== 'checks') return;
+            if (typeof key !== 'string' || !key || key.length > 40) return;
+            const write = value === null || value === undefined
+                ? admin.firestore.FieldValue.delete()
+                : (field === 'checks' ? !!value : String(value).slice(0, 40));
+            await kpiMonthsRef.doc(month).set({ [field]: { [key]: write } }, { merge: true });
+            socket.broadcast.emit('kpi:changed', { month, field, key, value: value === undefined ? null : value });
+        } catch (e) { console.error('KPI save error (kpi:set):', e.message); }
+    });
+
+    socket.on('kpi:clear', async (month) => {
+        try {
+            if (!/^\d{4}-\d{2}$/.test(month || '')) return;
+            await kpiMonthsRef.doc(month).delete();
+            socket.broadcast.emit('kpi:cleared', month);
+        } catch (e) { console.error('KPI save error (kpi:clear):', e.message); }
     });
 
     // ---- TEAM ----
