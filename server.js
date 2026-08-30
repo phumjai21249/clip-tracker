@@ -270,8 +270,11 @@ async function backfillHasCoverOnce({ force = false } = {}) {
     } catch (e) {
         // Most likely the daily read quota; try again on the next boot rather
         // than blocking startup.
-        lastBackfillResult = { error: e.message, code: e.code || null };
+        lastBackfillResult = { error: e.message, code: e.code || null, retryingInMin: 30 };
         console.error('hasCover backfill deferred:', e.message);
+        // The usual cause is the daily read quota, which clears on its own.
+        // Keep retrying so covers come back without needing a restart.
+        if (!force) setTimeout(() => backfillHasCoverOnce(), 30 * 60 * 1000).unref?.();
     }
     return lastBackfillResult;
 }
