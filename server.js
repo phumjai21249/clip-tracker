@@ -497,18 +497,26 @@ io.on('connection', (socket) => {
     // ---- MONTHLY KPI ----
     // One field per write, merged into the month's document, so two people
     // filling different rows of the same month never overwrite each other.
-    socket.on('kpi:set', async (msg) => {
+    // Acknowledged on purpose: a caller that is about to discard its only local
+    // copy has to be able to tell a stored write from a dropped one. Failing
+    // silently here is what cost a month of KPI results.
+    socket.on('kpi:set', async (msg, ack) => {
+        const reply = (r) => { if (typeof ack === 'function') ack(r); };
         try {
             const { month, field, key, value } = msg || {};
-            if (!/^\d{4}-\d{2}$/.test(month || '')) return;
-            if (field !== 'inputs' && field !== 'checks') return;
-            if (typeof key !== 'string' || !key || key.length > 40) return;
+            if (!/^\d{4}-\d{2}$/.test(month || '')) return reply({ ok: false, error: 'bad month' });
+            if (field !== 'inputs' && field !== 'checks') return reply({ ok: false, error: 'bad field' });
+            if (typeof key !== 'string' || !key || key.length > 40) return reply({ ok: false, error: 'bad key' });
             const write = value === null || value === undefined
                 ? admin.firestore.FieldValue.delete()
                 : (field === 'checks' ? !!value : String(value).slice(0, 40));
             await kpiMonthsRef.doc(month).set({ [field]: { [key]: write } }, { merge: true });
             socket.broadcast.emit('kpi:changed', { month, field, key, value: value === undefined ? null : value });
-        } catch (e) { console.error('KPI save error (kpi:set):', e.message); }
+            reply({ ok: true });
+        } catch (e) {
+            console.error('KPI save error (kpi:set):', e.message);
+            reply({ ok: false, error: e.message, code: e.code || null });
+        }
     });
 
     socket.on('kpi:clear', async (month) => {

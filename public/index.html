@@ -3105,16 +3105,28 @@ window.kpiSelectMonth = function (key) {
 };
 
 // One field per write, so a save never carries (and so never clobbers) fields
-// this browser has not seen.
-function kpiPush(field, key, value) {
-    if (socket) socket.emit('kpi:set', { month: kpiMonth, field, key, value });
+// this browser has not seen. Every write is acknowledged and mirrored locally,
+// so a server-side failure is visible and never leaves the typed value nowhere.
+let kpiWarnedThisSession = false;
+
+function kpiPush(month, field, key, value) {
+    if (!socket) return;
+    socket.emit('kpi:set', { month, field, key, value }, (res) => {
+        if (res && res.ok) return;
+        if (!kpiWarnedThisSession && typeof showToast === 'function') {
+            kpiWarnedThisSession = true;
+            showToast('บันทึก KPI ขึ้นเซิร์ฟเวอร์ไม่สำเร็จ — เก็บไว้ในเครื่องนี้ไว้ก่อน', 'warning');
+        }
+        console.error('kpi:set rejected', { month, field, key }, res);
+    });
 }
 function kpiSetField(field, key, value) {
     if (kpiLoading) return;
     const b = kpiBucket(kpiMonth);
     if (value === null) delete b[field][key]; else b[field][key] = value;
+    kpiBackupLocally(kpiMonth, b);
     renderKpiMonths();
-    kpiPush(field, key, value);
+    kpiPush(kpiMonth, field, key, value);
 }
 
 // Typing is debounced per field so a five-digit number is one write, not five.
@@ -3124,12 +3136,11 @@ function kpiSetFieldDebounced(field, key, value) {
     const b = kpiBucket(kpiMonth);
     if (value === null) delete b[field][key]; else b[field][key] = value;
     renderKpiMonths();
+    kpiBackupLocally(kpiMonth, b);
     const slot = field + ':' + key;
     clearTimeout(kpiPending[slot]);
     const month = kpiMonth;
-    kpiPending[slot] = setTimeout(() => {
-        if (socket) socket.emit('kpi:set', { month, field, key, value });
-    }, 500);
+    kpiPending[slot] = setTimeout(() => kpiPush(month, field, key, value), 500);
 }
 
 window.kpiReset = function () {
@@ -3152,27 +3163,88 @@ document.querySelectorAll('#tabKpi input[type=checkbox]').forEach((c, i) => {
 });
 
 // Anything already filled in under the old single-month key belongs to the
-// baseline month. Move it up once, then drop the local copy.
+// baseline month.
+//
+// An earlier version of this deleted the local copy immediately after emitting,
+// without waiting to learn whether the server had stored anything. While the
+// Firestore read quota was exhausted every one of those writes failed silently,
+// and the only copy of a month's results went with it. So: never delete the
+// local copy, keep a second copy under a key nothing ever removes, and only
+// consider the move done once the server has acknowledged every field.
+const KPI_BACKUP_PREFIX = 'clipTracker.kpi.backup.';
+
+function kpiBackupLocally(month, data) {
+    try { localStorage.setItem(KPI_BACKUP_PREFIX + month, JSON.stringify({ savedAt: Date.now(), data })); } catch (e) {}
+}
+
 function kpiMigrateLegacy() {
     let old = null;
     try { old = JSON.parse(localStorage.getItem(KPI_LEGACY_STORE) || 'null'); } catch (e) { return; }
     if (!old) return;
+
+    // Belt and braces before anything is sent anywhere.
+    kpiBackupLocally(KPI_FIRST_MONTH, old);
+
     const existing = kpiMonths[KPI_FIRST_MONTH];
     const alreadyThere = existing &&
         (Object.keys(existing.inputs || {}).length || Object.keys(existing.checks || {}).length);
-    if (!alreadyThere) {
-        const b = kpiBucket(KPI_FIRST_MONTH);
-        Object.entries(old.inputs || {}).forEach(([k, v]) => {
-            b.inputs[k] = v;
-            if (socket) socket.emit('kpi:set', { month: KPI_FIRST_MONTH, field: 'inputs', key: k, value: v });
-        });
-        (old.checks || []).forEach(i => {
-            b.checks[String(i)] = true;
-            if (socket) socket.emit('kpi:set', { month: KPI_FIRST_MONTH, field: 'checks', key: String(i), value: true });
-        });
-    }
-    try { localStorage.removeItem(KPI_LEGACY_STORE); } catch (e) {}
+    if (alreadyThere || !socket) return; // the server already has it, or we cannot ask
+
+    const b = kpiBucket(KPI_FIRST_MONTH);
+    const writes = [];
+    Object.entries(old.inputs || {}).forEach(([k, v]) => {
+        b.inputs[k] = v;
+        writes.push({ field: 'inputs', key: k, value: v });
+    });
+    (old.checks || []).forEach(i => {
+        b.checks[String(i)] = true;
+        writes.push({ field: 'checks', key: String(i), value: true });
+    });
+    if (!writes.length) return;
+
+    let acked = 0, failed = 0;
+    writes.forEach(w => {
+        socket.emit('kpi:set', { month: KPI_FIRST_MONTH, field: w.field, key: w.key, value: w.value },
+            (res) => {
+                if (res && res.ok) acked++; else failed++;
+                if (acked + failed < writes.length) return;
+                if (failed === 0) {
+                    // Every field is confirmed stored. The legacy key can go —
+                    // the backup copy stays regardless.
+                    try { localStorage.removeItem(KPI_LEGACY_STORE); } catch (e) {}
+                } else if (typeof showToast === 'function') {
+                    showToast('ย้ายข้อมูล KPI ขึ้นเซิร์ฟเวอร์ไม่สำเร็จ ' + failed + ' ช่อง — ข้อมูลเดิมยังอยู่ในเครื่อง', 'warning');
+                }
+            });
+    });
+    renderKpiMonths();
 }
+
+// Re-upload a month from whatever this browser still holds. Usable from the
+// console on any device that has not yet been migrated, and safe to run twice.
+window.kpiRestoreFromBackup = function (month) {
+    month = month || KPI_FIRST_MONTH;
+    let src = null;
+    try {
+        src = JSON.parse(localStorage.getItem(KPI_BACKUP_PREFIX + month) || 'null');
+        if (src && src.data) src = src.data;
+        if (!src) src = JSON.parse(localStorage.getItem(KPI_LEGACY_STORE) || 'null');
+    } catch (e) {}
+    if (!src) { console.warn('ไม่พบข้อมูลสำรองของ', month); return false; }
+    const b = kpiBucket(month);
+    Object.entries(src.inputs || {}).forEach(([k, v]) => {
+        b.inputs[k] = v;
+        if (socket) socket.emit('kpi:set', { month, field: 'inputs', key: k, value: v });
+    });
+    const checks = Array.isArray(src.checks) ? src.checks : Object.keys(src.checks || {});
+    checks.forEach(i => {
+        b.checks[String(i)] = true;
+        if (socket) socket.emit('kpi:set', { month, field: 'checks', key: String(i), value: true });
+    });
+    kpiApplyMonth(); renderKpiMonths();
+    console.log('ส่งคืน', Object.keys(src.inputs || {}).length, 'ช่อง และ', checks.length, 'เครื่องหมายถูก ไปที่', month);
+    return true;
+};
 
 function kpiBoot() {
     let saved = null;
