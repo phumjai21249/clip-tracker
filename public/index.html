@@ -1954,6 +1954,14 @@
         let currentFilter = 'all';
         let searchQuery = '';
         let editingClipId = null;
+        // The clip id the open modal writes to. Chosen when the modal OPENS,
+        // never at save time, and deliberately not cleared by closeModal():
+        // a second save for the same modal (a double tap, or a click the
+        // browser queued while render() was blocking the main thread) arrives
+        // after the modal has already closed, and must rewrite that same clip
+        // instead of minting a new one. modalSaved makes the repeat a no-op.
+        let modalClipId = null;
+        let modalSaved = false;
         let pendingDeleteId = null;
         let openDropdownId = null;
         let calYear, calMonth;
@@ -2276,17 +2284,11 @@
         function dayViewAddClip() { closeDayView(); calAddClip(currentDayViewDate); }
 
         function calAddClip(dateStr) {
-            editingClipId = null;
-            clearCoverField(); coverState = 'none';
-            document.getElementById('modalTitle').textContent = 'เพิ่มคลิปใหม่';
-            document.getElementById('clipName').value = '';
-            document.getElementById('clipDesc').value = '';
-            document.getElementById('clipCreator').value = '';
-            document.getElementById('clipStatus').value = 'idle';
-            document.getElementById('clipChannel').value = 'JS SPORT SHOP';
+            // Delegate the reset so the new clip's id is allocated in exactly
+            // one place. This used to repeat openModal()'s body inline, which
+            // meant a second entry point that could skip that allocation.
+            openModal();
             document.getElementById('clipDate').value = dateStr;
-            document.getElementById('modalOverlay').classList.add('open');
-            setTimeout(() => document.getElementById('clipName').focus(), 300);
         }
 
         function showCalTooltip(e, clipId) {
@@ -2633,7 +2635,13 @@
         function openModal(editing = false) {
             const overlay = document.getElementById('modalOverlay');
             overlay.classList.add('open');
-            if (!editing) {
+            modalSaved = false;
+            document.getElementById('btnSaveClip').disabled = false;
+            if (editing) {
+                // editClip() set editingClipId before calling us.
+                modalClipId = editingClipId;
+            } else {
+                modalClipId = genId();
                 clearCoverField(); coverState = 'none';
                 editingClipId = null;
                 document.getElementById('modalTitle').textContent = 'เพิ่มคลิปใหม่';
@@ -2647,9 +2655,19 @@
             }
             setTimeout(() => document.getElementById('clipName').focus(), 300);
         }
-        function closeModal() { document.getElementById('modalOverlay').classList.remove('open'); editingClipId = null; }
+        function closeModal() {
+            document.getElementById('modalOverlay').classList.remove('open');
+            // A real click on a disabled button is never dispatched, so this
+            // stops a queued/ghost tap before it can reach saveClip() at all.
+            // openModal() re-enables it. (modalClipId/modalSaved stay put.)
+            document.getElementById('btnSaveClip').disabled = true;
+            editingClipId = null;
+        }
 
         function saveClip() {
+            // This modal's clip is already stored. Anything reaching here now is
+            // a stray repeat, not a second clip the user asked for.
+            if (modalSaved) return;
             const name = document.getElementById('clipName').value.trim();
             const desc = document.getElementById('clipDesc').value.trim();
             const creator = document.getElementById('clipCreator').value;
@@ -2668,32 +2686,37 @@
             const linkResult = collectLinks();
             if (linkResult.error) { showToast(`ลิงค์ไม่ถูกต้อง: ${linkResult.error}`, 'warning'); return; }
 
-            let savedClip = null;
-            if (editingClipId) {
-                const clip = clips.find(c => c.id === editingClipId);
-                if (clip) {
-                    clip.title = name; clip.desc = desc; clip.creator = creator;
-                    clip.status = status; clip.channel = channel; clip.date = date;
-                    clip.links = linkResult.links;
-                    savedClip = clip;
-                }
+            // One upsert keyed on the modal's own id, for both add and edit.
+            // Branching on editingClipId was the bug: closeModal() nulls it, so
+            // a late second save fell into the add branch and created a copy of
+            // the clip it had just written.
+            const id = modalClipId || genId();
+            const i = clips.findIndex(c => c.id === id);
+            let savedClip;
+            if (i >= 0) {
+                savedClip = clips[i];
+                savedClip.title = name; savedClip.desc = desc; savedClip.creator = creator;
+                savedClip.status = status; savedClip.channel = channel; savedClip.date = date;
+                savedClip.links = linkResult.links;
                 showToast('แก้ไขคลิปเรียบร้อย', 'success');
             } else {
-                savedClip = { id: genId(), title: name, desc, creator, status, channel, uploaded: false, date, links: linkResult.links };
+                // Not found covers a genuine add, and also an edit of a clip a
+                // teammate deleted while this modal was open — re-create it
+                // rather than throw away what was just typed.
+                savedClip = { id, title: name, desc, creator, status, channel, uploaded: false, date, links: linkResult.links };
                 clips.unshift(savedClip);
                 showToast('เพิ่มคลิปใหม่เรียบร้อย', 'success');
             }
-            if (savedClip) {
-                if (coverImage !== undefined) {
-                    // Reflect the new cover locally right away; the version bump
-                    // is what makes the cached image URL refetch.
-                    savedClip.hasCover = !!coverImage;
-                    savedClip.coverVersion = coverImage ? Date.now() : null;
-                }
-                // The base64 rides along on this one save only — it is never kept
-                // in the in-memory clip, so later edits stay small.
-                syncClipSave(coverImage === undefined ? savedClip : { ...savedClip, coverImage });
+            modalSaved = true;
+            if (coverImage !== undefined) {
+                // Reflect the new cover locally right away; the version bump
+                // is what makes the cached image URL refetch.
+                savedClip.hasCover = !!coverImage;
+                savedClip.coverVersion = coverImage ? Date.now() : null;
             }
+            // The base64 rides along on this one save only — it is never kept
+            // in the in-memory clip, so later edits stay small.
+            syncClipSave(coverImage === undefined ? savedClip : { ...savedClip, coverImage });
             closeModal(); render();
         }
 
