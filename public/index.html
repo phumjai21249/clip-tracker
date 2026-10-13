@@ -51,6 +51,8 @@
             --info: #2f74e0;
             --cyan: #0e8fa3;
             --rose: #d63369;
+            --ty-clip: #6d4de0;
+            --ty-photo: #1f62c9;
 
             /* Effects */
             --shadow-sm: 0 1px 2px rgba(16, 24, 40, 0.05);
@@ -98,6 +100,8 @@
             --info: #5b95f0;
             --cyan: #38c1d6;
             --rose: #f06797;
+            --ty-clip: #a593f7;
+            --ty-photo: #5b95f0;
 
             --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
             --shadow-md: 0 4px 14px -2px rgba(0, 0, 0, 0.4);
@@ -552,6 +556,17 @@
         .channel-tag.ch-me { color: var(--rose); }
         .channel-tag.ch-puy { color: var(--warning); }
         .channel-tag.ch-foam { color: var(--success); }
+
+        .type-tag {
+            display: inline-flex; align-items: center; gap: 5px;
+            padding: 4px 11px; border-radius: var(--radius-full);
+            font-size: 0.76rem; font-weight: 700;
+            background: var(--surface-2); border: 1px solid var(--border);
+            white-space: nowrap;
+        }
+        .type-tag .material-icons-round { font-size: 15px; }
+        .type-tag.ty-clip { color: var(--ty-clip); }
+        .type-tag.ty-photo { color: var(--ty-photo); }
 
         /* Status badge + dropdown */
         .status-badge {
@@ -1362,6 +1377,7 @@
                             <th>ชื่อคลิป</th>
                             <th>คนทำ</th>
                             <th>สถานะ</th>
+                            <th>ประเภท</th>
                             <th>ช่องที่ลง</th>
                             <th>คนลงคลิป</th>
                             <th>อัปโหลด TikTok</th>
@@ -1748,6 +1764,13 @@
                     </select>
                 </div>
                 <div class="form-group">
+                    <label class="form-label" for="clipType">ประเภทงาน</label>
+                    <select class="form-select" id="clipType">
+                        <option value="clip">คลิป</option>
+                        <option value="photo">รูปภาพ</option>
+                    </select>
+                </div>
+                <div class="form-group">
                     <label class="form-label" for="clipChannel">ช่องที่จะลง <span class="req">*</span></label>
                     <select class="form-select" id="clipChannel">
                         <option value="JS SPORT SHOP">JS SPORT SHOP</option>
@@ -1936,6 +1959,15 @@
         };
         function channelInfo(name) { return CHANNELS[name] || CHANNELS[DEFAULT_CHANNEL]; }
 
+        // What was posted. Every clip written before this field existed has no
+        // `type`, so the fallback has to be 'clip' — that is what they all were.
+        const DEFAULT_TYPE = 'clip';
+        const TYPES = {
+            clip:  { label: 'คลิป',   cls: 'ty-clip',  icon: 'videocam' },
+            photo: { label: 'รูปภาพ', cls: 'ty-photo', icon: 'image' },
+        };
+        function typeInfo(key) { return TYPES[key] || TYPES[DEFAULT_TYPE]; }
+
         const FILTERS = [
             { key: 'all',      label: 'ทั้งหมด' },
             { key: 'idle',     label: 'ยังไม่ทำ' },
@@ -1943,6 +1975,8 @@
             { key: 'editing',  label: 'กำลังตัด' },
             { key: 'done',     label: 'อัปลงไดร์ฟแล้ว' },
             { key: 'uploaded', label: 'อัปลง TikTok แล้ว' },
+            { key: 'type:clip',  label: 'เฉพาะคลิป' },
+            { key: 'type:photo', label: 'เฉพาะรูปภาพ' },
         ];
 
         const THAI_MONTHS = ['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน',
@@ -2327,6 +2361,10 @@
         function getFilteredClips() {
             let list = clips;
             if (currentFilter === 'uploaded') list = list.filter(c => c.uploaded);
+            else if (currentFilter.startsWith('type:')) {
+                const want = currentFilter.slice(5);
+                list = list.filter(c => (c.type || DEFAULT_TYPE) === want);
+            }
             else if (currentFilter !== 'all') list = list.filter(c => c.status === currentFilter);
             if (searchQuery) {
                 const q = searchQuery.toLowerCase();
@@ -2335,6 +2373,7 @@
                     return (c.title || '').toLowerCase().includes(q)
                         || (c.desc || '').toLowerCase().includes(q)
                         || (c.channel || '').toLowerCase().includes(q)
+                        || typeInfo(c.type).label.toLowerCase().includes(q)
                         || (creator ? creator.name.toLowerCase().includes(q) : false);
                 });
             }
@@ -2344,6 +2383,10 @@
         function filterCount(key) {
             if (key === 'all') return clips.length;
             if (key === 'uploaded') return clips.filter(c => c.uploaded).length;
+            if (key.startsWith('type:')) {
+                const want = key.slice(5);
+                return clips.filter(c => (c.type || DEFAULT_TYPE) === want).length;
+            }
             return clips.filter(c => c.status === key).length;
         }
 
@@ -2416,6 +2459,10 @@
             const ch = clip.channel || DEFAULT_CHANNEL;
             return `<span class="channel-tag ${channelInfo(ch).cls}">${escHtml(ch)}</span>`;
         }
+        function typeTag(clip) {
+            const ty = typeInfo(clip.type);
+            return `<span class="type-tag ${ty.cls}"><span class="material-icons-round" aria-hidden="true">${ty.icon}</span>${ty.label}</span>`;
+        }
         function statusDropdownHtml(clip) {
             const st = STATUSES[clip.status] || STATUSES.idle;
             return `
@@ -2479,6 +2526,7 @@
                         </div>
                     </td>
                     <td>${statusDropdownHtml(clip)}</td>
+                    <td>${typeTag(clip)}</td>
                     <td>${channelTag(clip)}</td>
                     <td>
                         <div class="assigned-cell">
@@ -2514,6 +2562,7 @@
                             ${descHtml(clip)}
                             ${linksHtml(clip)}
                             <div class="clip-card-meta" style="margin-top:6px;">
+                                ${typeTag(clip)}
                                 ${channelTag(clip)}
                                 <span class="date-cell num">${formatDate(clip.date)}</span>
                             </div>
@@ -2650,6 +2699,7 @@
                 document.getElementById('clipCreator').value = '';
                 document.getElementById('clipStatus').value = 'idle';
                 document.getElementById('clipChannel').value = 'JS SPORT SHOP';
+                document.getElementById('clipType').value = DEFAULT_TYPE;
                 document.getElementById('clipDate').value = new Date().toISOString().split('T')[0];
                 document.getElementById('linkRows').innerHTML = '';
             }
@@ -2673,6 +2723,7 @@
             const creator = document.getElementById('clipCreator').value;
             const status = document.getElementById('clipStatus').value;
             const channel = document.getElementById('clipChannel').value;
+            const type = document.getElementById('clipType').value;
             const date = document.getElementById('clipDate').value;
             // undefined = leave whatever cover is on the server alone.
             // '' = the user explicitly removed it. A string = a new image.
@@ -2697,13 +2748,13 @@
                 savedClip = clips[i];
                 savedClip.title = name; savedClip.desc = desc; savedClip.creator = creator;
                 savedClip.status = status; savedClip.channel = channel; savedClip.date = date;
-                savedClip.links = linkResult.links;
+                savedClip.type = type; savedClip.links = linkResult.links;
                 showToast('แก้ไขคลิปเรียบร้อย', 'success');
             } else {
                 // Not found covers a genuine add, and also an edit of a clip a
                 // teammate deleted while this modal was open — re-create it
                 // rather than throw away what was just typed.
-                savedClip = { id, title: name, desc, creator, status, channel, uploaded: false, date, links: linkResult.links };
+                savedClip = { id, title: name, desc, creator, status, channel, type, uploaded: false, date, links: linkResult.links };
                 clips.unshift(savedClip);
                 showToast('เพิ่มคลิปใหม่เรียบร้อย', 'success');
             }
@@ -2741,6 +2792,7 @@
             document.getElementById('clipCreator').value = clip.creator;
             document.getElementById('clipStatus').value = clip.status;
             document.getElementById('clipChannel').value = clip.channel || 'JS SPORT SHOP';
+            document.getElementById('clipType').value = clip.type || DEFAULT_TYPE;
             document.getElementById('clipDate').value = clip.date;
             document.getElementById('linkRows').innerHTML = '';
             (clip.links || []).forEach(l => addLinkRow(l.label, l.url));
