@@ -130,6 +130,8 @@ The palette is neutral-and-functional: a light gray-blue canvas, one violet bran
 
 **The Channel Palette Rule.** Content channels get their own four-color set — cyan (JS SPORT SHOP), rose (Me SPORT), warning-amber (เสื้อปุ๋ย), success-green (โฟมขัดรองเท้า) — reusing the semantic `--warning`/`--success` hues for channel identity is intentional (channel tags live in a different visual context than toasts/status, so the reuse doesn't collide in practice).
 
+**The Content-Type Palette Rule.** The two content types get a third reserved pair, deliberately placed at opposite ends of the wheel so one never reads as the other: `--ty-clip` blue (221°) and `--ty-photo` orange (25°), 164° apart, each with the `-bg`/`-text` tint pair the status palette uses. Type tags are tint-filled while channel tags keep the grey `surface-2` shell, so the two columns stay legible side by side even where a hue runs close to a channel's. Every type tag also carries its own Material icon (`videocam` / `image`), so the distinction survives without colour. A third content type takes a new hue that is far from both and from the channel four — not a lighter shade of either of these.
+
 **The Gradient Accent Rule.** Flat color is the default everywhere except two deliberate exceptions, both 135° two-color gradients: person avatars (creators 1–3, uploader — `avatar-amber→avatar-red`, `avatar-blue→avatar-teal`, `avatar-green→avatar-mint`, `avatar-violet→avatar-pink`, for "whose face is this" at a glance) and the single app-logo icon badge in the header (`logo-gradient-start→logo-gradient-end`, `#7c5cf0→#a855f7`, its own violet pair distinct from `--brand`). Don't extend gradients to any other component — a third gradient family would dilute both.
 
 ## Typography
@@ -181,6 +183,7 @@ A second, smaller micro-radius band (2–6px, not tokenized as a CSS custom prop
 ### Chips & Badges
 - **Status badge:** pill (`--radius-full`), status color's `-bg`/`-text` pair, a small leading dot in the solid status color. Click opens a same-shaped dropdown listing the other three statuses.
 - **Channel tag:** pill, `surface-2` background, text colored by the channel's accent (cyan/rose/warning/success) — see the Channel Palette Rule.
+- **Content type tag:** pill, tint-filled from the type's `-bg`/`-text` pair, with a leading Material icon — `videocam` for คลิป, `image` for รูปภาพ. See the Content-Type Palette Rule.
 - **Content-link chip:** pill, `brand-soft` background, `brand-text` label, a small link icon — appears under a clip's title for each named reference URL (script doc, drive folder, etc.), opens in a new tab.
 - **Filter pill:** pill, ghost by default, brand-filled when the active filter.
 

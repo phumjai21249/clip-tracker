@@ -51,8 +51,8 @@
             --info: #2f74e0;
             --cyan: #0e8fa3;
             --rose: #d63369;
-            --ty-clip: #6d4de0;
-            --ty-photo: #1f62c9;
+            --ty-clip: #2563eb;   --ty-clip-bg: #e4ecfd;   --ty-clip-text: #1a4fc4;
+            --ty-photo: #ea6a0c;  --ty-photo-bg: #fdeee0;  --ty-photo-text: #9a3d07;
 
             /* Effects */
             --shadow-sm: 0 1px 2px rgba(16, 24, 40, 0.05);
@@ -100,8 +100,8 @@
             --info: #5b95f0;
             --cyan: #38c1d6;
             --rose: #f06797;
-            --ty-clip: #a593f7;
-            --ty-photo: #5b95f0;
+            --ty-clip: #60a5fa;   --ty-clip-bg: #16233d;   --ty-clip-text: #8fc0fd;
+            --ty-photo: #fb923c;  --ty-photo-bg: #33210f;  --ty-photo-text: #fdb36b;
 
             --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
             --shadow-md: 0 4px 14px -2px rgba(0, 0, 0, 0.4);
@@ -561,12 +561,12 @@
             display: inline-flex; align-items: center; gap: 5px;
             padding: 4px 11px; border-radius: var(--radius-full);
             font-size: 0.76rem; font-weight: 700;
-            background: var(--surface-2); border: 1px solid var(--border);
+            border: 1px solid transparent;
             white-space: nowrap;
         }
         .type-tag .material-icons-round { font-size: 15px; }
-        .type-tag.ty-clip { color: var(--ty-clip); }
-        .type-tag.ty-photo { color: var(--ty-photo); }
+        .type-tag.ty-clip  { background: var(--ty-clip-bg);  color: var(--ty-clip-text); }
+        .type-tag.ty-photo { background: var(--ty-photo-bg); color: var(--ty-photo-text); }
 
         /* Status badge + dropdown */
         .status-badge {
