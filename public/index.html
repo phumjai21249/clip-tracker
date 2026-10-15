@@ -1371,7 +1371,7 @@
                 </button>
                 <button class="btn clips-only" id="btnExport" onclick="exportData()">
                     <span class="material-icons-round">download</span>
-                    ส่งออก CSV
+                    ส่งออก Excel
                 </button>
                 <button class="btn btn-primary clips-only" id="btnAddClip" onclick="openModal()">
                     <span class="material-icons-round">add</span>
@@ -3095,32 +3095,265 @@
             showToast('ลบคลิปเรียบร้อย', 'info');
         }
 
-        function exportData() {
-            const csv = [
-                ['#','ชื่อคลิป','รายละเอียด','คนทำ','สถานะ','ช่องที่ลง','อัปโหลด','วันที่'].join(','),
-                ...clips.map((c, i) => {
-                    const creator = CREATORS.find(cr => cr.id === c.creator);
-                    const st = STATUSES[c.status];
-                    return [
-                        i + 1,
-                        `"${(c.title || '').replace(/"/g, '""')}"`,
-                        `"${(c.desc || '').replace(/"/g, '""')}"`,
-                        creator ? creator.name : '-',
-                        st ? st.label : c.status,
-                        c.channel || 'JS SPORT SHOP',
-                        c.uploaded ? 'อัปลง TikTok แล้ว' : 'ยังไม่อัปลง TikTok',
-                        c.date
-                    ].join(',');
-                })
-            ].join('\n');
-            const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
+        // ============ EXPORT ============
+        // A formatted Excel workbook: the full clip list plus a monthly and a
+        // per-person summary. ExcelJS (~1 MB) is fetched only when the button is
+        // pressed, pinned by version and SRI hash. If it cannot load (offline, CDN
+        // blocked) the export falls back to the plain CSV it always produced.
+        const EXCELJS_SRC = 'https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.4.0/exceljs.min.js';
+        const EXCELJS_SRI = 'sha512-dlPw+ytv/6JyepmelABrgeYgHI0O+frEwgfnPdXDTOIZz+eDgfW07QXG02/O8COfivBdGNINy+Vex+lYmJ5rxw==';
+        let excelJsPromise = null;
+
+        function loadExcelJs() {
+            if (window.ExcelJS) return Promise.resolve(window.ExcelJS);
+            if (!excelJsPromise) {
+                excelJsPromise = new Promise((resolve, reject) => {
+                    const s = document.createElement('script');
+                    s.src = EXCELJS_SRC;
+                    s.integrity = EXCELJS_SRI;
+                    s.crossOrigin = 'anonymous';
+                    s.onload = () => window.ExcelJS ? resolve(window.ExcelJS) : reject(new Error('ExcelJS did not register'));
+                    s.onerror = () => reject(new Error('ExcelJS failed to load'));
+                    document.head.appendChild(s);
+                }).catch(e => { excelJsPromise = null; throw e; });   // allow a retry later
+            }
+            return excelJsPromise;
+        }
+
+        // Light-theme hex values for the cells. Excel has no CSS variables, so
+        // these mirror the --st-* / --ty-* tokens in :root.
+        const XL = {
+            brand: 'FF6D4DE0', headText: 'FFFFFFFF', grid: 'FFE3E8EF', zebra: 'FFF8FAFC',
+            late: 'FFB4192D', soon: 'FFA05E03', muted: 'FF5B6678',
+            status: {
+                idle:    ['FFEEF1F5', 'FF475569'], filming: ['FFFDF3E0', 'FFA05E03'],
+                editing: ['FFE7EFFC', 'FF1D5BBF'], done:    ['FFE2F7EF', 'FF076E4C'],
+                paused:  ['FFF3F4F6', 'FF556070'],
+            },
+            type: { clip: ['FFE4ECFD', 'FF1A4FC4'], photo: ['FFFDEEE0', 'FF9A3D07'] },
+        };
+
+        // Excel stores a date as a UTC day count. A local-midnight Date in
+        // Thailand is 17:00 UTC the day before, which Excel shows as the previous
+        // date — so build the cell value at UTC midnight instead.
+        function excelDate(dateStr) {
+            const [y, m, d] = dateStr.split('-').map(Number);
+            return new Date(Date.UTC(y, m - 1, d));
+        }
+        function thaiDateLong(dateStr) {
+            const [y, m, d] = dateStr.split('-').map(Number);
+            return `${d} ${THAI_MONTHS_SHORT[m - 1]} ${y + 543}`;
+        }
+        function thaiMonthLabel(ym) {
+            const [y, m] = ym.split('-').map(Number);
+            return `${THAI_MONTHS_SHORT[m - 1]} ${y + 543}`;
+        }
+        function linksText(clip) {
+            return (clip.links || []).map(l => l.label ? `${l.label}: ${l.url}` : l.url).join('\n');
+        }
+
+        function styleHeader(row) {
+            row.height = 24;
+            row.eachCell(cell => {
+                cell.font = { bold: true, color: { argb: XL.headText } };
+                cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: XL.brand } };
+                cell.alignment = { vertical: 'middle', horizontal: 'center', wrapText: true };
+            });
+        }
+        function styleBody(ws, fromRow) {
+            for (let r = fromRow; r <= ws.rowCount; r++) {
+                ws.getRow(r).eachCell({ includeEmpty: true }, cell => {
+                    cell.border = { bottom: { style: 'thin', color: { argb: XL.grid } } };
+                    cell.alignment = Object.assign({ vertical: 'top' }, cell.alignment || {});
+                });
+            }
+        }
+        function titleRows(ws, title, today, span) {
+            ws.mergeCells(1, 1, 1, span);
+            const t = ws.getCell(1, 1);
+            t.value = title;
+            t.font = { bold: true, size: 14 };
+            ws.mergeCells(2, 1, 2, span);
+            const sub = ws.getCell(2, 1);
+            sub.value = `ข้อมูล ณ ${thaiDateLong(today)} · จาก Clip Tracker`;
+            sub.font = { color: { argb: XL.muted }, size: 10 };
+        }
+
+        function buildWorkbook(ExcelJS, list, today) {
+            const wb = new ExcelJS.Workbook();
+            wb.creator = 'Clip Tracker';
+            wb.created = new Date();
+            const creatorName = id => (CREATORS.find(c => c.id === id) || {}).name || '-';
+            const tomorrow = addDaysStr(today, 1);
+
+            // ---- Sheet 1: every clip, newest first ----
+            const ws = wb.addWorksheet('คลิปทั้งหมด', { views: [{ state: 'frozen', ySplit: 1 }] });
+            ws.columns = [
+                { header: 'วันที่ลง',      key: 'date',    width: 12 },
+                { header: 'ชื่อคลิป',      key: 'title',   width: 44 },
+                { header: 'ประเภท',       key: 'type',    width: 10 },
+                { header: 'ช่อง',          key: 'channel', width: 17 },
+                { header: 'คนทำ',         key: 'creator', width: 14 },
+                { header: 'สถานะ',        key: 'status',  width: 16 },
+                { header: 'ลง TikTok',    key: 'posted',  width: 11 },
+                { header: 'ค้าง (วัน)',    key: 'late',    width: 10 },
+                { header: 'รายละเอียด',   key: 'desc',    width: 52 },
+                { header: 'ลิงก์',         key: 'links',   width: 40 },
+            ];
+            styleHeader(ws.getRow(1));
+            const sorted = [...list].sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+            sorted.forEach(c => {
+                const st = STATUSES[c.status];
+                const ty = typeInfo(c.type);
+                // "Days late" is only meaningful for work someone still owes:
+                // an open clip past its date, or a finished one not yet posted.
+                const owed = CREATOR_OPEN.includes(c.status) || (c.status === 'done' && !c.uploaded);
+                const late = owed && c.date && c.date < today ? daysBetween(c.date, today) : null;
+                const row = ws.addRow({
+                    date: c.date ? excelDate(c.date) : null,
+                    title: c.title || '',
+                    type: ty.label,
+                    channel: c.channel || DEFAULT_CHANNEL,
+                    creator: creatorName(c.creator),
+                    status: st ? st.label : (c.status || ''),
+                    posted: c.uploaded ? '✓ ลงแล้ว' : '—',
+                    late,
+                    desc: c.desc || '',
+                    links: linksText(c),
+                });
+                row.getCell('date').numFmt = 'dd/mm/yyyy';
+                row.getCell('title').font = { bold: true };
+                const sc = XL.status[c.status];
+                if (sc) {
+                    row.getCell('status').fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: sc[0] } };
+                    row.getCell('status').font = { bold: true, color: { argb: sc[1] } };
+                }
+                const tc = XL.type[c.type || DEFAULT_TYPE];
+                if (tc) {
+                    row.getCell('type').fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: tc[0] } };
+                    row.getCell('type').font = { bold: true, color: { argb: tc[1] } };
+                }
+                if (late) row.getCell('late').font = { bold: true, color: { argb: XL.late } };
+                if (c.uploaded) row.getCell('posted').font = { color: { argb: XL.status.done[1] } };
+                ['desc', 'links', 'title'].forEach(k => { row.getCell(k).alignment = { wrapText: true, vertical: 'top' }; });
+                ['type', 'status', 'posted', 'late', 'date'].forEach(k => { row.getCell(k).alignment = { horizontal: 'center', vertical: 'top' }; });
+            });
+            styleBody(ws, 2);
+            ws.autoFilter = { from: { row: 1, column: 1 }, to: { row: 1, column: ws.columnCount } };
+
+            // ---- Sheet 2: month by month ----
+            const chNames = Object.keys(CHANNELS);
+            const ms = wb.addWorksheet('สรุปรายเดือน', { views: [{ state: 'frozen', ySplit: 3 }] });
+            const mHead = ['เดือน', 'ทั้งหมด', 'คลิป', 'รูปภาพ', 'อัปลงไดร์ฟแล้ว', 'ลง TikTok แล้ว', 'พักไว้', ...chNames];
+            titleRows(ms, 'สรุปรายเดือน', today, mHead.length);
+            const mh = ms.getRow(3); mh.values = mHead; styleHeader(mh);
+            ms.columns = mHead.map((h, i) => ({ width: i === 0 ? 13 : Math.max(11, h.length + 4) }));
+            const byMonth = {};
+            list.forEach(c => {
+                const ym = (c.date || '').slice(0, 7);
+                if (!ym) return;
+                const b = byMonth[ym] || (byMonth[ym] = { total: 0, clip: 0, photo: 0, done: 0, posted: 0, paused: 0, ch: {} });
+                b.total++;
+                b[(c.type || DEFAULT_TYPE) === 'photo' ? 'photo' : 'clip']++;
+                if (c.status === 'done') b.done++;
+                if (c.uploaded) b.posted++;
+                if (c.status === 'paused') b.paused++;
+                const ch = c.channel || DEFAULT_CHANNEL;
+                b.ch[ch] = (b.ch[ch] || 0) + 1;
+            });
+            const months = Object.keys(byMonth).sort().reverse();
+            months.forEach(ym => {
+                const b = byMonth[ym];
+                const r = ms.addRow([thaiMonthLabel(ym), b.total, b.clip, b.photo, b.done, b.posted, b.paused, ...chNames.map(n => b.ch[n] || 0)]);
+                r.getCell(1).font = { bold: true };
+            });
+            if (months.length) {
+                const first = 4, last = 3 + months.length;
+                const tot = ms.addRow(['รวม', ...mHead.slice(1).map((_, i) => {
+                    const col = ms.getColumn(i + 2).letter;
+                    return { formula: `SUM(${col}${first}:${col}${last})` };
+                })]);
+                tot.font = { bold: true };
+                tot.eachCell(c => { c.border = { top: { style: 'medium', color: { argb: XL.brand } } }; });
+            }
+            for (let r = 4; r <= ms.rowCount; r++) ms.getRow(r).alignment = { horizontal: 'center' };
+            for (let r = 4; r <= ms.rowCount; r++) ms.getRow(r).getCell(1).alignment = { horizontal: 'left' };
+
+            // ---- Sheet 3: who owes what, today ----
+            const ps = wb.addWorksheet('สรุปรายคน', { views: [{ state: 'frozen', ySplit: 3 }] });
+            const pHead = ['คน', 'หน้าที่', 'งานทั้งหมด', 'ค้างอยู่', 'เลยกำหนด', 'วันนี้–พรุ่งนี้', 'งานเลยกำหนดนานสุด (วัน)'];
+            titleRows(ps, 'สรุปรายคน — งานที่ค้าง', today, pHead.length);
+            const ph = ps.getRow(3); ph.values = pHead; styleHeader(ph);
+            ps.columns = [{ width: 18 }, { width: 14 }, { width: 12 }, { width: 11 }, { width: 11 }, { width: 14 }, { width: 22 }];
+            const queues = buildQueues(list, today, CREATORS.map(c => c.id), UPLOADER.id);
+            [...CREATORS, UPLOADER].forEach(m => {
+                const q = queues[m.id];
+                const isUploader = m.id === UPLOADER.id;
+                const all = isUploader ? list.filter(c => c.uploaded).length : list.filter(c => c.creator === m.id).length;
+                const open = q.overdue.length + q.soon.length + q.later.length;
+                const oldest = q.overdue.length ? daysBetween(q.overdue[0].date, today) : null;
+                const r = ps.addRow([m.name, isUploader ? 'คนลงคลิป' : 'คนทำคลิป', all, open, q.overdue.length, q.soon.length, oldest]);
+                r.getCell(1).font = { bold: true };
+                if (q.overdue.length) r.getCell(5).font = { bold: true, color: { argb: XL.late } };
+                if (q.soon.length) r.getCell(6).font = { bold: true, color: { argb: XL.soon } };
+                for (let i = 2; i <= 7; i++) r.getCell(i).alignment = { horizontal: 'center' };
+            });
+            ps.addRow([]);
+            const n = ps.addRow(['หมายเหตุ: "งานทั้งหมด" ของคนลงคลิป = คลิปที่ลง TikTok แล้ว · "ค้างอยู่" ของคนลงคลิป = อัปลงไดร์ฟแล้วแต่ยังไม่ได้กดว่าลง TikTok · คลิปที่ "พักไว้" ไม่นับ']);
+            ps.mergeCells(n.number, 1, n.number, pHead.length);
+            n.getCell(1).font = { color: { argb: XL.muted }, size: 10, italic: true };
+            n.getCell(1).alignment = { wrapText: true };
+            n.height = 30;
+
+            return wb;
+        }
+
+        function saveBlob(blob, filename) {
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
-            a.href = url;
-            a.download = `clip_tracker_${new Date().toISOString().split('T')[0]}.csv`;
-            a.click();
-            URL.revokeObjectURL(url);
-            showToast('ส่งออกข้อมูลเรียบร้อย', 'success');
+            a.href = url; a.download = filename;
+            document.body.appendChild(a); a.click(); a.remove();
+            setTimeout(() => URL.revokeObjectURL(url), 1000);
+        }
+
+        async function exportData() {
+            const btn = document.getElementById('btnExport');
+            if (btn.disabled) return;
+            btn.disabled = true;
+            const today = localDateStr();
+            try {
+                const ExcelJS = await loadExcelJs();
+                const buf = await buildWorkbook(ExcelJS, clips, today).xlsx.writeBuffer();
+                saveBlob(new Blob([buf], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }),
+                         `clip_tracker_${today}.xlsx`);
+                showToast('ส่งออก Excel เรียบร้อย', 'success');
+            } catch (e) {
+                console.error('Excel export failed, falling back to CSV:', e);
+                exportCsv(today);
+                showToast('สร้างไฟล์ Excel ไม่ได้ — ส่งออกเป็น CSV แทน', 'warning');
+            } finally {
+                btn.disabled = false;
+            }
+        }
+
+        // Plain CSV fallback. A leading = + - @ would make Excel/Sheets run the
+        // cell as a formula, so those get a leading apostrophe.
+        function csvCell(v) {
+            let s = v === null || v === undefined ? '' : String(v);
+            if (/^[=+\-@]/.test(s)) s = "'" + s;
+            return `"${s.replace(/"/g, '""')}"`;
+        }
+        function exportCsv(today = localDateStr()) {
+            const head = ['วันที่ลง', 'ชื่อคลิป', 'ประเภท', 'ช่อง', 'คนทำ', 'สถานะ', 'ลง TikTok', 'รายละเอียด', 'ลิงก์'];
+            const rows = [...clips].sort((a, b) => (b.date || '').localeCompare(a.date || '')).map(c => {
+                const creator = CREATORS.find(cr => cr.id === c.creator);
+                const st = STATUSES[c.status];
+                return [c.date || '', c.title || '', typeInfo(c.type).label, c.channel || DEFAULT_CHANNEL,
+                        creator ? creator.name : '-', st ? st.label : (c.status || ''),
+                        c.uploaded ? 'ลงแล้ว' : 'ยังไม่ลง', c.desc || '', linksText(c)].map(csvCell).join(',');
+            });
+            const csv = [head.map(csvCell).join(','), ...rows].join('\r\n');
+            saveBlob(new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8;' }), `clip_tracker_${today}.csv`);
         }
 
         // ============ UTILS ============
