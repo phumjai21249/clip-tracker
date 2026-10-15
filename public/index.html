@@ -53,7 +53,6 @@
             --info: #2f74e0;
             --cyan: #0e8fa3;
             --rose: #d63369;
-            --ty-clip: #2563eb;   --ty-clip-bg: #e4ecfd;   --ty-clip-text: #1a4fc4;
             --ty-photo: #ea6a0c;  --ty-photo-bg: #fdeee0;  --ty-photo-text: #9a3d07;
 
             /* Effects */
@@ -104,7 +103,6 @@
             --info: #5b95f0;
             --cyan: #38c1d6;
             --rose: #f06797;
-            --ty-clip: #60a5fa;   --ty-clip-bg: #16233d;   --ty-clip-text: #8fc0fd;
             --ty-photo: #fb923c;  --ty-photo-bg: #33210f;  --ty-photo-text: #fdb36b;
 
             --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
@@ -516,6 +514,7 @@
            10. TABLE TOOLBAR — SEARCH + FILTERS
         ============================================================ */
         .table-toolbar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+        .month-scope { width: auto; min-width: 180px; padding-top: 9px; padding-bottom: 9px; font-size: 0.84rem; font-weight: 700; }
         .search-box {
             display: flex; align-items: center; gap: 8px;
             background: var(--surface-2); border: 1px solid var(--border);
@@ -645,7 +644,7 @@
             white-space: nowrap;
         }
         .type-tag .material-icons-round { font-size: 15px; }
-        .type-tag.ty-clip  { background: var(--ty-clip-bg);  color: var(--ty-clip-text); }
+        .type-tag.ty-clip  { background: transparent; color: var(--text-2); border-color: var(--border-strong); }
         .type-tag.ty-photo { background: var(--ty-photo-bg); color: var(--ty-photo-text); }
 
         /* Status badge + dropdown */
@@ -1044,6 +1043,7 @@
 
             .table-toolbar { width: 100%; }
             .search-box { width: 100%; }
+            .month-scope { width: 100%; }
             .filter-pills { width: 100%; flex-wrap: nowrap; overflow-x: auto; padding-bottom: 6px; -webkit-overflow-scrolling: touch; }
             .filter-pill { flex-shrink: 0; }
 
@@ -1403,7 +1403,7 @@
         <!-- PROGRESS -->
         <div class="progress-section">
             <div class="progress-labels">
-                <span>ความคืบหน้ารวม</span>
+                <span id="progressLabel">ความคืบหน้ารวม</span>
                 <span class="progress-value num" id="progressPercent">0%</span>
             </div>
             <div class="progress-bar-wrapper" id="progressBar"></div>
@@ -1444,9 +1444,10 @@
                     รายการคลิปทั้งหมด
                 </h2>
                 <div class="table-toolbar">
+                    <select class="form-select month-scope" id="monthScope" onchange="setMonthScope(this.value)" aria-label="เลือกเดือน"></select>
                     <div class="search-box">
                         <span class="material-icons-round">search</span>
-                        <input type="search" id="searchInput" placeholder="ค้นหาคลิป ชื่อ คนทำ ช่อง..." oninput="onSearch(this.value)" aria-label="ค้นหาคลิป">
+                        <input type="search" id="searchInput" placeholder="ค้นหาทุกเดือน — ชื่อ คนทำ ช่อง..." oninput="onSearch(this.value)" aria-label="ค้นหาคลิป">
                         <button class="search-clear" id="searchClear" onclick="clearSearch()" aria-label="ล้างคำค้นหา">
                             <span class="material-icons-round">close</span>
                         </button>
@@ -2079,6 +2080,11 @@
 
         let clips = [];
         let currentFilter = 'all';
+        // The table, stat cards, filter pills and progress bar show one month at
+        // a time — 518 rows on one page was slow and buried this month's work.
+        // Defaults to the current month; 'all' is the escape hatch. Search is
+        // deliberately not scoped, so any clip can still be found by name.
+        let clipMonthScope = localDateStr().slice(0, 7);
         let searchQuery = '';
         let editingClipId = null;
         // The clip id the open modal writes to. Chosen when the modal OPENS,
@@ -2216,13 +2222,14 @@
             renderProgress();
             renderCalendar();
             renderFilters();
+            renderMonthScope();
             renderTable();
             renderTeamBar();
         }
 
         function renderStats() {
             const counts = { idle: 0, filming: 0, editing: 0, done: 0, uploaded: 0 };
-            clips.forEach(c => { if (counts[c.status] !== undefined) counts[c.status]++; if (c.uploaded) counts.uploaded++; });
+            clips.filter(inMonthScope).forEach(c => { if (counts[c.status] !== undefined) counts[c.status]++; if (c.uploaded) counts.uploaded++; });
             const cards = [
                 { key: 'idle',     icon: 'hourglass_empty', label: 'ยังไม่ทำ',        cls: 'ic-idle' },
                 { key: 'filming',  icon: 'videocam',        label: 'กำลังถ่ายทำ',     cls: 'ic-filming' },
@@ -2250,8 +2257,9 @@
         function renderProgress() {
             // Paused clips are set aside on purpose, so they neither count as
             // done nor drag the percentage down.
-            const active = clips.filter(c => c.status !== 'paused');
+            const active = clips.filter(c => inMonthScope(c) && c.status !== 'paused');
             const total = active.length;
+            document.getElementById('progressLabel').textContent = `ความคืบหน้า · ${monthScopeLabel()}`;
             const bar = document.getElementById('progressBar');
             const label = document.getElementById('progressPercent');
             if (!total) { bar.innerHTML = ''; label.textContent = '0%'; return; }
@@ -2454,8 +2462,17 @@
         function hideCalTooltip() { document.getElementById('calTooltip').classList.remove('show'); }
 
         // ============ FILTER + SEARCH ============
+        function inMonthScope(clip) {
+            return clipMonthScope === 'all' || (clip.date || '').slice(0, 7) === clipMonthScope;
+        }
+        function monthScopeLabel(key = clipMonthScope) {
+            if (key === 'all') return 'ทุกเดือน';
+            const [y, m] = key.split('-').map(Number);
+            return `${THAI_MONTHS[m - 1]} ${y + 543}`;
+        }
+
         function getFilteredClips() {
-            let list = clips;
+            let list = searchQuery ? clips : clips.filter(inMonthScope);
             if (currentFilter === 'uploaded') list = list.filter(c => c.uploaded);
             else if (currentFilter.startsWith('type:')) {
                 const want = currentFilter.slice(5);
@@ -2477,13 +2494,14 @@
         }
 
         function filterCount(key) {
-            if (key === 'all') return clips.length;
-            if (key === 'uploaded') return clips.filter(c => c.uploaded).length;
+            const scoped = clips.filter(inMonthScope);
+            if (key === 'all') return scoped.length;
+            if (key === 'uploaded') return scoped.filter(c => c.uploaded).length;
             if (key.startsWith('type:')) {
                 const want = key.slice(5);
-                return clips.filter(c => (c.type || DEFAULT_TYPE) === want).length;
+                return scoped.filter(c => (c.type || DEFAULT_TYPE) === want).length;
             }
-            return clips.filter(c => c.status === key).length;
+            return scoped.filter(c => c.status === key).length;
         }
 
         function renderFilters() {
@@ -2492,6 +2510,27 @@
                     ${f.label} <span class="pill-count num">${filterCount(f.key)}</span>
                 </button>
             `).join('');
+        }
+
+        function renderMonthScope() {
+            const counts = {};
+            clips.forEach(c => { const k = (c.date || '').slice(0, 7); if (k) counts[k] = (counts[k] || 0) + 1; });
+            const months = Object.keys(counts);
+            // The current month is always offered, even before anything is
+            // planned in it, so a fresh month is never unreachable.
+            const nowKey = localDateStr().slice(0, 7);
+            if (!counts[nowKey]) months.push(nowKey);
+            if (clipMonthScope !== 'all' && !months.includes(clipMonthScope)) months.push(clipMonthScope);
+            months.sort().reverse();
+            const opts = months.map(k =>
+                `<option value="${k}" ${k === clipMonthScope ? 'selected' : ''}>${monthScopeLabel(k)} (${counts[k] || 0})</option>`);
+            opts.push(`<option value="all" ${clipMonthScope === 'all' ? 'selected' : ''}>ทุกเดือน (${clips.length})</option>`);
+            document.getElementById('monthScope').innerHTML = opts.join('');
+        }
+
+        function setMonthScope(value) {
+            clipMonthScope = value;
+            renderStats(); renderProgress(); renderFilters(); renderTable(); renderMonthScope();
         }
 
         function setFilter(key) { currentFilter = key; renderFilters(); renderStats(); renderTable(); }
@@ -2597,7 +2636,13 @@
                 cards.innerHTML = '';
                 empty.style.display = 'block';
                 const searching = !!searchQuery || currentFilter !== 'all';
-                document.getElementById('emptyTitle').textContent = searching ? 'ไม่พบคลิปที่ตรงเงื่อนไข' : 'ยังไม่มีคลิป';
+                const emptyMonth = !searching && clipMonthScope !== 'all' && clips.length > 0;
+                document.getElementById('emptyTitle').textContent = searching ? 'ไม่พบคลิปที่ตรงเงื่อนไข'
+                    : emptyMonth ? `ยังไม่มีคลิปใน${monthScopeLabel()}` : 'ยังไม่มีคลิป';
+                if (emptyMonth) {
+                    document.getElementById('emptyDesc').textContent = 'เลือกเดือนอื่นจากเมนูเดือน หรือกด "เพิ่มคลิปใหม่"';
+                    return;
+                }
                 document.getElementById('emptyDesc').textContent = searching ? 'ลองเปลี่ยนคำค้นหาหรือตัวกรองดู' : 'กดปุ่ม "เพิ่มคลิปใหม่" เพื่อเริ่มต้น';
                 return;
             }
@@ -3043,6 +3088,10 @@
             // The base64 rides along on this one save only — it is never kept
             // in the in-memory clip, so later edits stay small.
             syncClipSave(coverImage === undefined ? savedClip : { ...savedClip, coverImage });
+            // Saved into a month the table is not showing: follow it there,
+            // otherwise the clip just added would seem to vanish.
+            const savedMonth = (savedClip.date || '').slice(0, 7);
+            if (clipMonthScope !== 'all' && savedMonth && savedMonth !== clipMonthScope) clipMonthScope = savedMonth;
             closeModal(); render();
         }
 
@@ -3130,7 +3179,7 @@
                 editing: ['FFE7EFFC', 'FF1D5BBF'], done:    ['FFE2F7EF', 'FF076E4C'],
                 paused:  ['FFF3F4F6', 'FF556070'],
             },
-            type: { clip: ['FFE4ECFD', 'FF1A4FC4'], photo: ['FFFDEEE0', 'FF9A3D07'] },
+            type: { photo: ['FFFDEEE0', 'FF9A3D07'] },   // clip is the default: left plain
         };
 
         // Excel stores a date as a UTC day count. A local-midnight Date in
