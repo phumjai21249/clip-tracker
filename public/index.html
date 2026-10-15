@@ -292,6 +292,8 @@
         .queue-btn.primary { background: var(--brand); border-color: var(--brand); color: #fff; }
         .queue-btn.primary:hover { background: var(--brand-strong); color: #fff; }
         .queue-btn.on { background: var(--brand-soft); border-color: transparent; color: var(--brand-text); }
+        .queue-btn.danger { color: var(--danger-text); border-color: var(--danger-bg); }
+        .queue-btn.danger:hover { background: var(--danger-bg); color: var(--danger-text); border-color: var(--danger-bg); }
         .queue-group-label {
             margin: 14px 0 6px; font-size: 0.72rem; font-weight: 800; color: var(--text-2);
             display: flex; align-items: center; gap: 6px;
@@ -2864,6 +2866,11 @@
             const total = q.overdue.length + q.soon.length + q.later.length;
             const title = isUploader ? `คลิปรอลง TikTok — ${escHtml(who.name)}` : `งานของ ${escHtml(who.name)}`;
             const sub = total ? `${total} ชิ้น${q.overdue.length ? ` · เลยกำหนด ${q.overdue.length}` : ''}` : '';
+            // Creators only. The uploader's overdue items are finished clips —
+            // deleting those would destroy real work, so they get "posted" instead.
+            const purge = !isUploader && q.overdue.length
+                ? `<button type="button" class="queue-btn danger" onclick="deleteOverdue('${who.id}')"><span class="material-icons-round">delete_sweep</span>ลบงานที่เลยกำหนด (${q.overdue.length})</button>`
+                : '';
             const bulk = isUploader && q.overdue.length >= 2
                 ? `<button type="button" class="queue-btn" onclick="markOverduePosted()"><span class="material-icons-round">done_all</span>ลงแล้วทั้งหมดที่เลยกำหนด (${q.overdue.length})</button>`
                 : '';
@@ -2875,7 +2882,7 @@
                 <div class="queue-head">
                     <h3>${title}</h3>
                     ${sub ? `<span class="queue-sub">${sub}</span>` : ''}
-                    <div class="queue-actions">${bulk}${meBtn}</div>
+                    <div class="queue-actions">${bulk}${purge}${meBtn}</div>
                 </div>
                 ${total ? `
                     ${queueGroupHtml('เลยกำหนด', 'late', q.overdue, isUploader, today, QUEUE_CAP.overdue)}
@@ -2911,6 +2918,30 @@
             clip.uploaded = true;
             syncClipSave(clip); render();
             showToast('อัปลง TikTok แล้ว ✓', 'success');
+        }
+
+        // Delete every overdue clip in one creator's queue, after a confirm that
+        // names them. Each goes through the normal clip:delete, exactly as the
+        // per-row bin does. A copy of what was removed is kept in this browser's
+        // localStorage (clipTracker.deleted.<time>) so a mistaken purge can still
+        // be put back by hand; cover images are not in that copy — they are
+        // deleted on the server with the clip.
+        function deleteOverdue(memberId) {
+            if (memberId === UPLOADER.id) return;
+            const today = localDateStr();
+            const items = buildQueues(clips, today, CREATORS.map(c => c.id), UPLOADER.id)[memberId].overdue;
+            if (!items.length) return;
+            const who = (CREATORS.find(c => c.id === memberId) || {}).name || '';
+            const names = items.slice(0, 6).map(c => `• ${c.title}`).join('\n')
+                + (items.length > 6 ? `\n… และอีก ${items.length - 6} ชิ้น` : '');
+            const ok = confirm(`ลบงานที่เลยกำหนดของ ${who} ทั้งหมด ${items.length} ชิ้น?\n\n${names}\n\nลบแล้วจะหายจากทุกเครื่อง รวมทั้งรูปปก`);
+            if (!ok) return;
+            try { localStorage.setItem('clipTracker.deleted.' + Date.now(), JSON.stringify(items)); } catch (e) {}
+            const ids = new Set(items.map(c => c.id));
+            clips = clips.filter(c => !ids.has(c.id));
+            ids.forEach(id => syncClipDelete(id));
+            render();
+            showToast(`ลบแล้ว ${ids.size} ชิ้น`, 'info');
         }
 
         // One-off clean-up for a backlog of clips that were posted but never
