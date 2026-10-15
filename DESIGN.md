@@ -126,7 +126,7 @@ The palette is neutral-and-functional: a light gray-blue canvas, one violet bran
 - **Text / Text 2 / Text 3** (`#1a2233` / `#5b6678` / `#98a2b3`): primary copy, secondary/explanatory copy, and the lightest tier reserved for pure decoration (never for text a user must read — `text-3` sits under the 4.5:1 body-text contrast floor).
 
 ### Named Rules
-**The Status-Owns-Color Rule.** `--st-idle` / `--st-filming` / `--st-editing` / `--st-done` / `--st-uploaded` (each with a paired `-bg` and `-text` tint) are reserved for clip status only. No other UI element borrows a status color, so a glance at any color on the board reliably means "this is a status."
+**The Status-Owns-Color Rule.** `--st-idle` / `--st-filming` / `--st-editing` / `--st-done` / `--st-uploaded` / `--st-paused` (each with a paired `-bg` and `-text` tint) are reserved for clip status only. No other UI element borrows a status color, so a glance at any color on the board reliably means "this is a status."
 
 **The Channel Palette Rule.** Content channels get their own four-color set — cyan (JS SPORT SHOP), rose (Me SPORT), warning-amber (เสื้อปุ๋ย), success-green (โฟมขัดรองเท้า) — reusing the semantic `--warning`/`--success` hues for channel identity is intentional (channel tags live in a different visual context than toasts/status, so the reuse doesn't collide in practice).
 
@@ -182,6 +182,9 @@ A second, smaller micro-radius band (2–6px, not tokenized as a CSS custom prop
 
 ### Chips & Badges
 - **Status badge:** pill (`--radius-full`), status color's `-bg`/`-text` pair, a small leading dot in the solid status color. Click opens a same-shaped dropdown listing the other three statuses.
+- **Paused status badge:** the grey family like idle, told apart by a 1px *dashed* border in `--st-paused` (and a dashed outline on its calendar chip) — "set aside on purpose", never confused with "not started".
+- **Queue chip (team bar):** each member is a pill button; its badges count open work — `--danger-bg`/`--danger-text` "เลย N", `--warning-bg`/`--warning-text` "ด่วน N", neutral `surface-2` "ถัดไป N", or a quiet "✓ ว่าง". The open member gets a 1px brand ring. A small brand-soft "ฉัน" tag marks the person this browser remembers.
+- **Queue panel:** `--radius-lg` section shell directly under the team bar; groups overdue → today/tomorrow → later, each capped (6 / 6 / 5) behind a text "ดูอีก N ชิ้น" button. Due text is coloured by urgency only (danger / warning / text-2); the row's own status badge keeps its status colour.
 - **Channel tag:** pill, `surface-2` background, text colored by the channel's accent (cyan/rose/warning/success) — see the Channel Palette Rule.
 - **Content type tag:** pill, tint-filled from the type's `-bg`/`-text` pair, with a leading Material icon — `videocam` for คลิป, `image` for รูปภาพ. See the Content-Type Palette Rule.
 - **Content-link chip:** pill, `brand-soft` background, `brand-text` label, a small link icon — appears under a clip's title for each named reference URL (script doc, drive folder, etc.), opens in a new tab.
