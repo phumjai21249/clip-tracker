@@ -48,7 +48,7 @@ const quiet = { error: () => {} };
 
     // ---- validation ----
     await t('allows top-level and single nested paths', () => {
-        assert.strictEqual(validateUpdate({ id: 'p1', fields: { price: '1,790', 'specs.3': {}, 'prepDone.2': true, 'clipIds.1': 'c' } }), null);
+        assert.strictEqual(validateUpdate({ id: 'p1', fields: { price: '1,790', 'specs.3': {}, 'prepDone.2': true, 'clipIds.1': 'c', 'assign.4': 'c2' } }), null);
     });
     await t('rejects unknown and deep paths', () => {
         assert.match(validateUpdate({ id: 'p1', fields: { _seq: 1 } }), /not allowed/);

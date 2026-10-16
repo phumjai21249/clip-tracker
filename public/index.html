@@ -743,6 +743,16 @@
         .hl-ph { background: var(--danger-bg); color: var(--danger-text); border-radius: 3px; padding: 0 2px; }
 
         .modal-lg { max-width: 780px; }
+        .arr-quick { display: flex; align-items: center; gap: 8px; font-size: 0.78rem; font-weight: 700; color: var(--text-2); }
+        .arr-quick select { width: auto; flex: 1; }
+        .arr-assign { display: flex; flex-direction: column; border: 1px solid var(--border); border-radius: var(--radius-md); }
+        .arr-row { display: grid; grid-template-columns: 52px minmax(0, 1fr) 150px; gap: 10px; align-items: center; padding: 8px 12px; }
+        .arr-row + .arr-row { border-top: 1px solid var(--border); }
+        .arr-day { font-size: 0.74rem; font-weight: 800; color: var(--text-2); }
+        .arr-fmt { font-size: 0.84rem; font-weight: 700; color: var(--text); }
+        .arr-row .form-select { padding-top: 7px; padding-bottom: 7px; font-size: 0.82rem; }
+        .arr-row.done .arr-fmt::after { content: ' · โพสต์แล้ว'; color: var(--st-done-text); font-weight: 600; font-size: 0.74rem; }
+        .prd-spec-row .prd-who { width: auto; min-width: 130px; flex: none; padding: 5px 34px 5px 10px; font-size: 0.78rem; font-weight: 700; }
         .spec-rows { display: flex; flex-direction: column; gap: 8px; }
         .spec-row { display: grid; grid-template-columns: 70px 1fr 1fr 1fr 32px; gap: 6px; align-items: start; }
         .spec-row textarea, .spec-row input { font-size: 0.8rem; padding: 7px 8px; min-height: 0; }
@@ -1157,6 +1167,8 @@
             .spec-row > button { grid-column: 2; grid-row: 1; }
             .spec-row-head { display: none; }
             .form-row-3, .form-row-2 { grid-template-columns: 1fr; }
+            .arr-row { grid-template-columns: 44px minmax(0, 1fr); }
+            .arr-row .form-select { grid-column: 1 / -1; }
             .filter-pills { width: 100%; flex-wrap: nowrap; overflow-x: auto; padding-bottom: 6px; -webkit-overflow-scrolling: touch; }
             .filter-pill { flex-shrink: 0; }
 
@@ -1982,7 +1994,7 @@
 
     <!-- ARRIVAL MODAL -->
     <div class="modal-overlay" id="arrivalModalOverlay">
-        <div class="modal modal-sm" role="dialog" aria-modal="true" aria-labelledby="arrivalTitle">
+        <div class="modal" role="dialog" aria-modal="true" aria-labelledby="arrivalTitle">
             <div class="modal-header">
                 <h3><span class="material-icons-round">local_shipping</span><span id="arrivalTitle">ของเข้าแล้ว</span></h3>
                 <button class="modal-close" onclick="closeArrivalModal()" aria-label="ปิด"><span class="material-icons-round">close</span></button>
@@ -1994,8 +2006,9 @@
                     <input class="form-input" type="date" id="arrDate">
                 </div>
                 <div class="form-group">
-                    <label class="form-label" for="arrCreator">คนทำคลิป <span class="req">*</span></label>
-                    <select class="form-select" id="arrCreator"></select>
+                    <label class="form-label">คนทำแต่ละคลิป <span class="req">*</span></label>
+                    <div class="arr-quick"><span>ทั้งหมดเป็น</span><select class="form-select" id="arrAll" onchange="arrivalSetAll(this.value)" aria-label="ตั้งคนทำทุกคลิป"></select></div>
+                    <div class="arr-assign" id="arrAssign"></div>
                 </div>
                 <div class="form-group">
                     <label class="form-label" for="arrChannel">ช่องที่ลง</label>
@@ -3982,8 +3995,22 @@
         };
     }
 
+    // Who makes a format: the clip on the board wins (it may have been
+    // re-assigned there), then the plan's per-format choice, then the
+    // product-wide default kept from before per-clip assignment existed.
+    function productCreatorFor(p, no) {
+        const c = productClipOf(p, no);
+        if (c && c.creator) return c.creator;
+        return ((p.assign || {})[no]) || p.creator || '';
+    }
+    function productTeamNames(p) {
+        const ids = [...new Set(PRODUCT_FORMATS.map(f => productCreatorFor(p, f.no)).filter(Boolean))];
+        return ids.map(creatorNameOf).filter(Boolean).join(', ');
+    }
+
     // Creates whichever of the six clips are not on the board yet.
-    function createProductClips(p, arrival, creator, channel) {
+    // `assign` maps format number -> creator id.
+    function createProductClips(p, arrival, assign, channel) {
         let made = 0;
         const links = {};
         PRODUCT_FORMATS.forEach(f => {
@@ -3992,7 +4019,7 @@
             if (clips.some(c => c.id === id)) return;
             const spec = (p.specs || {})[f.no] || {};
             const clip = {
-                id, title: productClipTitle(p, f), desc: spec.goal || '', creator, status: 'idle',
+                id, title: productClipTitle(p, f), desc: spec.goal || '', creator: assign[f.no] || '', status: 'idle',
                 channel, type: f.photo ? 'photo' : 'clip', uploaded: false,
                 date: addDaysStr(arrival, f.day - 1), links: [], productId: p.id, formatNo: f.no,
             };
@@ -4095,7 +4122,7 @@
             });
             grid.innerHTML = sorted.map(p => {
                 const info = productDayInfo(p), posted = productPosted(p);
-                const who = creatorNameOf(p.creator);
+                const who = productTeamNames(p);
                 return `
                 <button type="button" class="prd-card ${productOpenId === p.id ? 'open' : ''}" onclick="productToggle('${p.id}')" aria-expanded="${productOpenId === p.id}">
                     <div class="prd-card-top"><span class="prd-code">${escHtml(p.code || '•')}</span><span class="prd-name">${escHtml(p.name)}</span></div>
@@ -4121,7 +4148,7 @@
         const meter = (lab, n, of) => `<div class="prd-meter"><span class="lab">${lab}</span><span class="num">${n}/${of}</span><div class="prd-bar"><i style="width:${of ? n / of * 100 : 0}%"></i></div></div>`;
         const today = localDateStr();
         const arrivalBtn = p.arrivalDate
-            ? `<button type="button" class="queue-btn" onclick="openArrivalModal('${p.id}')"><span class="material-icons-round">edit_calendar</span>เปลี่ยนวันของเข้า</button>`
+            ? `<button type="button" class="queue-btn" onclick="openArrivalModal('${p.id}')"><span class="material-icons-round">edit_calendar</span>เปลี่ยนวัน / คนทำ</button>`
             : `<button type="button" class="queue-btn primary" onclick="openArrivalModal('${p.id}')"><span class="material-icons-round">local_shipping</span>ของเข้าแล้ว</button>`;
 
         const week = [];
@@ -4142,7 +4169,7 @@
                     <div>
                         <h3><span class="prd-code">${escHtml(p.code || '•')}</span>${escHtml(p.name)}</h3>
                         ${p.intro ? `<div class="prd-intro">${phHtml(p.intro)}</div>` : ''}
-                        <div class="prd-sub ${p.arrivalDate ? '' : 'wait'}" style="margin-top:4px">${productDayInfo(p).text}${creatorNameOf(p.creator) ? ' · คนทำ ' + escHtml(creatorNameOf(p.creator)) : ''}</div>
+                        <div class="prd-sub ${p.arrivalDate ? '' : 'wait'}" style="margin-top:4px">${productDayInfo(p).text}${productTeamNames(p) ? ' · คนทำ ' + escHtml(productTeamNames(p)) : ''}</div>
                     </div>
                     <div class="prd-actions">
                         ${arrivalBtn}
@@ -4180,6 +4207,10 @@
             <article class="prd-spec ${st.posted ? 'posted' : ''}">
                 <div class="prd-spec-row">
                     <div class="prd-spec-title"><span class="t">${escHtml(p.code || '')}${f.no} · ${f.label}</span><span class="meta">${meta}</span></div>
+                    <select class="form-select prd-who" onchange="productSetCreator('${p.id}', ${f.no}, this.value)" aria-label="คนทำ ${escAttr((p.code || '') + f.no)}">
+                        <option value="">— คนทำ —</option>
+                        ${CREATORS.map(c => `<option value="${c.id}" ${productCreatorFor(p, f.no) === c.id ? 'selected' : ''}>${escHtml(c.name)}</option>`).join('')}
+                    </select>
                     <div class="prd-stages">${stageHtml}</div>
                     <button type="button" class="queue-btn" onclick="openSpecModal('${p.id}', ${f.no})"><span class="material-icons-round">edit_note</span>แก้</button>
                 </div>
@@ -4202,6 +4233,18 @@
     }
 
     // ---------- interactions ----------
+    // Changing who makes one format: recorded on the plan, and applied to the
+    // clip on the board straight away if it exists.
+    function productSetCreator(id, no, creator) {
+        const p = findProduct(id);
+        if (!p) return;
+        const clip = productClipOf(p, no);
+        if (clip && clip.creator !== creator) { clip.creator = creator; syncClipSave(clip); render(); }
+        productUpdate(p, { ['assign.' + no]: creator || null });
+        const name = creatorNameOf(creator);
+        showToast(name ? `${p.code || ''}${no} ให้ ${name} ทำ` : `${p.code || ''}${no} ยังไม่มีคนทำ`, 'info');
+    }
+
     function productToggle(id) { productOpenId = productOpenId === id ? null : id; renderProducts(); }
     function productSpecToggled(key, open) { if (open) productOpenSpecs.add(key); else productOpenSpecs.delete(key); }
     function productTogglePrep(id, i, on) { const p = findProduct(id); if (p) productUpdate(p, { ['prepDone.' + i]: on ? true : null }); }
@@ -4291,19 +4334,31 @@
         const p = findProduct(id);
         if (!p) return;
         arrivalTarget = id;
-        document.getElementById('arrivalTitle').textContent = p.arrivalDate ? 'เปลี่ยนวันของเข้า' : 'ของเข้าแล้ว';
+        document.getElementById('arrivalTitle').textContent = p.arrivalDate ? 'เปลี่ยนวัน / คนทำ' : 'ของเข้าแล้ว';
         document.getElementById('arrivalHint').textContent = p.arrivalDate
-            ? 'คลิปที่ยังไม่โพสต์จะเลื่อนตามวันใหม่ คลิปที่โพสต์แล้วอยู่ที่เดิม'
+            ? 'คลิปที่ยังไม่โพสต์จะเลื่อนตามวันใหม่ คลิปที่โพสต์แล้วอยู่ที่เดิม · เปลี่ยนคนทำได้ทุกคลิป'
             : `ระบบจะสร้าง 6 คลิปของ ${p.name} ลงตารางติดตามคลิป วันละ 1 คลิป เริ่มวันที่ของเข้า วันที่ 7 เผื่อไว้`;
         document.getElementById('arrDate').value = p.arrivalDate || localDateStr();
-        const cSel = document.getElementById('arrCreator');
-        cSel.innerHTML = '<option value="">— เลือกคนทำ —</option>' + CREATORS.map(c => `<option value="${c.id}">${escHtml(c.name)}</option>`).join('');
-        cSel.value = p.creator || '';
+        const opts = CREATORS.map(c => `<option value="${c.id}">${escHtml(c.name)}</option>`).join('');
+        document.getElementById('arrAll').innerHTML = '<option value="">— เลือก —</option>' + opts;
+        document.getElementById('arrAssign').innerHTML = PRODUCT_FORMATS.map(f => {
+            const posted = productStage(productClipOf(p, f.no)).posted;
+            return `<div class="arr-row ${posted ? 'done' : ''}">
+                <span class="arr-day">วัน ${f.day}</span>
+                <span class="arr-fmt">${escHtml(p.code || '')}${f.no} · ${f.label}</span>
+                <select class="form-select" data-no="${f.no}" aria-label="คนทำ ${escAttr((p.code || '') + f.no)}"><option value="">— คนทำ —</option>${opts}</select>
+            </div>`;
+        }).join('');
+        document.querySelectorAll('#arrAssign select').forEach(sel => { sel.value = productCreatorFor(p, Number(sel.dataset.no)); });
         const chSel = document.getElementById('arrChannel');
         chSel.innerHTML = Object.keys(CHANNELS).map(ch => `<option value="${escAttr(ch)}">${escHtml(ch)}</option>`).join('');
         chSel.value = p.channel || DEFAULT_CHANNEL;
         document.getElementById('btnSaveArrival').disabled = false;
         document.getElementById('arrivalModalOverlay').classList.add('open');
+    }
+    function arrivalSetAll(creator) {
+        if (!creator) return;
+        document.querySelectorAll('#arrAssign select').forEach(sel => { sel.value = creator; });
     }
     function closeArrivalModal() {
         document.getElementById('arrivalModalOverlay').classList.remove('open');
@@ -4313,21 +4368,35 @@
         const p = findProduct(arrivalTarget);
         if (!p) return;
         const date = document.getElementById('arrDate').value;
-        const creator = document.getElementById('arrCreator').value;
         const channel = document.getElementById('arrChannel').value || DEFAULT_CHANNEL;
+        const assign = {};
+        document.querySelectorAll('#arrAssign select').forEach(sel => { assign[sel.dataset.no] = sel.value; });
         if (!date) { showToast('กรุณาเลือกวันที่ของเข้า', 'warning'); return; }
-        if (!creator) { showToast('กรุณาเลือกคนทำคลิป', 'warning'); return; }
+        const missing = PRODUCT_FORMATS.filter(f => !assign[f.no]);
+        if (missing.length) {
+            showToast(`ยังไม่ได้เลือกคนทำ: ${missing.map(f => (p.code || '') + f.no + ' ' + f.label).join(', ')}`, 'warning');
+            return;
+        }
         closeArrivalModal();
         const moved = p.arrivalDate && p.arrivalDate !== date ? shiftProductClips(p, date) : 0;
-        const { made, links } = createProductClips(p, date, creator, channel);
+        // Re-assignments apply to clips already on the board too.
+        let reassigned = 0;
+        PRODUCT_FORMATS.forEach(f => {
+            const c = productClipOf(p, f.no);
+            if (c && c.creator !== assign[f.no]) { c.creator = assign[f.no]; syncClipSave(c); reassigned++; }
+        });
+        const { made, links } = createProductClips(p, date, assign, channel);
         // Follow the new clips on the board, like any other save.
         if (typeof clipMonthScope !== 'undefined' && clipMonthScope !== 'all') clipMonthScope = date.slice(0, 7);
         render();
-        const res = await productUpdate(p, Object.assign({ arrivalDate: date, creator, channel }, links));
+        const assignFields = {};
+        Object.entries(assign).forEach(([no, c]) => { assignFields['assign.' + no] = c; });
+        const res = await productUpdate(p, Object.assign({ arrivalDate: date, channel }, assignFields, links));
         if (res.ok) {
             const parts = [];
             if (made) parts.push(`สร้าง ${made} คลิปลงตารางแล้ว`);
             if (moved) parts.push(`เลื่อน ${moved} คลิป`);
+            if (reassigned) parts.push(`เปลี่ยนคนทำ ${reassigned} คลิป`);
             showToast(parts.length ? parts.join(' · ') : 'บันทึกวันของเข้าแล้ว', 'success');
         }
     }

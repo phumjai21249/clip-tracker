@@ -4,12 +4,12 @@
 // the same product never overwrite each other.
 
 // Top-level details are replaced whole; specs, prep ticks and clip links are
-// addressed one entry at a time ("specs.3", "prepDone.2", "clipIds.1").
+// addressed one entry at a time ("specs.3", "prepDone.2", "clipIds.1", "assign.4" — who makes format 4).
 const TOP_LEVEL = new Set([
     'name', 'code', 'intro', 'color', 'price', 'sizes', 'features',
     'compareWith', 'creator', 'channel', 'arrivalDate', 'prep',
 ]);
-const NESTED = /^(specs|prepDone|clipIds)\.[0-9A-Za-z_]{1,20}$/;
+const NESTED = /^(specs|prepDone|clipIds|assign)\.[0-9A-Za-z_]{1,20}$/;
 const ID = /^[0-9A-Za-z_-]{1,80}$/;
 const MAX_BYTES = 200 * 1024;   // per write; a product doc is well under 1 MB
 
