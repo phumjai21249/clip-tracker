@@ -37,6 +37,11 @@ const clipsRef = db.collection('clipTracker').doc('clips'); // legacy whole-arra
 const clipsItemsRef = clipsRef.collection('items'); // source of truth: one Firestore doc per clip
 const teamRef = db.collection('clipTracker').doc('team');
 const kpiMonthsRef = db.collection('clipTracker').doc('kpi').collection('months'); // one doc per YYYY-MM
+// New-product launch plans, one doc per product — see products.js.
+const products = require('./products').createProducts({
+    ref: db.collection('clipTracker').doc('products').collection('items'),
+    FieldValue: admin.firestore.FieldValue,
+});
 
 // ============ INITIAL DATA ============
 function getDefaultClips() {
@@ -134,6 +139,7 @@ async function initDB() {
     startTeamListener();
     startCoversListener();
     startKpiListener();
+    products.startListener();
     backfillHasCoverOnce();
 }
 // Started at the bottom of this file, once the cache bindings below exist.
@@ -394,6 +400,8 @@ app.get('/__diag', async (req, res) => {
         coverBytesMB: Math.round([...coverCache.values()].reduce((s, c) => s + c.buf.length, 0) / 1048576 * 10) / 10,
         kpiReady: kpiCacheReady,
         kpiMonths: Object.keys(kpiCache).sort(),
+        productsReady: products.isReady(),
+        products: products.count(),
         lastError: clipsCacheError ? clipsCacheError.message : null
     };
     out.backfill = lastBackfillResult;
@@ -444,7 +452,8 @@ io.on('connection', (socket) => {
         socket.emit('init:data', {
             clips,
             team: teamCache || getDefaultTeam(),
-            kpi: kpiCache
+            kpi: kpiCache,
+            products: products.list()
         });
     }).catch(e => {
         // Never fail silently here: before this, a rejected read left the client
@@ -526,6 +535,9 @@ io.on('connection', (socket) => {
             socket.broadcast.emit('kpi:cleared', month);
         } catch (e) { console.error('KPI save error (kpi:clear):', e.message); }
     });
+
+    // ---- NEW-PRODUCT LAUNCH PLANS ----
+    products.attach(socket);
 
     // ---- TEAM ----
     socket.on('team:update', async (team) => {

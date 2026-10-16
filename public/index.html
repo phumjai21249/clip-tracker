@@ -649,6 +649,107 @@
         .type-tag.ty-clip  { background: transparent; color: var(--text-2); border-color: var(--border-strong); }
         .type-tag.ty-photo { background: var(--ty-photo-bg); color: var(--ty-photo-text); }
 
+
+        /* ============================================================
+           NEW-PRODUCT LAUNCH PLANS (tab: สินค้าใหม่)
+        ============================================================ */
+        .prd-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; padding: 18px 24px 24px; }
+        .prd-card {
+            display: flex; flex-direction: column; gap: 8px; text-align: left;
+            padding: 14px 16px; border-radius: var(--radius-md);
+            background: var(--surface); border: 1px solid var(--border);
+            font: inherit; color: inherit; cursor: pointer;
+            transition: border-color var(--t-fast), box-shadow var(--t-fast);
+        }
+        .prd-card:hover { border-color: var(--border-strong); }
+        .prd-card:focus-visible { outline: none; box-shadow: 0 0 0 2px var(--bg), 0 0 0 4px var(--brand); }
+        .prd-card.open { border-color: var(--brand); box-shadow: 0 0 0 1px var(--brand); }
+        .prd-card-top { display: flex; align-items: center; gap: 8px; }
+        .prd-code {
+            display: inline-flex; align-items: center; justify-content: center;
+            min-width: 26px; height: 22px; padding: 0 6px; border-radius: 6px;
+            background: var(--brand-soft); color: var(--brand-text);
+            font-size: 0.74rem; font-weight: 800;
+        }
+        .prd-name { font-weight: 800; font-size: 0.92rem; color: var(--text); line-height: 1.35; }
+        .prd-sub { font-size: 0.76rem; color: var(--text-2); font-weight: 600; }
+        .prd-sub.wait { color: var(--warning-text); }
+        .prd-bar { height: 6px; border-radius: 3px; background: var(--surface-3); overflow: hidden; }
+        .prd-bar > i { display: block; height: 100%; background: var(--st-done); }
+        .prd-empty { padding: 28px 24px; color: var(--text-2); font-size: 0.86rem; font-weight: 600; }
+
+        .prd-detail { padding: 18px 24px 24px; display: flex; flex-direction: column; gap: 20px; }
+        .prd-head { display: flex; gap: 12px; align-items: flex-start; flex-wrap: wrap; }
+        .prd-head h3 { font-size: 1.1rem; font-weight: 800; color: var(--text); display: flex; align-items: center; gap: 8px; }
+        .prd-head .prd-intro { font-size: 0.82rem; color: var(--text-2); margin-top: 4px; max-width: 70ch; }
+        .prd-actions { margin-left: auto; display: flex; gap: 6px; flex-wrap: wrap; }
+        .prd-meters { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+        .prd-meter { display: flex; flex-direction: column; gap: 4px; }
+        .prd-meter .lab { font-size: 0.72rem; color: var(--text-2); font-weight: 700; }
+        .prd-meter .num { font-size: 0.95rem; font-weight: 800; color: var(--text); }
+        .prd-h { font-size: 0.86rem; font-weight: 800; color: var(--text); margin-bottom: 8px; }
+
+        .prd-prep { border: 1px solid var(--border); border-radius: var(--radius-md); }
+        .prd-prep label { display: flex; gap: 10px; align-items: flex-start; padding: 9px 14px; cursor: pointer; font-size: 0.84rem; }
+        .prd-prep label + label { border-top: 1px solid var(--border); }
+        .prd-prep input { width: 17px; height: 17px; margin: 2px 0 0; accent-color: var(--st-done); flex: none; }
+        .prd-prep label.on span { color: var(--text-2); text-decoration: line-through; }
+
+        .prd-week { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 8px; }
+        .prd-day { border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 8px 10px; display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+        .prd-day b { font-size: 0.74rem; color: var(--text-2); }
+        .prd-day span { font-size: 0.78rem; font-weight: 700; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .prd-day small { font-size: 0.7rem; color: var(--text-2); }
+        .prd-day.posted { border-color: var(--st-done); background: var(--st-done-bg); }
+        .prd-day.today { box-shadow: 0 0 0 1px var(--brand); border-color: var(--brand); }
+        .prd-day.spare span { color: var(--text-2); font-weight: 600; }
+
+        .prd-spec { border: 1px solid var(--border); border-left: 4px solid var(--brand); border-radius: var(--radius-md); overflow: hidden; }
+        .prd-spec.posted { border-left-color: var(--st-done); }
+        .prd-spec-row { display: flex; gap: 12px; align-items: center; padding: 12px 14px; flex-wrap: wrap; }
+        .prd-spec-title { flex: 1; min-width: 200px; display: flex; flex-direction: column; gap: 2px; }
+        .prd-spec-title .t { font-weight: 800; font-size: 0.9rem; color: var(--text); }
+        .prd-spec-title .meta { font-size: 0.76rem; color: var(--text-2); }
+        .prd-stages { display: flex; gap: 5px; flex-wrap: wrap; }
+        .prd-stage {
+            font-size: 0.72rem; font-weight: 700; padding: 3px 9px; border-radius: var(--radius-full);
+            border: 1px solid var(--border); color: var(--text-2);
+        }
+        .prd-stage.on { background: var(--st-done-bg); color: var(--st-done-text); border-color: transparent; }
+        .prd-spec details { border-top: 1px solid var(--border); }
+        .prd-spec summary { cursor: pointer; padding: 8px 14px; font-size: 0.8rem; font-weight: 700; color: var(--text-2); list-style: none; }
+        .prd-spec summary::-webkit-details-marker { display: none; }
+        .prd-spec summary::before { content: '▸ '; }
+        .prd-spec details[open] summary::before { content: '▾ '; }
+        .prd-spec-body { padding: 4px 14px 16px; display: flex; flex-direction: column; gap: 12px; font-size: 0.84rem; }
+        .prd-script { overflow-x: auto; border: 1px solid var(--border); border-radius: var(--radius-sm); }
+        .prd-script table { width: 100%; border-collapse: collapse; min-width: 560px; font-size: 0.8rem; }
+        .prd-script th, .prd-script td { text-align: left; vertical-align: top; padding: 6px 9px; border-bottom: 1px solid var(--border); }
+        .prd-script th { font-size: 0.72rem; color: var(--text-2); background: var(--surface-2); }
+        .prd-script tr:last-child td { border-bottom: none; }
+        .prd-script td.sec { white-space: nowrap; color: var(--text-2); font-variant-numeric: tabular-nums; }
+        .prd-photos { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 3px; }
+        .prd-kv { display: grid; grid-template-columns: 84px minmax(0, 1fr); gap: 6px 12px; }
+        .prd-kv dt { color: var(--text-2); font-size: 0.76rem; font-weight: 700; padding-top: 2px; }
+        .prd-kv dd { margin: 0; min-width: 0; overflow-wrap: anywhere; }
+        .prd-copyline { display: flex; gap: 8px; align-items: flex-start; }
+        .prd-copyline > span { flex: 1; min-width: 0; }
+        .prd-copy {
+            font: inherit; font-size: 0.72rem; font-weight: 700; cursor: pointer; flex: none;
+            border: 1px solid var(--border); background: var(--surface-2); color: var(--text-2);
+            border-radius: 5px; padding: 2px 8px;
+        }
+        .prd-note { background: var(--warning-bg); color: var(--text); border-left: 3px solid var(--warning); border-radius: 6px; padding: 8px 12px; }
+        .hl-ph { background: var(--danger-bg); color: var(--danger-text); border-radius: 3px; padding: 0 2px; }
+
+        .modal-lg { max-width: 780px; }
+        .spec-rows { display: flex; flex-direction: column; gap: 8px; }
+        .spec-row { display: grid; grid-template-columns: 70px 1fr 1fr 1fr 32px; gap: 6px; align-items: start; }
+        .spec-row textarea, .spec-row input { font-size: 0.8rem; padding: 7px 8px; min-height: 0; }
+        .spec-row-head { font-size: 0.7rem; font-weight: 800; color: var(--text-2); }
+        .form-row-3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+        .form-row-2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+
         /* Status badge + dropdown */
         .status-badge {
             display: inline-flex; align-items: center; gap: 7px;
@@ -1046,6 +1147,16 @@
             .table-toolbar { width: 100%; }
             .search-box { width: 100%; }
             .month-scope { width: 100%; }
+            .prd-grid { padding: 14px; grid-template-columns: 1fr; }
+            .prd-detail { padding: 14px; }
+            .prd-meters { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+            .prd-week { grid-template-columns: repeat(7, minmax(92px, 1fr)); overflow-x: auto; padding-bottom: 6px; }
+            .prd-actions { margin-left: 0; width: 100%; }
+            .spec-row { grid-template-columns: 1fr 32px; }
+            .spec-row > :not(button) { grid-column: 1; }
+            .spec-row > button { grid-column: 2; grid-row: 1; }
+            .spec-row-head { display: none; }
+            .form-row-3, .form-row-2 { grid-template-columns: 1fr; }
             .filter-pills { width: 100%; flex-wrap: nowrap; overflow-x: auto; padding-bottom: 6px; -webkit-overflow-scrolling: touch; }
             .filter-pill { flex-shrink: 0; }
 
@@ -1389,6 +1500,9 @@
             </button>
             <button type="button" class="tab-btn" id="tabBtnKpi" data-tab="Kpi" role="tab" onclick="setTab('Kpi')">
                 <span class="material-icons-round">insights</span> KPI คอนเทนต์
+            </button>
+            <button type="button" class="tab-btn" id="tabBtnProducts" data-tab="Products" role="tab" onclick="setTab('Products')">
+                <span class="material-icons-round">inventory_2</span> สินค้าใหม่
             </button>
         </nav>
 
@@ -1799,6 +1913,139 @@
             </div>
 
             <p class="kpi-footer">จัดทำจากข้อมูล API จริงของร้าน JS Sport · เดือนที่ 2 ให้รีแคลิเบรตเป้าใหม่จากผลจริงที่วัดด้วยวิธีเดียวกัน</p>
+        </div>
+
+        <!-- ===== TAB: NEW PRODUCTS ===== -->
+        <div class="tab-panel" id="tabProducts">
+            <div class="section-card">
+                <div class="section-header">
+                    <h2><span class="material-icons-round">inventory_2</span>สินค้าใหม่ — แผนลงคลิป 7 วัน</h2>
+                    <button class="btn btn-primary" onclick="openProductModal()"><span class="material-icons-round">add</span>เพิ่มรุ่นใหม่</button>
+                </div>
+                <div class="prd-grid" id="prodGrid"></div>
+            </div>
+            <div class="section-card" id="prodDetail" hidden></div>
+        </div>
+    </div>
+
+    <!-- PRODUCT (ADD/EDIT) MODAL -->
+    <div class="modal-overlay" id="prodModalOverlay">
+        <div class="modal" role="dialog" aria-modal="true" aria-labelledby="prodModalTitle">
+            <div class="modal-header">
+                <h3><span class="material-icons-round">inventory_2</span><span id="prodModalTitle">เพิ่มรุ่นใหม่</span></h3>
+                <button class="modal-close" onclick="closeProductModal()" aria-label="ปิด"><span class="material-icons-round">close</span></button>
+            </div>
+            <div class="modal-body">
+                <div class="form-row-2">
+                    <div class="form-group">
+                        <label class="form-label" for="prdName">ชื่อรุ่น <span class="req">*</span></label>
+                        <input class="form-input" id="prdName" placeholder="เช่น PAN ZOOM ELITE">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="prdCode">ตัวย่อ (ขึ้นหน้าชื่อคลิป)</label>
+                        <input class="form-input" id="prdCode" maxlength="4" placeholder="เช่น Z">
+                    </div>
+                </div>
+                <div class="form-row-3">
+                    <div class="form-group"><label class="form-label" for="prdColor">สี</label><input class="form-input" id="prdColor"></div>
+                    <div class="form-group"><label class="form-label" for="prdPrice">ราคา</label><input class="form-input" id="prdPrice" placeholder="เช่น 1,790"></div>
+                    <div class="form-group"><label class="form-label" for="prdSizes">ไซซ์</label><input class="form-input" id="prdSizes" placeholder="เช่น 39–45"></div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="prdF1">จุดเด่น 3 ข้อ (ใช้ในคลิปโปรโมท / แนะนำคุณภาพ)</label>
+                    <input class="form-input" id="prdF1" placeholder="จุดเด่น 1 เช่น ผ้าถัก Knit 3D แนบเท้า">
+                    <input class="form-input" id="prdF2" placeholder="จุดเด่น 2">
+                    <input class="form-input" id="prdF3" placeholder="จุดเด่น 3">
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="prdCompare">รุ่นที่จะเทียบในแบบ 6</label>
+                    <input class="form-input" id="prdCompare" placeholder="เช่น WINGZ VORTEX PRO">
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="prdIntro">คำอธิบายสั้น ๆ</label>
+                    <textarea class="form-input form-textarea" id="prdIntro" rows="2"></textarea>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="prdPrep">เตรียมก่อนวันถ่าย (บรรทัดละ 1 ข้อ — เว้นว่างได้ ระบบใส่ให้)</label>
+                    <textarea class="form-input form-textarea" id="prdPrep" rows="4"></textarea>
+                </div>
+                <label class="form-label" id="prdRegenRow" style="display:flex;gap:8px;align-items:center;font-weight:600">
+                    <input type="checkbox" id="prdRegen"> สร้างสคริปต์ 6 แบบใหม่จากข้อมูลนี้ (ทับสคริปต์เดิมที่แก้ไว้)
+                </label>
+            </div>
+            <div class="modal-footer">
+                <button class="btn" onclick="closeProductModal()">ยกเลิก</button>
+                <button class="btn btn-primary" id="btnSaveProduct" onclick="saveProduct()"><span class="material-icons-round">check</span>บันทึก</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ARRIVAL MODAL -->
+    <div class="modal-overlay" id="arrivalModalOverlay">
+        <div class="modal modal-sm" role="dialog" aria-modal="true" aria-labelledby="arrivalTitle">
+            <div class="modal-header">
+                <h3><span class="material-icons-round">local_shipping</span><span id="arrivalTitle">ของเข้าแล้ว</span></h3>
+                <button class="modal-close" onclick="closeArrivalModal()" aria-label="ปิด"><span class="material-icons-round">close</span></button>
+            </div>
+            <div class="modal-body">
+                <p class="form-hint" id="arrivalHint" style="font-size:0.8rem;color:var(--text-2)"></p>
+                <div class="form-group">
+                    <label class="form-label" for="arrDate">วันที่ของเข้า (= วันที่ 1) <span class="req">*</span></label>
+                    <input class="form-input" type="date" id="arrDate">
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="arrCreator">คนทำคลิป <span class="req">*</span></label>
+                    <select class="form-select" id="arrCreator"></select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="arrChannel">ช่องที่ลง</label>
+                    <select class="form-select" id="arrChannel"></select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn" onclick="closeArrivalModal()">ยกเลิก</button>
+                <button class="btn btn-primary" id="btnSaveArrival" onclick="saveArrival()"><span class="material-icons-round">event_available</span>สร้างตาราง</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SPEC (SCRIPT) EDIT MODAL -->
+    <div class="modal-overlay" id="specModalOverlay">
+        <div class="modal modal-lg" role="dialog" aria-modal="true" aria-labelledby="specModalTitle">
+            <div class="modal-header">
+                <h3><span class="material-icons-round">edit_note</span><span id="specModalTitle">แก้สคริปต์</span></h3>
+                <button class="modal-close" onclick="closeSpecModal()" aria-label="ปิด"><span class="material-icons-round">close</span></button>
+            </div>
+            <div class="modal-body">
+                <div class="form-row-3">
+                    <div class="form-group"><label class="form-label" for="spLen">ความยาว</label><input class="form-input" id="spLen"></div>
+                    <div class="form-group"><label class="form-label" for="spTime">เวลาลงที่แนะนำ</label><input class="form-input" id="spTime" placeholder="18:00"></div>
+                    <div class="form-group"><label class="form-label" for="spWho">ใคร / ที่ไหน</label><input class="form-input" id="spWho"></div>
+                </div>
+                <div class="form-group"><label class="form-label" for="spGoal">เป้าหมาย</label><textarea class="form-input form-textarea" id="spGoal" rows="2"></textarea></div>
+                <div class="form-group" id="spScriptGroup">
+                    <label class="form-label">สคริปต์รายช่วง</label>
+                    <div class="spec-row spec-row-head"><span>วินาที</span><span>ภาพ / ช็อต</span><span>พูด (VO)</span><span>ข้อความบนจอ</span><span></span></div>
+                    <div class="spec-rows" id="spRows"></div>
+                    <button type="button" class="queue-btn" onclick="specAddRow()" style="align-self:flex-start"><span class="material-icons-round">add</span>เพิ่มช่วง</button>
+                </div>
+                <div class="form-group" id="spPhotosGroup">
+                    <label class="form-label" for="spPhotos">ช็อตลิสต์ภาพนิ่ง (บรรทัดละ 1 รูป)</label>
+                    <textarea class="form-input form-textarea" id="spPhotos" rows="7"></textarea>
+                </div>
+                <div class="form-group"><label class="form-label" for="spCaption">แคปชัน</label><textarea class="form-input form-textarea" id="spCaption" rows="3"></textarea></div>
+                <div class="form-group"><label class="form-label" for="spTags">แฮชแท็ก</label><input class="form-input" id="spTags"></div>
+                <div class="form-row-2">
+                    <div class="form-group"><label class="form-label" for="spCart">ปักตะกร้า</label><input class="form-input" id="spCart"></div>
+                    <div class="form-group"><label class="form-label" for="spKpi">KPI</label><input class="form-input" id="spKpi"></div>
+                </div>
+                <div class="form-group"><label class="form-label" for="spCover">ปก</label><input class="form-input" id="spCover"></div>
+                <div class="form-group"><label class="form-label" for="spNote">หมายเหตุ</label><textarea class="form-input form-textarea" id="spNote" rows="2"></textarea></div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn" onclick="closeSpecModal()">ยกเลิก</button>
+                <button class="btn btn-primary" id="btnSaveSpec" onclick="saveSpec()"><span class="material-icons-round">check</span>บันทึก</button>
+            </div>
         </div>
     </div>
 
@@ -2227,6 +2474,7 @@
             renderMonthScope();
             renderTable();
             renderTeamBar();
+            if (typeof renderProducts === 'function') renderProducts();   // progress there is read from clips
         }
 
         function renderStats() {
@@ -3538,7 +3786,7 @@
         function initTab() {
             let saved = 'Clips';
             try { saved = localStorage.getItem('clipTracker.tab') || 'Clips'; } catch (e) {}
-            setTab(saved === 'Kpi' ? 'Kpi' : 'Clips');
+            setTab(['Kpi', 'Products'].includes(saved) ? saved : 'Clips');
             window.scrollTo({ top: 0 });
         }
         function kpiJump(n) {
@@ -3555,6 +3803,601 @@
             renderCreatorSelect(); // ต้องมีตัวเลือกคนทำตั้งแต่แรก แม้ยังไม่เชื่อมต่อ server
             render(); // แสดง UI ทันที ไม่ต้องรอ server (ข้อมูลจริงจะซิงค์เข้ามาเอง)
         })();
+    </script>
+    <script>
+    // ============================================================
+    //  NEW-PRODUCT LAUNCH PLANS (tab: สินค้าใหม่)
+    //  Every new shoe gets the same six content formats. Pressing
+    //  "ของเข้าแล้ว" puts all six on the clip board, one a day from the
+    //  arrival date, day 7 spare. Progress is read back from those clips,
+    //  so nothing is ticked twice.
+    // ============================================================
+
+    // Posting order. `no` is the format number used everywhere (specs.<no>,
+    // clip ids); `day` is the day it goes out, arrival = day 1.
+    const PRODUCT_FORMATS = [
+        { no: 1, label: 'บอกของเข้า',     day: 1 },
+        { no: 2, label: 'โปรโมท',         day: 2 },
+        { no: 3, label: 'ภาพนิ่ง 7 รูป',   day: 3, photo: true },
+        { no: 4, label: 'แนะนำคุณภาพ',    day: 4 },
+        { no: 6, label: 'เปรียบเทียบ',     day: 5 },
+        { no: 5, label: 'เหมาะกับใคร',     day: 6 },
+    ];
+    const PRODUCT_SPARE_DAY = 7;
+    const TAG_TAIL = '#รองเท้าสตั๊ด #รองเท้าฟุตบอล #เจเอสสปอร์ตหนองบัวลําภู #JSSPORT';
+
+    // Templates mirror the hand-written VORTEX / LEGENDA / ZOOM plans.
+    // {tokens} are filled from the product; anything unknown becomes a
+    // [highlighted] placeholder the team fills before recording.
+    const SPEC_TEMPLATES = {
+        1: { len: '≤15 วิ', who: 'พี่แจน · หน้าร้าน/เคาน์เตอร์', time: '18:00',
+             goal: 'แจ้งของเข้า ให้คนจำชื่อรุ่น และชวนเข้าไลฟ์ดูของจริง',
+             script: [
+                ['0–3', 'แจนยกกล่อง {name} ขึ้นมาตรงกล้อง เปิดฝา', '"{name} มาแล้วค่า!"', '{name} มาแล้ว!'],
+                ['3–9', 'หยิบรองเท้าออกมาหมุนโชว์รอบคู่', '"สี {color} ไซซ์ {sizes}"', 'สี {color} · ไซซ์ {sizes}'],
+                ['9–13', 'ชี้เข้ากล้อง', '"อยากดูของจริงทุกมุม เข้าไลฟ์เลย ลองให้ดูสด ๆ"', 'ดูของจริงในไลฟ์ 🔴'],
+                ['13–15', 'ยิ้ม ชี้ลงมุมตะกร้า', '"บอกเบอร์เท้าใต้คลิปได้เลยค่า"', 'บอกเบอร์เท้า 👇'],
+             ],
+             caption: '{name} สี {color} มาแล้ว! ไซซ์ {sizes} ไซซ์ไหนหมดก่อนไม่รู้ด้วยนะ บอกเบอร์เท้าใต้คลิป แอดมินเช็กให้ 👇 ดูของจริงได้ในไลฟ์',
+             tags: '{tag} #สินค้ามาแล้ว ' + TAG_TAIL, cart: '{name}',
+             cover: 'แจนถือรองเท้าตรงกลาง ตัวหนังสือ "{name} มาแล้ว!" สีเหลือง ขอบดำ อยู่ 1/3 บน',
+             kpi: 'ค้างดู 3 วิ · คอมเมนต์ที่มีเบอร์เท้า · วิว ≥6,000 ใน 7 วัน', note: '' },
+        2: { len: 'เป้า 15 วิ (เพดาน 20)', who: 'นายแบบ 1–2 คน · สนามหญ้า แสงกลางวัน', time: '18:00',
+             goal: 'ให้เห็นรองเท้าตอนใช้งานจริง แล้วปิดด้วยตะกร้า',
+             script: [
+                ['0–2', 'สโลว์โมชันปุ่มกระแทกหญ้า (60fps)', '(เพลงบีท)', '{name}'],
+                ['2–6', 'ใส่วิ่งออกตัว เลี้ยงหลบกรวย', 'VO: "{name}"', '{f1}'],
+                ['6–10', 'ยิง/ผ่านบอล ตัดภาพตามบีท', '—', '{f2}'],
+                ['10–13', 'โคลสอัพจุดเด่นบนรองเท้า', '—', '{f3}'],
+                ['13–15', 'รองเท้าวางบนหญ้า ข้างลูกบอล', 'VO: "จิ้มตะกร้าเลือกเบอร์เลย"', 'ไซซ์ {sizes} · 🛒'],
+             ],
+             caption: '{name} ลงสนามจริงให้ดูแล้ว {f1} ใครเตะเบอร์ไหน คอมเมนต์มา 👇',
+             tags: '{tag} #รุ่นล่าสุด ' + TAG_TAIL, cart: '{name}',
+             cover: 'เฟรมเท้ากำลังเตะบอล ตัวหนังสือ "{name}"',
+             kpi: 'อัตราดูจบ · CTR ตะกร้า · ถูกใจ ≥1.2% ของวิว',
+             note: 'ถ่ายกลางแจ้งตอนแดดอ่อน ห้ามถ่ายมืด (คลิปภาพมืดค้าง 3 วิแค่ 14–17%)' },
+        3: { len: 'โพสต์แบบภาพ (Photo mode)', who: 'นายแบบ 1 คน + ช็อตสินค้าล้วน', time: '12:00',
+             goal: 'ใช้ 2 ทาง: โพสต์ภาพ TikTok และรูปลิสต์ Shopee/Lazada/Facebook',
+             photos: [
+                'ปก: รองเท้าวางบนหญ้า มุมต่ำ 45° ข้อความ "{name}"',
+                'ด้านข้างเต็มคู่ พื้นหลังเรียบสีอ่อน',
+                'โคลสอัพ {f1}',
+                'พลิกคว่ำ โชว์พื้นปุ่ม',
+                'นายแบบใส่ เหยียบบอล (เฟรมถึงเข่า)',
+                'นายแบบใส่ จังหวะเตะ (ถ่ายต่อเนื่อง เลือกเฟรมคมที่สุด)',
+                'การ์ดสรุป: ราคา {price} · ไซซ์ {sizes} · "กดตะกร้าได้เลย"',
+             ],
+             caption: '{name} ครบทุกมุม ปัดดูให้ครบ 7 รูป ชอบรูปไหน คอมเมนต์เลขรูปมา 👇',
+             tags: '{tag} #สินค้าคุณภาพ ' + TAG_TAIL, cart: '{name}', cover: '',
+             kpi: 'จำนวนคนปัดจนจบ · คอมเมนต์เลขรูป · CTR ตะกร้า', note: '' },
+        4: { len: '35–45 วิ', who: 'พนักงานขาย ถือรองเท้าพูดหน้ากล้อง', time: '18:00',
+             goal: 'ตอบ 3 ความกังวลที่คนเตะประจำมีก่อนซื้อ ด้วยการโชว์ของจริง',
+             script: [
+                ['0–3', 'ถือรองเท้าใกล้กล้อง', '"ซื้อสตั๊ดคู่ใหม่ กลัว 3 เรื่องนี้ใช่ไหม?"', 'กลัว 3 เรื่องนี้ใช่ไหม?'],
+                ['3–13', 'โชว์จุดที่ 1 ให้เห็นกับตา', '"1. {f1} [พูดความรู้สึกตอนใส่จริง]"', '1 {f1}'],
+                ['13–23', 'โชว์จุดที่ 2', '"2. {f2}"', '2 {f2}'],
+                ['23–33', 'พลิกพื้น แล้วตัดช็อตเลี้ยงบนหญ้า', '"3. {f3}"', '3 {f3}'],
+                ['33–40', 'แคปรีวิวลูกค้าจริงขึ้นจอ 1–2 อัน (เบลอชื่อ)', '"ลูกค้าที่ซื้อไปบอกว่า [อ่านรีวิวจริง]"', 'รีวิวจริงจากลูกค้า'],
+                ['40–45', 'ชูรองเท้า', '"เคยกังวลข้อไหน คอมเมนต์ 1 2 หรือ 3"', 'คอมเมนต์ 1 · 2 · 3'],
+             ],
+             caption: 'ก่อนซื้อสตั๊ดต้องเช็ก 3 เรื่องนี้: {f1} · {f2} · {f3} {name} ตอบให้ครบในคลิป เคยกังวลข้อไหน คอมเมนต์เลข 👇',
+             tags: '{tag} #สตั๊ดใส่สบาย #สินค้าคุณภาพ ' + TAG_TAIL, cart: '{name}', cover: '',
+             kpi: 'อัตราดูจบ · ยอดบันทึก · คอมเมนต์ 1/2/3',
+             note: 'ใช้รีวิวจริงจาก TikTok Shop/Shopee เท่านั้น ห้ามแต่งรีวิวเอง ถ้ายังไม่มีรีวิว ตัดช่วง 33–40 ทิ้ง' },
+        5: { len: '30–40 วิ', who: 'พนักงานขาย ถือรองเท้า', time: '18:00',
+             goal: 'บอกชัดว่าใครควรซื้อ ใครไม่ควร แล้วส่งคนที่ไม่เหมาะไปรุ่นอื่นในร้าน',
+             script: [
+                ['0–3', 'ถือรองเท้าใกล้กล้อง', '"{name} ไม่ได้เหมาะกับทุกคนนะ"', 'คู่นี้เหมาะกับใคร?'],
+                ['3–14', 'นับนิ้ว 1-2-3', '"เหมาะกับ: [ใครควรซื้อ 3 ข้อ]"', '✓ [ข้อ 1] ✓ [ข้อ 2] ✓ [ข้อ 3]'],
+                ['14–24', 'ส่ายหน้า ชี้ไปที่ {compare} บนชั้น', '"ไม่เหมาะกับ: [ใครไม่ควรซื้อ] ไปดู {compare} แทน"', '✗ [ใครไม่เหมาะ]'],
+                ['24–33', 'โชว์ตารางไซซ์บนจอ', '"ไม่แน่ใจเบอร์ วัดความยาวเท้าเป็นเซนติเมตร คอมเมนต์มา แอดมินเทียบให้"', 'ไซซ์ {sizes}'],
+                ['33–38', 'ยิ้ม', '"เข้าไลฟ์ ลองใส่ให้ดูได้"', 'ลองของจริงในไลฟ์ 🔴'],
+             ],
+             caption: '{name} เหมาะกับใคร? [เหมาะกับใคร] ✓ · [ไม่เหมาะกับใคร] ✗ ไปดู {compare} แทน ไม่แน่ใจเบอร์ บอกความยาวเท้า (ซม.) ใต้คลิป 👇',
+             tags: '{tag} ' + TAG_TAIL, cart: '{name}', cover: '',
+             kpi: 'คอมเมนต์ที่มีความยาวเท้า/เบอร์ · CTR ตะกร้า', note: '' },
+        6: { len: '35–45 วิ', who: 'พนักงานขาย · โต๊ะสินค้า', time: '19:00',
+             goal: 'ใช้สูตร "ให้คนเลือกใน 3 วิ" (สูตรที่ค้างดู 3 วิสูงสุดของร้าน) แล้วอธิบายส่วนต่าง',
+             script: [
+                ['0–3', '2 คู่วางตรงหน้า นับนิ้ว 3-2-1', '"ซ้ายหรือขวา? มีเวลา 3 วิ!"', 'เลือกคู่ไหน? ⏱ 3'],
+                ['3–8', 'ยกทีละคู่', '"ซ้าย {name} {price} ขวา {compare} [ราคา]"', '{name} {price} / {compare} [ราคา]'],
+                ['8–16', 'โคลสอัพอัปเปอร์ 2 คู่สลับกัน', '"จุดที่ 1 อัปเปอร์ [วัสดุจริงของทั้งคู่]"', '1 อัปเปอร์'],
+                ['16–24', 'พลิกพื้น 2 คู่', '"จุดที่ 2 พื้น [ชนิดปุ่มจริงของทั้งคู่]"', '2 พื้นปุ่ม'],
+                ['24–31', 'โชว์จุดต่างอื่นที่เห็นจริง', '"จุดที่ 3 [จุดต่างที่เห็นจริง]"', '3 [จุดต่าง]'],
+                ['31–37', 'แบ่งจอซ้าย/ขวา', '"[ใครควรเลือก {name}] [ใครควรเลือก {compare}]"', '[สรุปเลือก]'],
+                ['37–42', 'ถือ 2 คู่', '"ตอนแรกคุณเลือกถูกไหม คอมเมนต์ซ้ายหรือขวา"', 'ซ้าย หรือ ขวา 👇'],
+             ],
+             caption: 'ซ้ายหรือขวา มีเวลา 3 วิ! {name} vs {compare} ต่างกันตรงไหน ดูจบแล้วคอมเมนต์ว่าเลือกถูกไหม 👇',
+             tags: '{tag} ' + TAG_TAIL, cart: '{name}',
+             cover: '2 คู่ซ้าย/ขวา "VS" ตัวใหญ่สีเหลืองตรงกลาง ด้านบน "เลือกคู่ไหน? มีเวลา 3 วิ"',
+             kpi: 'ค้างดู 3 วิ · แชร์ · คอมเมนต์ซ้าย/ขวา',
+             note: 'ห้ามพูดว่าคู่ไหน "ดีกว่า" แบบเหมารวม พูดเป็น "เหมาะกับใคร" เพราะร้านขายทั้งสองรุ่น' },
+    };
+    const PREP_TEMPLATE = [
+        'ยืนยันชื่อรุ่น สี ราคา และไซซ์ที่มีของจริงของ {name}',
+        'วัสดุอัปเปอร์และชนิดปุ่มของ {name} และ {compare} (ใช้ในแบบ 4, 6)',
+        'ราคา {compare} และส่วนต่างที่จะพูดในแบบ 6',
+        'รีวิวลูกค้าจริง 2–3 อัน แคปหน้าจอ เบลอชื่อ (ใช้ในแบบ 4)',
+        'ลิสต์สินค้าขึ้นตะกร้าก่อนโพสต์คลิปแรก',
+        'นายแบบใส่ไซซ์ตรงกับของที่มี · ลูกบอล · กรวย · ป้ายชื่อรุ่น',
+    ];
+
+    let products = [];
+    let productOpenId = null;
+    let productModalId = null;   // id the open product modal writes to (allocated on open)
+    let productModalIsNew = false;
+    let productModalSaved = false;
+    let specModalTarget = null;  // { productId, no }
+    let arrivalTarget = null;    // productId
+    const productOpenSpecs = new Set();   // "<productId>:<no>" details left open across re-renders
+
+    // ---------- template filling (pure) ----------
+    function productTokens(p) {
+        const f = p.features || [];
+        const name = (p.name || '').trim();
+        return {
+            name: name || '[ชื่อรุ่น]', color: p.color || '[สี]', price: p.price || '[ราคา]',
+            sizes: p.sizes || '[ไซซ์]', f1: f[0] || '[จุดเด่น 1]', f2: f[1] || '[จุดเด่น 2]', f3: f[2] || '[จุดเด่น 3]',
+            compare: p.compareWith || '[รุ่นที่เทียบ]',
+            tag: name ? '#' + name.replace(/[^0-9A-Za-z฀-๿]/g, '') : '[#แท็กรุ่น]',
+        };
+    }
+    function fillTemplate(str, tokens) {
+        return String(str).replace(/\{(\w+)\}/g, (m, k) => (k in tokens ? tokens[k] : m));
+    }
+    // Script rows are objects: Firestore cannot store an array of arrays.
+    function buildSpecs(p) {
+        const tk = productTokens(p);
+        const out = {};
+        Object.entries(SPEC_TEMPLATES).forEach(([no, t]) => {
+            const s = {};
+            ['len', 'who', 'time', 'goal', 'caption', 'tags', 'cart', 'cover', 'kpi', 'note'].forEach(k => { s[k] = fillTemplate(t[k] || '', tk); });
+            if (t.script) s.script = t.script.map(r => ({ t: r[0], shot: fillTemplate(r[1], tk), vo: fillTemplate(r[2], tk), text: fillTemplate(r[3], tk) }));
+            if (t.photos) s.photos = t.photos.map(x => fillTemplate(x, tk));
+            out[no] = s;
+        });
+        return out;
+    }
+    function buildPrep(p) {
+        const tk = productTokens(p);
+        return PREP_TEMPLATE.map(x => fillTemplate(x, tk));
+    }
+
+    // ---------- links to the clip board ----------
+    // Deterministic ids: two people pressing "ของเข้าแล้ว" at once write the
+    // same six documents rather than twelve.
+    function productClipId(p, no) { return `clip_${p.id}_${no}`; }
+    function productClipOf(p, no) { return clips.find(c => c.id === productClipId(p, no)) || null; }
+    function productClipTitle(p, f) { return `${p.code || ''}${f.no} · ${f.label} — ${p.name}`; }
+
+    // Progress read back from the clip itself — never ticked a second time.
+    function productStage(clip) {
+        if (!clip) return { shot: false, edited: false, posted: false, exists: false };
+        const s = clip.status;
+        return {
+            exists: true,
+            shot: s === 'editing' || s === 'done' || !!clip.uploaded,
+            edited: s === 'done' || !!clip.uploaded,
+            posted: !!clip.uploaded,
+        };
+    }
+
+    // Creates whichever of the six clips are not on the board yet.
+    function createProductClips(p, arrival, creator, channel) {
+        let made = 0;
+        const links = {};
+        PRODUCT_FORMATS.forEach(f => {
+            const id = productClipId(p, f.no);
+            links['clipIds.' + f.no] = id;
+            if (clips.some(c => c.id === id)) return;
+            const spec = (p.specs || {})[f.no] || {};
+            const clip = {
+                id, title: productClipTitle(p, f), desc: spec.goal || '', creator, status: 'idle',
+                channel, type: f.photo ? 'photo' : 'clip', uploaded: false,
+                date: addDaysStr(arrival, f.day - 1), links: [], productId: p.id, formatNo: f.no,
+            };
+            clips.unshift(clip);
+            syncClipSave(clip);
+            made++;
+        });
+        return { made, links };
+    }
+
+    // Moves the linked clips that are not posted yet to the new schedule.
+    function shiftProductClips(p, arrival) {
+        let moved = 0;
+        PRODUCT_FORMATS.forEach(f => {
+            const c = productClipOf(p, f.no);
+            if (!c || c.uploaded) return;
+            const want = addDaysStr(arrival, f.day - 1);
+            if (c.date === want) return;
+            c.date = want;
+            syncClipSave(c);
+            moved++;
+        });
+        return moved;
+    }
+
+    // ---------- server I/O (acknowledged, never silent) ----------
+    function clean(v) { return JSON.parse(JSON.stringify(v)); }   // drop undefined: Firestore rejects it
+    function productEmit(ev, payload) {
+        if (!socket) return Promise.resolve({ ok: true, offline: true });
+        return new Promise(resolve => {
+            const timer = setTimeout(() => resolve({ ok: false, error: 'timeout' }), 15000);
+            socket.emit(ev, clean(payload), res => { clearTimeout(timer); resolve(res || { ok: false, error: 'no reply' }); });
+        }).then(res => {
+            if (!res.ok) {
+                showToast('บันทึกสินค้าใหม่ไม่สำเร็จ — ' + (res.error || 'ลองใหม่อีกครั้ง'), 'warning');
+                console.error(ev, 'rejected', res);
+            }
+            return res;
+        });
+    }
+    function applyProductFields(p, fields) {
+        Object.entries(fields).forEach(([k, v]) => {
+            const dot = k.indexOf('.');
+            if (dot < 0) { if (v === null) delete p[k]; else p[k] = v; return; }
+            const top = k.slice(0, dot), sub = k.slice(dot + 1);
+            p[top] = p[top] || {};
+            if (v === null) delete p[top][sub]; else p[top][sub] = v;
+        });
+    }
+    function productUpdate(p, fields) {
+        applyProductFields(p, clean(fields));
+        renderProducts();
+        return productEmit('product:update', { id: p.id, fields });
+    }
+    function findProduct(id) { return products.find(p => p.id === id) || null; }
+
+    if (socket) {
+        socket.on('init:data', d => { products = (d && d.products) || []; renderProducts(); });
+        socket.on('product:created', p => {
+            const i = products.findIndex(x => x.id === p.id);
+            if (i >= 0) products[i] = p; else products.unshift(p);
+            renderProducts();
+        });
+        socket.on('product:updated', ({ id, fields }) => {
+            const p = findProduct(id);
+            if (p) { applyProductFields(p, fields); renderProducts(); }
+        });
+        socket.on('product:deleted', id => {
+            products = products.filter(p => p.id !== id);
+            if (productOpenId === id) productOpenId = null;
+            renderProducts();
+        });
+    }
+
+    // ---------- rendering ----------
+    function phHtml(text) {   // escape, then mark [placeholders]
+        return escHtml(String(text || '')).replace(/\[[^\]]+\]/g, m => `<span class="hl-ph">${m}</span>`);
+    }
+    function creatorNameOf(id) { const c = CREATORS.find(x => x.id === id); return c ? c.name : ''; }
+    function productPosted(p) { return PRODUCT_FORMATS.filter(f => productStage(productClipOf(p, f.no)).posted).length; }
+
+    function productDayInfo(p) {
+        if (!p.arrivalDate) return { text: 'รอของ', wait: true };
+        const n = daysBetween(p.arrivalDate, localDateStr()) + 1;
+        if (n < 1) return { text: `ของเข้า ${formatDate(p.arrivalDate)} (อีก ${1 - n} วัน)` };
+        if (n > PRODUCT_SPARE_DAY) return { text: `ของเข้า ${formatDate(p.arrivalDate)} · ครบสัปดาห์แล้ว` };
+        return { text: `ของเข้า ${formatDate(p.arrivalDate)} · วันที่ ${n}/7` };
+    }
+
+    function renderProducts() {
+        const grid = document.getElementById('prodGrid');
+        if (!grid) return;
+        if (!products.length) {
+            grid.innerHTML = '<div class="prd-empty">ยังไม่มีรุ่นใหม่ — กด "เพิ่มรุ่นใหม่" เพื่อเริ่ม</div>';
+        } else {
+            const sorted = [...products].sort((a, b) => {
+                // Waiting first, then the newest arrivals.
+                if (!a.arrivalDate !== !b.arrivalDate) return a.arrivalDate ? 1 : -1;
+                return (b.arrivalDate || '').localeCompare(a.arrivalDate || '') || (b._seq || 0) - (a._seq || 0);
+            });
+            grid.innerHTML = sorted.map(p => {
+                const info = productDayInfo(p), posted = productPosted(p);
+                const who = creatorNameOf(p.creator);
+                return `
+                <button type="button" class="prd-card ${productOpenId === p.id ? 'open' : ''}" onclick="productToggle('${p.id}')" aria-expanded="${productOpenId === p.id}">
+                    <div class="prd-card-top"><span class="prd-code">${escHtml(p.code || '•')}</span><span class="prd-name">${escHtml(p.name)}</span></div>
+                    <span class="prd-sub ${info.wait ? 'wait' : ''}">${info.text}${who ? ' · ' + escHtml(who) : ''}</span>
+                    <div class="prd-bar"><i style="width:${posted / 6 * 100}%"></i></div>
+                    <span class="prd-sub">โพสต์แล้ว ${posted}/6</span>
+                </button>`;
+            }).join('');
+        }
+        renderProductDetail();
+    }
+
+    function renderProductDetail() {
+        const host = document.getElementById('prodDetail');
+        const p = findProduct(productOpenId);
+        if (!p) { host.hidden = true; host.innerHTML = ''; return; }
+        host.hidden = false;
+        const stages = PRODUCT_FORMATS.map(f => productStage(productClipOf(p, f.no)));
+        const count = k => stages.filter(s => s[k]).length;
+        const prep = p.prep || [];
+        const prepDone = p.prepDone || {};
+        const prepN = prep.filter((_, i) => prepDone[i]).length;
+        const meter = (lab, n, of) => `<div class="prd-meter"><span class="lab">${lab}</span><span class="num">${n}/${of}</span><div class="prd-bar"><i style="width:${of ? n / of * 100 : 0}%"></i></div></div>`;
+        const today = localDateStr();
+        const arrivalBtn = p.arrivalDate
+            ? `<button type="button" class="queue-btn" onclick="openArrivalModal('${p.id}')"><span class="material-icons-round">edit_calendar</span>เปลี่ยนวันของเข้า</button>`
+            : `<button type="button" class="queue-btn primary" onclick="openArrivalModal('${p.id}')"><span class="material-icons-round">local_shipping</span>ของเข้าแล้ว</button>`;
+
+        const week = [];
+        for (let d = 1; d <= PRODUCT_SPARE_DAY; d++) {
+            const f = PRODUCT_FORMATS.find(x => x.day === d);
+            const date = p.arrivalDate ? addDaysStr(p.arrivalDate, d - 1) : null;
+            const st = f ? productStage(productClipOf(p, f.no)) : null;
+            week.push(`<div class="prd-day ${st && st.posted ? 'posted' : ''} ${date === today ? 'today' : ''} ${f ? '' : 'spare'}">
+                <b>วัน ${d}${date ? ' · ' + formatDate(date) : ''}</b>
+                <span>${f ? `${escHtml(p.code || '')}${f.no} ${f.label}` : 'สำรอง'}</span>
+                ${f && (p.specs || {})[f.no] && p.specs[f.no].time ? `<small>${escHtml(p.specs[f.no].time)}</small>` : ''}
+            </div>`);
+        }
+
+        host.innerHTML = `
+            <div class="prd-detail">
+                <div class="prd-head">
+                    <div>
+                        <h3><span class="prd-code">${escHtml(p.code || '•')}</span>${escHtml(p.name)}</h3>
+                        ${p.intro ? `<div class="prd-intro">${phHtml(p.intro)}</div>` : ''}
+                        <div class="prd-sub ${p.arrivalDate ? '' : 'wait'}" style="margin-top:4px">${productDayInfo(p).text}${creatorNameOf(p.creator) ? ' · คนทำ ' + escHtml(creatorNameOf(p.creator)) : ''}</div>
+                    </div>
+                    <div class="prd-actions">
+                        ${arrivalBtn}
+                        <button type="button" class="queue-btn" onclick="openProductModal('${p.id}')"><span class="material-icons-round">edit</span>แก้ข้อมูลรุ่น</button>
+                        <button type="button" class="queue-btn danger" onclick="deleteProduct('${p.id}')"><span class="material-icons-round">delete_outline</span>ลบรุ่น</button>
+                    </div>
+                </div>
+                <div class="prd-meters">
+                    ${meter('ถ่ายแล้ว', count('shot'), 6)}${meter('ตัดต่อ/แต่งรูปแล้ว', count('edited'), 6)}${meter('โพสต์แล้ว', count('posted'), 6)}${meter('เตรียมก่อนถ่าย', prepN, prep.length)}
+                </div>
+                ${prep.length ? `<div><div class="prd-h">เตรียมก่อนวันถ่าย</div><div class="prd-prep">${prep.map((t, i) => `
+                    <label class="${prepDone[i] ? 'on' : ''}"><input type="checkbox" ${prepDone[i] ? 'checked' : ''} onchange="productTogglePrep('${p.id}', ${i}, this.checked)"><span>${phHtml(t)}</span></label>`).join('')}</div></div>` : ''}
+                <div><div class="prd-h">ตารางลง 7 วัน ${p.arrivalDate ? '' : '<span class="prd-sub wait">— เริ่มนับเมื่อกด "ของเข้าแล้ว"</span>'}</div><div class="prd-week">${week.join('')}</div></div>
+                <div style="display:flex;flex-direction:column;gap:10px">${PRODUCT_FORMATS.map(f => specCardHtml(p, f)).join('')}</div>
+            </div>`;
+    }
+
+    function specCardHtml(p, f) {
+        const s = (p.specs || {})[f.no] || {};
+        const clip = productClipOf(p, f.no);
+        const st = productStage(clip);
+        const key = `${p.id}:${f.no}`;
+        const date = p.arrivalDate ? addDaysStr(p.arrivalDate, f.day - 1) : null;
+        const meta = [s.len, s.who, date ? `ลง ${formatDate(date)}${s.time ? ' ' + s.time : ''}` : (s.time ? `ลง วัน ${f.day} ${s.time}` : `วัน ${f.day}`)].filter(Boolean).map(escHtml).join(' · ');
+        const pill = (on, label) => `<span class="prd-stage ${on ? 'on' : ''}">${on ? '✓ ' : ''}${label}</span>`;
+        const stageHtml = clip
+            ? pill(st.shot, 'ถ่ายแล้ว') + pill(st.edited, f.photo ? 'แต่งรูปแล้ว' : 'ตัดต่อแล้ว') + pill(st.posted, 'โพสต์แล้ว')
+            : `<span class="prd-stage">${p.arrivalDate ? 'ยังไม่มีคลิปในตาราง' : 'รอของเข้า'}</span>`;
+        const script = (s.script && s.script.length) ? `<div class="prd-script"><table><thead><tr><th>วินาที</th><th>ภาพ / ช็อต</th><th>พูด (VO)</th><th>ข้อความบนจอ</th></tr></thead><tbody>${s.script.map(r => `
+            <tr><td class="sec">${escHtml(r.t || '')}</td><td>${phHtml(r.shot)}</td><td>${phHtml(r.vo)}</td><td>${phHtml(r.text)}</td></tr>`).join('')}</tbody></table></div>` : '';
+        const photos = (s.photos && s.photos.length) ? `<ol class="prd-photos">${s.photos.map(x => `<li>${phHtml(x)}</li>`).join('')}</ol>` : '';
+        const copyLine = text => `<div class="prd-copyline"><span>${phHtml(text)}</span><button type="button" class="prd-copy" data-copy="${escAttr(text || '')}" onclick="productCopy(this)">คัดลอก</button></div>`;
+        const row = (k, v) => v ? `<dt>${k}</dt><dd>${v}</dd>` : '';
+        return `
+            <article class="prd-spec ${st.posted ? 'posted' : ''}">
+                <div class="prd-spec-row">
+                    <div class="prd-spec-title"><span class="t">${escHtml(p.code || '')}${f.no} · ${f.label}</span><span class="meta">${meta}</span></div>
+                    <div class="prd-stages">${stageHtml}</div>
+                    <button type="button" class="queue-btn" onclick="openSpecModal('${p.id}', ${f.no})"><span class="material-icons-round">edit_note</span>แก้</button>
+                </div>
+                <details ${productOpenSpecs.has(key) ? 'open' : ''} ontoggle="productSpecToggled('${key}', this.open)">
+                    <summary>${s.photos ? 'ช็อตลิสต์ แคปชัน และรายละเอียด' : 'สคริปต์ แคปชัน และรายละเอียด'}</summary>
+                    <div class="prd-spec-body">
+                        ${s.goal ? `<div><b>เป้าหมาย:</b> ${phHtml(s.goal)}</div>` : ''}
+                        ${script}${photos}
+                        <dl class="prd-kv">
+                            ${row('แคปชัน', s.caption ? copyLine(s.caption) : '')}
+                            ${row('แฮชแท็ก', s.tags ? copyLine(s.tags) : '')}
+                            ${row('ปักตะกร้า', s.cart ? phHtml(s.cart) : '')}
+                            ${row('ปก', s.cover ? phHtml(s.cover) : '')}
+                            ${row('KPI', s.kpi ? escHtml(s.kpi) : '')}
+                        </dl>
+                        ${s.note ? `<div class="prd-note">${phHtml(s.note)}</div>` : ''}
+                    </div>
+                </details>
+            </article>`;
+    }
+
+    // ---------- interactions ----------
+    function productToggle(id) { productOpenId = productOpenId === id ? null : id; renderProducts(); }
+    function productSpecToggled(key, open) { if (open) productOpenSpecs.add(key); else productOpenSpecs.delete(key); }
+    function productTogglePrep(id, i, on) { const p = findProduct(id); if (p) productUpdate(p, { ['prepDone.' + i]: on ? true : null }); }
+    async function productCopy(btn) {
+        const text = btn.dataset.copy || '';
+        try { await navigator.clipboard.writeText(text); btn.textContent = 'คัดลอกแล้ว'; }
+        catch (e) { btn.textContent = 'คัดลอกไม่ได้'; }
+        setTimeout(() => { btn.textContent = 'คัดลอก'; }, 1600);
+    }
+
+    async function deleteProduct(id) {
+        const p = findProduct(id);
+        if (!p) return;
+        const made = PRODUCT_FORMATS.filter(f => productClipOf(p, f.no)).length;
+        if (!confirm(`ลบรุ่น "${p.name}"?\n\nลบเฉพาะแผนของรุ่นนี้${made ? ` — คลิป ${made} ชิ้นที่สร้างไปแล้วยังอยู่ในตารางติดตามคลิป` : ''}`)) return;
+        products = products.filter(x => x.id !== id);
+        if (productOpenId === id) productOpenId = null;
+        renderProducts();
+        const res = await productEmit('product:delete', id);
+        if (res.ok) showToast('ลบรุ่นแล้ว', 'info');
+    }
+
+    // ----- product modal -----
+    function openProductModal(id) {
+        const p = id ? findProduct(id) : null;
+        productModalIsNew = !p;
+        // Like the clip modal: the id is chosen when the modal opens, so a
+        // double tap on Save can never create the product twice.
+        productModalId = p ? p.id : 'prod_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 6);
+        productModalSaved = false;
+        document.getElementById('btnSaveProduct').disabled = false;
+        document.getElementById('prodModalTitle').textContent = p ? 'แก้ข้อมูลรุ่น' : 'เพิ่มรุ่นใหม่';
+        const v = (elId, val) => { document.getElementById(elId).value = val || ''; };
+        v('prdName', p && p.name); v('prdCode', p && p.code); v('prdColor', p && p.color); v('prdPrice', p && p.price);
+        v('prdSizes', p && p.sizes); v('prdCompare', p && p.compareWith); v('prdIntro', p && p.intro);
+        const f = (p && p.features) || [];
+        v('prdF1', f[0]); v('prdF2', f[1]); v('prdF3', f[2]);
+        v('prdPrep', p ? (p.prep || []).join('\n') : '');
+        document.getElementById('prdRegen').checked = false;
+        document.getElementById('prdRegenRow').style.display = p ? 'flex' : 'none';
+        document.getElementById('prodModalOverlay').classList.add('open');
+        setTimeout(() => document.getElementById('prdName').focus(), 250);
+    }
+    function closeProductModal() {
+        document.getElementById('prodModalOverlay').classList.remove('open');
+        document.getElementById('btnSaveProduct').disabled = true;
+    }
+    async function saveProduct() {
+        if (productModalSaved) return;
+        const val = elId => document.getElementById(elId).value.trim();
+        const name = val('prdName');
+        if (!name) { showToast('กรุณาใส่ชื่อรุ่น', 'warning'); return; }
+        const details = {
+            name, code: val('prdCode').toUpperCase(), color: val('prdColor'), price: val('prdPrice'),
+            sizes: val('prdSizes'), compareWith: val('prdCompare'), intro: val('prdIntro'),
+            features: [val('prdF1'), val('prdF2'), val('prdF3')],
+        };
+        const prepLines = val('prdPrep').split('\n').map(s => s.trim()).filter(Boolean);
+        productModalSaved = true;
+        closeProductModal();
+        if (productModalIsNew) {
+            const p = Object.assign({ id: productModalId }, details, {
+                creator: '', channel: DEFAULT_CHANNEL, arrivalDate: null,
+                prep: prepLines.length ? prepLines : buildPrep(details), prepDone: {},
+                specs: buildSpecs(details), clipIds: {}, createdAt: Date.now(), _seq: Date.now(),
+            });
+            products.unshift(p);
+            productOpenId = p.id;
+            renderProducts();
+            const res = await productEmit('product:create', { product: p });
+            if (res.ok) showToast(`เพิ่ม ${name} แล้ว — สคริปต์ 6 แบบพร้อม กด "ของเข้าแล้ว" เมื่อของมาถึง`, 'success');
+        } else {
+            const p = findProduct(productModalId);
+            if (!p) return;
+            const fields = Object.assign({}, details, { prep: prepLines });
+            if (document.getElementById('prdRegen').checked) {
+                const specs = buildSpecs(details);
+                Object.keys(specs).forEach(no => { fields['specs.' + no] = specs[no]; });
+            }
+            const res = await productUpdate(p, fields);
+            if (res.ok) showToast('บันทึกข้อมูลรุ่นแล้ว', 'success');
+        }
+    }
+
+    // ----- arrival modal -----
+    function openArrivalModal(id) {
+        const p = findProduct(id);
+        if (!p) return;
+        arrivalTarget = id;
+        document.getElementById('arrivalTitle').textContent = p.arrivalDate ? 'เปลี่ยนวันของเข้า' : 'ของเข้าแล้ว';
+        document.getElementById('arrivalHint').textContent = p.arrivalDate
+            ? 'คลิปที่ยังไม่โพสต์จะเลื่อนตามวันใหม่ คลิปที่โพสต์แล้วอยู่ที่เดิม'
+            : `ระบบจะสร้าง 6 คลิปของ ${p.name} ลงตารางติดตามคลิป วันละ 1 คลิป เริ่มวันที่ของเข้า วันที่ 7 เผื่อไว้`;
+        document.getElementById('arrDate').value = p.arrivalDate || localDateStr();
+        const cSel = document.getElementById('arrCreator');
+        cSel.innerHTML = '<option value="">— เลือกคนทำ —</option>' + CREATORS.map(c => `<option value="${c.id}">${escHtml(c.name)}</option>`).join('');
+        cSel.value = p.creator || '';
+        const chSel = document.getElementById('arrChannel');
+        chSel.innerHTML = Object.keys(CHANNELS).map(ch => `<option value="${escAttr(ch)}">${escHtml(ch)}</option>`).join('');
+        chSel.value = p.channel || DEFAULT_CHANNEL;
+        document.getElementById('btnSaveArrival').disabled = false;
+        document.getElementById('arrivalModalOverlay').classList.add('open');
+    }
+    function closeArrivalModal() {
+        document.getElementById('arrivalModalOverlay').classList.remove('open');
+        document.getElementById('btnSaveArrival').disabled = true;
+    }
+    async function saveArrival() {
+        const p = findProduct(arrivalTarget);
+        if (!p) return;
+        const date = document.getElementById('arrDate').value;
+        const creator = document.getElementById('arrCreator').value;
+        const channel = document.getElementById('arrChannel').value || DEFAULT_CHANNEL;
+        if (!date) { showToast('กรุณาเลือกวันที่ของเข้า', 'warning'); return; }
+        if (!creator) { showToast('กรุณาเลือกคนทำคลิป', 'warning'); return; }
+        closeArrivalModal();
+        const moved = p.arrivalDate && p.arrivalDate !== date ? shiftProductClips(p, date) : 0;
+        const { made, links } = createProductClips(p, date, creator, channel);
+        // Follow the new clips on the board, like any other save.
+        if (typeof clipMonthScope !== 'undefined' && clipMonthScope !== 'all') clipMonthScope = date.slice(0, 7);
+        render();
+        const res = await productUpdate(p, Object.assign({ arrivalDate: date, creator, channel }, links));
+        if (res.ok) {
+            const parts = [];
+            if (made) parts.push(`สร้าง ${made} คลิปลงตารางแล้ว`);
+            if (moved) parts.push(`เลื่อน ${moved} คลิป`);
+            showToast(parts.length ? parts.join(' · ') : 'บันทึกวันของเข้าแล้ว', 'success');
+        }
+    }
+
+    // ----- spec modal -----
+    function specRowHtml(r) {
+        r = r || {};
+        return `<div class="spec-row">
+            <input class="form-input" data-k="t" value="${escAttr(r.t || '')}">
+            <textarea class="form-input" data-k="shot" rows="2">${escHtml(r.shot || '')}</textarea>
+            <textarea class="form-input" data-k="vo" rows="2">${escHtml(r.vo || '')}</textarea>
+            <textarea class="form-input" data-k="text" rows="2">${escHtml(r.text || '')}</textarea>
+            <button type="button" class="action-btn delete" onclick="this.parentElement.remove()" aria-label="ลบช่วงนี้"><span class="material-icons-round" style="font-size:18px">close</span></button>
+        </div>`;
+    }
+    function specAddRow() { document.getElementById('spRows').insertAdjacentHTML('beforeend', specRowHtml()); }
+    function openSpecModal(id, no) {
+        const p = findProduct(id);
+        if (!p) return;
+        specModalTarget = { productId: id, no };
+        const f = PRODUCT_FORMATS.find(x => x.no === no);
+        const s = (p.specs || {})[no] || {};
+        const photoMode = !!s.photos || (f && f.photo);
+        document.getElementById('specModalTitle').textContent = `${p.code || ''}${no} · ${f ? f.label : ''} — ${p.name}`;
+        const v = (elId, val) => { document.getElementById(elId).value = val || ''; };
+        v('spLen', s.len); v('spTime', s.time); v('spWho', s.who); v('spGoal', s.goal); v('spCaption', s.caption);
+        v('spTags', s.tags); v('spCart', s.cart); v('spKpi', s.kpi); v('spCover', s.cover); v('spNote', s.note);
+        v('spPhotos', (s.photos || []).join('\n'));
+        document.getElementById('spRows').innerHTML = (s.script || []).map(specRowHtml).join('');
+        document.getElementById('spScriptGroup').style.display = photoMode ? 'none' : '';
+        document.getElementById('spPhotosGroup').style.display = photoMode ? '' : 'none';
+        document.getElementById('btnSaveSpec').disabled = false;
+        document.getElementById('specModalOverlay').classList.add('open');
+    }
+    function closeSpecModal() {
+        document.getElementById('specModalOverlay').classList.remove('open');
+        document.getElementById('btnSaveSpec').disabled = true;
+    }
+    async function saveSpec() {
+        const t = specModalTarget;
+        const p = t && findProduct(t.productId);
+        if (!p) return;
+        const val = elId => document.getElementById(elId).value.trim();
+        const spec = {
+            len: val('spLen'), time: val('spTime'), who: val('spWho'), goal: val('spGoal'), caption: val('spCaption'),
+            tags: val('spTags'), cart: val('spCart'), kpi: val('spKpi'), cover: val('spCover'), note: val('spNote'),
+        };
+        if (document.getElementById('spPhotosGroup').style.display !== 'none') {
+            spec.photos = val('spPhotos').split('\n').map(s => s.trim()).filter(Boolean);
+        } else {
+            spec.script = [...document.querySelectorAll('#spRows .spec-row')].map(row => {
+                const r = {};
+                row.querySelectorAll('[data-k]').forEach(el => { r[el.dataset.k] = el.value.trim(); });
+                return r;
+            }).filter(r => r.t || r.shot || r.vo || r.text);
+        }
+        closeSpecModal();
+        const res = await productUpdate(p, { ['specs.' + t.no]: spec });
+        if (res.ok) showToast('บันทึกสคริปต์แล้ว', 'success');
+    }
+
+    ['prodModalOverlay', 'arrivalModalOverlay', 'specModalOverlay'].forEach(id => {
+        document.getElementById(id).addEventListener('click', e => { if (e.target.id === id) e.target.classList.remove('open'); });
+    });
+    document.addEventListener('keydown', e => {
+        if (e.key !== 'Escape') return;
+        ['prodModalOverlay', 'arrivalModalOverlay', 'specModalOverlay'].forEach(id => document.getElementById(id).classList.remove('open'));
+    });
+
+    renderProducts();
     </script>
     <!-- KPI DASHBOARD LOGIC -->
     <script>
