@@ -742,17 +742,26 @@
         .prd-note { background: var(--warning-bg); color: var(--text); border-left: 3px solid var(--warning); border-radius: 6px; padding: 8px 12px; }
         .hl-ph { background: var(--danger-bg); color: var(--danger-text); border-radius: 3px; padding: 0 2px; }
 
-        .modal-lg { max-width: 780px; }
+        .modal.modal-lg { max-width: 780px; }
         .arr-quick { display: flex; align-items: center; gap: 8px; font-size: 0.78rem; font-weight: 700; color: var(--text-2); }
         .arr-quick select { width: auto; flex: 1; }
         .arr-assign { display: flex; flex-direction: column; border: 1px solid var(--border); border-radius: var(--radius-md); }
-        .arr-row { display: grid; grid-template-columns: 52px minmax(0, 1fr) 150px; gap: 10px; align-items: center; padding: 8px 12px; }
+        .arr-row { display: grid; grid-template-columns: minmax(0, 1fr) 150px 140px; gap: 10px; align-items: center; padding: 8px 12px; }
+        .arr-head { display: flex; align-items: baseline; gap: 10px; min-width: 0; }
+        .arr-def { display: block; font-size: 0.72rem; font-weight: 600; color: var(--text-2); }
+        .arr-row .form-input { padding-top: 6px; padding-bottom: 6px; font-size: 0.82rem; }
         .arr-row + .arr-row { border-top: 1px solid var(--border); }
-        .arr-day { font-size: 0.74rem; font-weight: 800; color: var(--text-2); }
+        .arr-day { font-size: 0.74rem; font-weight: 800; color: var(--text-2); flex: none; width: 42px; }
         .arr-fmt { font-size: 0.84rem; font-weight: 700; color: var(--text); }
         .arr-row .form-select { padding-top: 7px; padding-bottom: 7px; font-size: 0.82rem; }
         .arr-row.done .arr-fmt::after { content: ' · โพสต์แล้ว'; color: var(--st-done-text); font-weight: 600; font-size: 0.74rem; }
         .prd-spec-row .prd-who { width: auto; min-width: 130px; flex: none; padding: 5px 34px 5px 10px; font-size: 0.78rem; font-weight: 700; }
+        .prd-when { display: flex; align-items: center; gap: 4px; flex: none; }
+        .prd-when .form-input { width: auto; padding: 4px 8px; font-size: 0.78rem; font-weight: 700; }
+        .prd-when.custom .form-input { border-color: var(--brand); }
+        .prd-when button { border: 0; background: none; color: var(--text-2); cursor: pointer; padding: 2px; display: flex; }
+        .prd-when button:hover { color: var(--text); }
+        .prd-day i { font-style: normal; font-size: 0.66rem; font-weight: 700; color: var(--brand); }
         .spec-rows { display: flex; flex-direction: column; gap: 8px; }
         .spec-row { display: grid; grid-template-columns: 70px 1fr 1fr 1fr 32px; gap: 6px; align-items: start; }
         .spec-row textarea, .spec-row input { font-size: 0.8rem; padding: 7px 8px; min-height: 0; }
@@ -1167,8 +1176,8 @@
             .spec-row > button { grid-column: 2; grid-row: 1; }
             .spec-row-head { display: none; }
             .form-row-3, .form-row-2 { grid-template-columns: 1fr; }
-            .arr-row { grid-template-columns: 44px minmax(0, 1fr); }
-            .arr-row .form-select { grid-column: 1 / -1; }
+            .arr-row { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+            .arr-head { grid-column: 1 / -1; }
             .filter-pills { width: 100%; flex-wrap: nowrap; overflow-x: auto; padding-bottom: 6px; -webkit-overflow-scrolling: touch; }
             .filter-pill { flex-shrink: 0; }
 
@@ -1994,7 +2003,7 @@
 
     <!-- ARRIVAL MODAL -->
     <div class="modal-overlay" id="arrivalModalOverlay">
-        <div class="modal" role="dialog" aria-modal="true" aria-labelledby="arrivalTitle">
+        <div class="modal modal-lg" role="dialog" aria-modal="true" aria-labelledby="arrivalTitle">
             <div class="modal-header">
                 <h3><span class="material-icons-round">local_shipping</span><span id="arrivalTitle">ของเข้าแล้ว</span></h3>
                 <button class="modal-close" onclick="closeArrivalModal()" aria-label="ปิด"><span class="material-icons-round">close</span></button>
@@ -2003,10 +2012,11 @@
                 <p class="form-hint" id="arrivalHint" style="font-size:0.8rem;color:var(--text-2)"></p>
                 <div class="form-group">
                     <label class="form-label" for="arrDate">วันที่ของเข้า (= วันที่ 1) <span class="req">*</span></label>
-                    <input class="form-input" type="date" id="arrDate">
+                    <input class="form-input" type="date" id="arrDate" onchange="arrivalRefreshDefaults()">
                 </div>
                 <div class="form-group">
-                    <label class="form-label">คนทำแต่ละคลิป <span class="req">*</span></label>
+                    <label class="form-label">วันลงและคนทำแต่ละคลิป <span class="req">*</span></label>
+                    <p class="form-hint" style="font-size:0.76rem;color:var(--text-2);margin:0 0 6px">ไม่ใส่วันลง = ลงตามปกติ (วันละ 1 คลิปนับจากวันของเข้า)</p>
                     <div class="arr-quick"><span>ทั้งหมดเป็น</span><select class="form-select" id="arrAll" onchange="arrivalSetAll(this.value)" aria-label="ตั้งคนทำทุกคลิป"></select></div>
                     <div class="arr-assign" id="arrAssign"></div>
                 </div>
@@ -4008,9 +4018,24 @@
         return ids.map(creatorNameOf).filter(Boolean).join(', ');
     }
 
+    // When a format posts. A date set by hand (p.dates) wins; otherwise one
+    // a day from arrival, as before per-clip dates existed. The clip on the
+    // board wins over both — it may have been moved there.
+    function productDefaultDate(p, f, arrival) {
+        arrival = arrival || p.arrivalDate;
+        return arrival ? addDaysStr(arrival, f.day - 1) : null;
+    }
+    function productPlanDate(p, f, arrival, dates) {
+        return ((dates || p.dates || {})[f.no]) || productDefaultDate(p, f, arrival);
+    }
+    function productDateFor(p, f) {
+        const c = productClipOf(p, f.no);
+        return (c && c.date) || productPlanDate(p, f);
+    }
+
     // Creates whichever of the six clips are not on the board yet.
-    // `assign` maps format number -> creator id.
-    function createProductClips(p, arrival, assign, channel) {
+    // `assign` maps format number -> creator id, `dates` -> hand-set post date.
+    function createProductClips(p, arrival, assign, channel, dates) {
         let made = 0;
         const links = {};
         PRODUCT_FORMATS.forEach(f => {
@@ -4021,7 +4046,7 @@
             const clip = {
                 id, title: productClipTitle(p, f), desc: spec.goal || '', creator: assign[f.no] || '', status: 'idle',
                 channel, type: f.photo ? 'photo' : 'clip', uploaded: false,
-                date: addDaysStr(arrival, f.day - 1), links: [], productId: p.id, formatNo: f.no,
+                date: productPlanDate(p, f, arrival, dates), links: [], productId: p.id, formatNo: f.no,
             };
             clips.unshift(clip);
             syncClipSave(clip);
@@ -4031,12 +4056,12 @@
     }
 
     // Moves the linked clips that are not posted yet to the new schedule.
-    function shiftProductClips(p, arrival) {
+    function shiftProductClips(p, arrival, dates) {
         let moved = 0;
         PRODUCT_FORMATS.forEach(f => {
             const c = productClipOf(p, f.no);
             if (!c || c.uploaded) return;
-            const want = addDaysStr(arrival, f.day - 1);
+            const want = productPlanDate(p, f, arrival, dates);
             if (c.date === want) return;
             c.date = want;
             syncClipSave(c);
@@ -4151,17 +4176,27 @@
             ? `<button type="button" class="queue-btn" onclick="openArrivalModal('${p.id}')"><span class="material-icons-round">edit_calendar</span>เปลี่ยนวัน / คนทำ</button>`
             : `<button type="button" class="queue-btn primary" onclick="openArrivalModal('${p.id}')"><span class="material-icons-round">local_shipping</span>ของเข้าแล้ว</button>`;
 
-        const week = [];
-        for (let d = 1; d <= PRODUCT_SPARE_DAY; d++) {
-            const f = PRODUCT_FORMATS.find(x => x.day === d);
-            const date = p.arrivalDate ? addDaysStr(p.arrivalDate, d - 1) : null;
+        // One cell per format in posting order; the spare day shows while
+        // nothing has been moved onto it.
+        const slots = PRODUCT_FORMATS.map(f => ({ f, date: productDateFor(p, f) }));
+        const spare = productDefaultDate(p, { day: PRODUCT_SPARE_DAY });
+        if (!slots.some(x => x.date && x.date === spare)) slots.push({ f: null, date: spare, day: PRODUCT_SPARE_DAY });
+        const day = x => x.f ? x.f.day : x.day;
+        const key = x => (x.date || 'z') + String(day(x)).padStart(2, '0');
+        slots.sort((a, b) => key(a).localeCompare(key(b)));
+        const week = slots.map(({ f, date }) => {
             const st = f ? productStage(productClipOf(p, f.no)) : null;
-            week.push(`<div class="prd-day ${st && st.posted ? 'posted' : ''} ${date === today ? 'today' : ''} ${f ? '' : 'spare'}">
-                <b>วัน ${d}${date ? ' · ' + formatDate(date) : ''}</b>
+            const moved = f && date && !st.posted && date !== productDefaultDate(p, f);
+            const n = date && p.arrivalDate ? daysBetween(p.arrivalDate, date) + 1 : 0;
+            const label = date ? (n >= 1 ? `วัน ${n} · ${formatDate(date)}` : formatDate(date))
+                : `วัน ${f ? f.day : PRODUCT_SPARE_DAY}`;
+            return `<div class="prd-day ${st && st.posted ? 'posted' : ''} ${date === today ? 'today' : ''} ${f ? '' : 'spare'}">
+                <b>${label}</b>
                 <span>${f ? `${escHtml(p.code || '')}${f.no} ${f.label}` : 'สำรอง'}</span>
+                ${moved ? '<i>กำหนดเอง</i>' : ''}
                 ${f && (p.specs || {})[f.no] && p.specs[f.no].time ? `<small>${escHtml(p.specs[f.no].time)}</small>` : ''}
-            </div>`);
-        }
+            </div>`;
+        });
 
         host.innerHTML = `
             <div class="prd-detail">
@@ -4182,7 +4217,7 @@
                 </div>
                 ${prep.length ? `<div><div class="prd-h">เตรียมก่อนวันถ่าย</div><div class="prd-prep">${prep.map((t, i) => `
                     <label class="${prepDone[i] ? 'on' : ''}"><input type="checkbox" ${prepDone[i] ? 'checked' : ''} onchange="productTogglePrep('${p.id}', ${i}, this.checked)"><span>${phHtml(t)}</span></label>`).join('')}</div></div>` : ''}
-                <div><div class="prd-h">ตารางลง 7 วัน ${p.arrivalDate ? '' : '<span class="prd-sub wait">— เริ่มนับเมื่อกด "ของเข้าแล้ว"</span>'}</div><div class="prd-week">${week.join('')}</div></div>
+                <div><div class="prd-h">ตารางลง ${p.arrivalDate ? '' : '<span class="prd-sub wait">— เริ่มนับเมื่อกด "ของเข้าแล้ว" (กำหนดวันลงเองรายคลิปได้)</span>'}</div><div class="prd-week">${week.join('')}</div></div>
                 <div style="display:flex;flex-direction:column;gap:10px">${PRODUCT_FORMATS.map(f => specCardHtml(p, f)).join('')}</div>
             </div>`;
     }
@@ -4192,8 +4227,9 @@
         const clip = productClipOf(p, f.no);
         const st = productStage(clip);
         const key = `${p.id}:${f.no}`;
-        const date = p.arrivalDate ? addDaysStr(p.arrivalDate, f.day - 1) : null;
-        const meta = [s.len, s.who, date ? `ลง ${formatDate(date)}${s.time ? ' ' + s.time : ''}` : (s.time ? `ลง วัน ${f.day} ${s.time}` : `วัน ${f.day}`)].filter(Boolean).map(escHtml).join(' · ');
+        const date = productDateFor(p, f);
+        const custom = !!date && date !== productDefaultDate(p, f);
+        const meta = [s.len, s.who, date ? `ลง ${formatDate(date)}${s.time ? ' ' + s.time : ''}${custom ? ' (กำหนดเอง)' : ''}` : (s.time ? `ลง วัน ${f.day} ${s.time}` : `วัน ${f.day}`)].filter(Boolean).map(escHtml).join(' · ');
         const pill = (on, label) => `<span class="prd-stage ${on ? 'on' : ''}">${on ? '✓ ' : ''}${label}</span>`;
         const stageHtml = clip
             ? pill(st.shot, 'ถ่ายแล้ว') + pill(st.edited, f.photo ? 'แต่งรูปแล้ว' : 'ตัดต่อแล้ว') + pill(st.posted, 'โพสต์แล้ว')
@@ -4211,6 +4247,10 @@
                         <option value="">— คนทำ —</option>
                         ${CREATORS.map(c => `<option value="${c.id}" ${productCreatorFor(p, f.no) === c.id ? 'selected' : ''}>${escHtml(c.name)}</option>`).join('')}
                     </select>
+                    <span class="prd-when ${custom ? 'custom' : ''}" title="${st.posted ? 'โพสต์แล้ว' : 'วันลง — เว้นว่างไว้ = ลงตามปกติ'}">
+                        <input class="form-input" type="date" value="${date || ''}" ${st.posted ? 'disabled' : ''} onchange="productSetDate('${p.id}', ${f.no}, this.value)" aria-label="วันลง ${escAttr((p.code || '') + f.no)}">
+                        ${custom && !st.posted ? `<button type="button" onclick="productSetDate('${p.id}', ${f.no}, '')" aria-label="กลับไปวันปกติ" title="กลับไปวันปกติ"><span class="material-icons-round" style="font-size:18px">restart_alt</span></button>` : ''}
+                    </span>
                     <div class="prd-stages">${stageHtml}</div>
                     <button type="button" class="queue-btn" onclick="openSpecModal('${p.id}', ${f.no})"><span class="material-icons-round">edit_note</span>แก้</button>
                 </div>
@@ -4243,6 +4283,22 @@
         productUpdate(p, { ['assign.' + no]: creator || null });
         const name = creatorNameOf(creator);
         showToast(name ? `${p.code || ''}${no} ให้ ${name} ทำ` : `${p.code || ''}${no} ยังไม่มีคนทำ`, 'info');
+    }
+
+    // Setting one format's post date: kept on the plan (empty = back to the
+    // usual day) and applied to its clip on the board if it is not posted.
+    function productSetDate(id, no, date) {
+        const p = findProduct(id);
+        const f = PRODUCT_FORMATS.find(x => x.no === no);
+        if (!p || !f) return;
+        const def = productDefaultDate(p, f);
+        const want = date || def;
+        const clip = productClipOf(p, no);
+        if (clip && clip.uploaded) return;
+        if (clip && want && clip.date !== want) { clip.date = want; syncClipSave(clip); render(); }
+        productUpdate(p, { ['dates.' + no]: date && date !== def ? date : null });
+        const tag = `${p.code || ''}${no}`;
+        showToast(want ? `${tag} ลง ${formatDate(want)}${date && date !== def ? '' : ' (วันปกติ)'}` : `${tag} กลับไปลงตามปกติ — เริ่มนับเมื่อของเข้า`, 'info');
     }
 
     function productToggle(id) { productOpenId = productOpenId === id ? null : id; renderProducts(); }
@@ -4336,25 +4392,40 @@
         arrivalTarget = id;
         document.getElementById('arrivalTitle').textContent = p.arrivalDate ? 'เปลี่ยนวัน / คนทำ' : 'ของเข้าแล้ว';
         document.getElementById('arrivalHint').textContent = p.arrivalDate
-            ? 'คลิปที่ยังไม่โพสต์จะเลื่อนตามวันใหม่ คลิปที่โพสต์แล้วอยู่ที่เดิม · เปลี่ยนคนทำได้ทุกคลิป'
-            : `ระบบจะสร้าง 6 คลิปของ ${p.name} ลงตารางติดตามคลิป วันละ 1 คลิป เริ่มวันที่ของเข้า วันที่ 7 เผื่อไว้`;
+            ? 'คลิปที่ยังไม่โพสต์จะเลื่อนตามวันใหม่ (ยกเว้นคลิปที่กำหนดวันเอง) คลิปที่โพสต์แล้วอยู่ที่เดิม · เปลี่ยนคนทำได้ทุกคลิป'
+            : `ระบบจะสร้าง 6 คลิปของ ${p.name} ลงตารางติดตามคลิป วันละ 1 คลิป เริ่มวันที่ของเข้า วันที่ 7 เผื่อไว้ · กำหนดวันลงเองรายคลิปได้`;
         document.getElementById('arrDate').value = p.arrivalDate || localDateStr();
         const opts = CREATORS.map(c => `<option value="${c.id}">${escHtml(c.name)}</option>`).join('');
         document.getElementById('arrAll').innerHTML = '<option value="">— เลือก —</option>' + opts;
         document.getElementById('arrAssign').innerHTML = PRODUCT_FORMATS.map(f => {
             const posted = productStage(productClipOf(p, f.no)).posted;
+            // A clip already moved on the board keeps its date as a hand-set one.
+            const clip = productClipOf(p, f.no);
+            const set = (p.dates || {})[f.no] || (clip && clip.date !== productDefaultDate(p, f) ? clip.date : '');
             return `<div class="arr-row ${posted ? 'done' : ''}">
-                <span class="arr-day">วัน ${f.day}</span>
-                <span class="arr-fmt">${escHtml(p.code || '')}${f.no} · ${f.label}</span>
+                <div class="arr-head"><span class="arr-day">วัน ${f.day}</span><span class="arr-fmt">${escHtml(p.code || '')}${f.no} · ${f.label}<span class="arr-def" data-def="${f.no}"></span></span></div>
+                <input class="form-input" type="date" data-date="${f.no}" value="${set || ''}" ${posted ? 'disabled' : ''} oninput="arrivalRefreshDefaults()" aria-label="วันลง ${escAttr((p.code || '') + f.no)}">
                 <select class="form-select" data-no="${f.no}" aria-label="คนทำ ${escAttr((p.code || '') + f.no)}"><option value="">— คนทำ —</option>${opts}</select>
             </div>`;
         }).join('');
         document.querySelectorAll('#arrAssign select').forEach(sel => { sel.value = productCreatorFor(p, Number(sel.dataset.no)); });
+        arrivalRefreshDefaults();
         const chSel = document.getElementById('arrChannel');
         chSel.innerHTML = Object.keys(CHANNELS).map(ch => `<option value="${escAttr(ch)}">${escHtml(ch)}</option>`).join('');
         chSel.value = p.channel || DEFAULT_CHANNEL;
         document.getElementById('btnSaveArrival').disabled = false;
         document.getElementById('arrivalModalOverlay').classList.add('open');
+    }
+    // Under each format: the day it posts when no date is set.
+    function arrivalRefreshDefaults() {
+        const arrival = document.getElementById('arrDate').value;
+        PRODUCT_FORMATS.forEach(f => {
+            const el = document.querySelector(`#arrAssign [data-def="${f.no}"]`);
+            const inp = document.querySelector(`#arrAssign [data-date="${f.no}"]`);
+            if (!el || !inp) return;
+            const def = arrival ? addDaysStr(arrival, f.day - 1) : null;
+            el.textContent = inp.value ? 'กำหนดเอง' : (def ? `ปกติ ${formatDate(def)}` : '');
+        });
     }
     function arrivalSetAll(creator) {
         if (!creator) return;
@@ -4371,6 +4442,13 @@
         const channel = document.getElementById('arrChannel').value || DEFAULT_CHANNEL;
         const assign = {};
         document.querySelectorAll('#arrAssign select').forEach(sel => { assign[sel.dataset.no] = sel.value; });
+        // Only dates that differ from the usual day are kept as hand-set.
+        const dates = {};
+        document.querySelectorAll('#arrAssign [data-date]').forEach(inp => {
+            const f = PRODUCT_FORMATS.find(x => x.no === Number(inp.dataset.date));
+            const def = date ? addDaysStr(date, f.day - 1) : null;
+            dates[f.no] = inp.value && inp.value !== def ? inp.value : '';
+        });
         if (!date) { showToast('กรุณาเลือกวันที่ของเข้า', 'warning'); return; }
         const missing = PRODUCT_FORMATS.filter(f => !assign[f.no]);
         if (missing.length) {
@@ -4378,19 +4456,20 @@
             return;
         }
         closeArrivalModal();
-        const moved = p.arrivalDate && p.arrivalDate !== date ? shiftProductClips(p, date) : 0;
+        const moved = shiftProductClips(p, date, dates);
         // Re-assignments apply to clips already on the board too.
         let reassigned = 0;
         PRODUCT_FORMATS.forEach(f => {
             const c = productClipOf(p, f.no);
             if (c && c.creator !== assign[f.no]) { c.creator = assign[f.no]; syncClipSave(c); reassigned++; }
         });
-        const { made, links } = createProductClips(p, date, assign, channel);
+        const { made, links } = createProductClips(p, date, assign, channel, dates);
         // Follow the new clips on the board, like any other save.
         if (typeof clipMonthScope !== 'undefined' && clipMonthScope !== 'all') clipMonthScope = date.slice(0, 7);
         render();
         const assignFields = {};
         Object.entries(assign).forEach(([no, c]) => { assignFields['assign.' + no] = c; });
+        Object.entries(dates).forEach(([no, d]) => { assignFields['dates.' + no] = d || null; });
         const res = await productUpdate(p, Object.assign({ arrivalDate: date, channel }, assignFields, links));
         if (res.ok) {
             const parts = [];

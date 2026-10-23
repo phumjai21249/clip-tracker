@@ -4,12 +4,14 @@
 // the same product never overwrite each other.
 
 // Top-level details are replaced whole; specs, prep ticks and clip links are
-// addressed one entry at a time ("specs.3", "prepDone.2", "clipIds.1", "assign.4" — who makes format 4).
+// addressed one entry at a time ("specs.3", "prepDone.2", "clipIds.1", "assign.4" — who makes format 4,
+// "dates.4" — the day format 4 posts when set by hand).
 const TOP_LEVEL = new Set([
     'name', 'code', 'intro', 'color', 'price', 'sizes', 'features',
     'compareWith', 'creator', 'channel', 'arrivalDate', 'prep',
 ]);
-const NESTED = /^(specs|prepDone|clipIds|assign)\.[0-9A-Za-z_]{1,20}$/;
+const NESTED = /^(specs|prepDone|clipIds|assign|dates)\.[0-9A-Za-z_]{1,20}$/;
+const DATE = /^\d{4}-\d{2}-\d{2}$/;
 const ID = /^[0-9A-Za-z_-]{1,80}$/;
 const MAX_BYTES = 200 * 1024;   // per write; a product doc is well under 1 MB
 
@@ -25,6 +27,8 @@ function validateUpdate(msg) {
     if (!keys.length) return 'no fields';
     for (const k of keys) {
         if (!TOP_LEVEL.has(k) && !NESTED.test(k)) return `field not allowed: ${k}`;
+        const v = fields[k];
+        if (k.startsWith('dates.') && v !== null && !(typeof v === 'string' && DATE.test(v))) return `bad date: ${k}`;
     }
     if (sizeOf(fields) > MAX_BYTES) return 'too large';
     return null;

@@ -50,6 +50,11 @@ const quiet = { error: () => {} };
     await t('allows top-level and single nested paths', () => {
         assert.strictEqual(validateUpdate({ id: 'p1', fields: { price: '1,790', 'specs.3': {}, 'prepDone.2': true, 'clipIds.1': 'c', 'assign.4': 'c2' } }), null);
     });
+    await t('a hand-set post date must be a date or null', () => {
+        assert.strictEqual(validateUpdate({ id: 'p1', fields: { 'dates.3': '2026-10-25', 'dates.4': null } }), null);
+        assert.match(validateUpdate({ id: 'p1', fields: { 'dates.3': '25/10/2026' } }), /bad date/);
+        assert.match(validateUpdate({ id: 'p1', fields: { 'dates.3': { x: 1 } } }), /bad date/);
+    });
     await t('rejects unknown and deep paths', () => {
         assert.match(validateUpdate({ id: 'p1', fields: { _seq: 1 } }), /not allowed/);
         assert.match(validateUpdate({ id: 'p1', fields: { 'specs.3.caption': 'x' } }), /not allowed/);
