@@ -743,6 +743,45 @@
         .hl-ph { background: var(--danger-bg); color: var(--danger-text); border-radius: 3px; padding: 0 2px; }
 
         .modal.modal-lg { max-width: 780px; }
+
+        /* Posting schedule */
+        .sch-sum { display: flex; gap: 14px; flex-wrap: wrap; padding: 12px 20px 0; font-size: 0.8rem; color: var(--text-2); font-weight: 700; }
+        .sch-sum b { color: var(--text); }
+        .sch-week { display: grid; grid-template-columns: repeat(auto-fill, minmax(270px, 1fr)); gap: 12px; padding: 16px 20px 20px; }
+        .sch-day { border: 1px solid var(--border); border-radius: var(--radius-md); background: var(--surface); display: flex; flex-direction: column; min-width: 0; }
+        .sch-day.today { border-color: var(--brand); box-shadow: 0 0 0 1px var(--brand); }
+        .sch-day-head { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; padding: 10px 12px; border-bottom: 1px solid var(--border); }
+        .sch-day-head b { font-size: 0.9rem; color: var(--text); }
+        .sch-day-head .now { font-size: 0.68rem; font-weight: 800; color: #fff; background: var(--brand); border-radius: 999px; padding: 1px 8px; margin-left: 6px; }
+        .sch-day-head span.cnt { font-size: 0.74rem; color: var(--text-2); font-weight: 700; white-space: nowrap; }
+        .sch-lane { padding: 8px 12px 10px; }
+        .sch-lane + .sch-lane { border-top: 1px dashed var(--border); }
+        .sch-ch { font-size: 0.72rem; font-weight: 800; margin-bottom: 4px; }
+        .sch-slot { display: grid; grid-template-columns: 78px minmax(0, 1fr); gap: 8px; align-items: center; padding: 3px 0; }
+        .sch-slot input { width: 100%; min-width: 0; padding: 4px; font: inherit; font-size: 0.78rem; font-weight: 700; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--surface); color: var(--text); }
+        .sch-slot input:disabled { color: var(--text-3); }
+        .sch-time0 { font-size: 0.78rem; font-weight: 700; color: var(--text-3); padding-left: 6px; }
+        .sch-item { border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 6px 8px; display: flex; flex-direction: column; gap: 4px; min-width: 0; background: var(--surface); }
+        .sch-item .t { all: unset; cursor: pointer; font-size: 0.8rem; font-weight: 700; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .sch-item .t:hover { color: var(--brand-text); }
+        .sch-item .t:focus-visible { box-shadow: 0 0 0 2px var(--brand); border-radius: 3px; }
+        .sch-item .m { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; font-size: 0.7rem; color: var(--text-2); }
+        .sch-pill { font-size: 0.68rem; font-weight: 700; padding: 1px 7px; border-radius: 999px; }
+        .sch-flag { font-size: 0.68rem; font-weight: 800; }
+        .sch-item.ready { border-color: var(--st-done); }
+        .sch-item.ready .sch-flag { color: var(--st-done-text); }
+        .sch-item.late { border-color: var(--danger); background: var(--danger-bg); }
+        .sch-item.late .sch-flag { color: var(--danger-text); }
+        .sch-item.posted { background: var(--st-done-bg); border-color: transparent; }
+        .sch-item.posted .sch-flag { color: var(--st-done-text); }
+        .sch-item.paused .t { color: var(--text-3); }
+        .sch-post { margin-left: auto; border: 1px solid var(--border-strong); background: var(--surface); color: var(--text); border-radius: 999px; padding: 1px 9px; font: inherit; font-size: 0.7rem; font-weight: 700; cursor: pointer; }
+        .sch-post:hover { border-color: var(--st-done); color: var(--st-done-text); }
+        .sch-empty { width: 100%; border: 1px dashed var(--border-strong); border-radius: var(--radius-sm); padding: 6px 8px; background: none; font: inherit; font-size: 0.76rem; color: var(--text-3); text-align: left; cursor: pointer; }
+        .sch-empty:hover, .sch-empty:focus-visible { color: var(--brand-text); border-color: var(--brand); outline: none; }
+        .sch-add { border: 0; background: none; font: inherit; font-size: 0.74rem; font-weight: 700; color: var(--brand-text); cursor: pointer; padding: 4px 0 0; }
+        .sch-add:hover { text-decoration: underline; }
+        .sch-day-foot { padding: 6px 12px 10px; border-top: 1px solid var(--border); margin-top: auto; }
         .arr-quick { display: flex; align-items: center; gap: 8px; font-size: 0.78rem; font-weight: 700; color: var(--text-2); }
         .arr-quick select { width: auto; flex: 1; }
         .arr-assign { display: flex; flex-direction: column; border: 1px solid var(--border); border-radius: var(--radius-md); }
@@ -1522,6 +1561,9 @@
             <button type="button" class="tab-btn" id="tabBtnKpi" data-tab="Kpi" role="tab" onclick="setTab('Kpi')">
                 <span class="material-icons-round">insights</span> KPI คอนเทนต์
             </button>
+            <button type="button" class="tab-btn" id="tabBtnSchedule" data-tab="Schedule" role="tab" onclick="setTab('Schedule')">
+                <span class="material-icons-round">event_note</span> ตารางลงคลิป
+            </button>
             <button type="button" class="tab-btn" id="tabBtnProducts" data-tab="Products" role="tab" onclick="setTab('Products')">
                 <span class="material-icons-round">inventory_2</span> สินค้าใหม่
             </button>
@@ -1936,6 +1978,27 @@
             <p class="kpi-footer">จัดทำจากข้อมูล API จริงของร้าน JS Sport · เดือนที่ 2 ให้รีแคลิเบรตเป้าใหม่จากผลจริงที่วัดด้วยวิธีเดียวกัน</p>
         </div>
 
+        <!-- ===== TAB: POSTING SCHEDULE ===== -->
+        <div class="tab-panel" id="tabSchedule">
+            <div class="section-card">
+                <div class="section-header">
+                    <h2><span class="material-icons-round">event_note</span>ตารางลงคลิป</h2>
+                    <div class="calendar-nav">
+                        <button class="today-btn" onclick="schedThisWeek()">สัปดาห์นี้</button>
+                        <button class="nav-btn" onclick="schedShift(-7)" aria-label="สัปดาห์ก่อนหน้า">
+                            <span class="material-icons-round">chevron_left</span>
+                        </button>
+                        <span class="calendar-month-label num" id="schLabel"></span>
+                        <button class="nav-btn" onclick="schedShift(7)" aria-label="สัปดาห์ถัดไป">
+                            <span class="material-icons-round">chevron_right</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="sch-sum" id="schSum"></div>
+                <div class="sch-week" id="schWeek"></div>
+            </div>
+        </div>
+
         <!-- ===== TAB: NEW PRODUCTS ===== -->
         <div class="tab-panel" id="tabProducts">
             <div class="section-card">
@@ -2141,10 +2204,17 @@
                         <option value="โฟมขัดรองเท้า">โฟมขัดรองเท้า</option>
                     </select>
                 </div>
-                <div class="form-group">
-                    <label class="form-label" for="clipDate">วันที่ลงคลิป <span class="req">*</span></label>
-                    <input class="form-input" id="clipDate" type="date">
+                <div class="form-row-2">
+                    <div class="form-group">
+                        <label class="form-label" for="clipDate">วันที่ลงคลิป <span class="req">*</span></label>
+                        <input class="form-input" id="clipDate" type="date">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="clipTime">เวลาลง</label>
+                        <input class="form-input" id="clipTime" type="time">
+                    </div>
                 </div>
+                <p class="form-hint" style="font-size:0.76rem;color:var(--text-2);margin-top:-6px">ไม่ใส่เวลา = ระบบใส่ช่วงเวลาว่างถัดไปของช่องนั้นให้ (JS 09:00 · 13:00 · 17:00 / Me 09:00)</p>
             </div>
             <div class="modal-footer">
                 <button class="btn" onclick="closeModal()">ยกเลิก</button>
@@ -2498,6 +2568,7 @@
             renderTable();
             renderTeamBar();
             if (typeof renderProducts === 'function') renderProducts();   // progress there is read from clips
+            if (typeof renderSchedule === 'function') renderSchedule();
         }
 
         function renderStats() {
@@ -2952,7 +3023,7 @@
                         </div>
                     </td>
                     <td>${uploadToggleHtml(clip)}</td>
-                    <td class="date-cell num">${formatDate(clip.date)}</td>
+                    <td class="date-cell num">${formatDate(clip.date)}${clip.postTime ? `<br><small>${escHtml(clip.postTime)} น.</small>` : ''}</td>
                     <td>
                         <div class="actions-cell">
                             <button class="action-btn" onclick="editClip('${clip.id}')" title="แก้ไข" aria-label="แก้ไข">
@@ -2981,7 +3052,7 @@
                             <div class="clip-card-meta" style="margin-top:6px;">
                                 ${typeTag(clip)}
                                 ${channelTag(clip)}
-                                <span class="date-cell num">${formatDate(clip.date)}</span>
+                                <span class="date-cell num">${formatDate(clip.date)}${clip.postTime ? ' · ' + escHtml(clip.postTime) : ''}</span>
                             </div>
                         </div>
                     </div>
@@ -3322,7 +3393,8 @@
                 document.getElementById('clipStatus').value = 'idle';
                 document.getElementById('clipChannel').value = 'JS SPORT SHOP';
                 document.getElementById('clipType').value = DEFAULT_TYPE;
-                document.getElementById('clipDate').value = new Date().toISOString().split('T')[0];
+                document.getElementById('clipDate').value = localDateStr();
+                document.getElementById('clipTime').value = '';
                 document.getElementById('linkRows').innerHTML = '';
             }
             setTimeout(() => document.getElementById('clipName').focus(), 300);
@@ -3347,6 +3419,7 @@
             const channel = document.getElementById('clipChannel').value;
             const type = document.getElementById('clipType').value;
             const date = document.getElementById('clipDate').value;
+            const postTime = document.getElementById('clipTime').value;
             // undefined = leave whatever cover is on the server alone.
             // '' = the user explicitly removed it. A string = a new image.
             const coverImage = coverState === 'new' ? document.getElementById('clipCoverBase64').value
@@ -3371,12 +3444,15 @@
                 savedClip.title = name; savedClip.desc = desc; savedClip.creator = creator;
                 savedClip.status = status; savedClip.channel = channel; savedClip.date = date;
                 savedClip.type = type; savedClip.links = linkResult.links;
+                savedClip.postTime = postTime;
                 showToast('แก้ไขคลิปเรียบร้อย', 'success');
             } else {
                 // Not found covers a genuine add, and also an edit of a clip a
                 // teammate deleted while this modal was open — re-create it
                 // rather than throw away what was just typed.
-                savedClip = { id, title: name, desc, creator, status, channel, type, uploaded: false, date, links: linkResult.links };
+                // A new clip with no time takes the channel's next free slot.
+                savedClip = { id, title: name, desc, creator, status, channel, type, uploaded: false, date, links: linkResult.links,
+                              postTime: postTime || nextFreeSlot(channel, date, id) };
                 clips.unshift(savedClip);
                 showToast('เพิ่มคลิปใหม่เรียบร้อย', 'success');
             }
@@ -3420,6 +3496,7 @@
             document.getElementById('clipChannel').value = clip.channel || 'JS SPORT SHOP';
             document.getElementById('clipType').value = clip.type || DEFAULT_TYPE;
             document.getElementById('clipDate').value = clip.date;
+            document.getElementById('clipTime').value = clip.postTime || '';
             document.getElementById('linkRows').innerHTML = '';
             (clip.links || []).forEach(l => addLinkRow(l.label, l.url));
             openModal(true);
@@ -3541,6 +3618,7 @@
             const ws = wb.addWorksheet('คลิปทั้งหมด', { views: [{ state: 'frozen', ySplit: 1 }] });
             ws.columns = [
                 { header: 'วันที่ลง',      key: 'date',    width: 12 },
+                { header: 'เวลา',         key: 'time',    width: 8 },
                 { header: 'ชื่อคลิป',      key: 'title',   width: 44 },
                 { header: 'ประเภท',       key: 'type',    width: 10 },
                 { header: 'ช่อง',          key: 'channel', width: 17 },
@@ -3562,6 +3640,7 @@
                 const late = owed && c.date && c.date < today ? daysBetween(c.date, today) : null;
                 const row = ws.addRow({
                     date: c.date ? excelDate(c.date) : null,
+                    time: c.postTime || '',
                     title: c.title || '',
                     type: ty.label,
                     channel: c.channel || DEFAULT_CHANNEL,
@@ -3587,7 +3666,7 @@
                 if (late) row.getCell('late').font = { bold: true, color: { argb: XL.late } };
                 if (c.uploaded) row.getCell('posted').font = { color: { argb: XL.status.done[1] } };
                 ['desc', 'links', 'title'].forEach(k => { row.getCell(k).alignment = { wrapText: true, vertical: 'top' }; });
-                ['type', 'status', 'posted', 'late', 'date'].forEach(k => { row.getCell(k).alignment = { horizontal: 'center', vertical: 'top' }; });
+                ['type', 'status', 'posted', 'late', 'date', 'time'].forEach(k => { row.getCell(k).alignment = { horizontal: 'center', vertical: 'top' }; });
             });
             styleBody(ws, 2);
             ws.autoFilter = { from: { row: 1, column: 1 }, to: { row: 1, column: ws.columnCount } };
@@ -3695,11 +3774,11 @@
             return `"${s.replace(/"/g, '""')}"`;
         }
         function exportCsv(today = localDateStr()) {
-            const head = ['วันที่ลง', 'ชื่อคลิป', 'ประเภท', 'ช่อง', 'คนทำ', 'สถานะ', 'ลง TikTok', 'รายละเอียด', 'ลิงก์'];
+            const head = ['วันที่ลง', 'เวลา', 'ชื่อคลิป', 'ประเภท', 'ช่อง', 'คนทำ', 'สถานะ', 'ลง TikTok', 'รายละเอียด', 'ลิงก์'];
             const rows = [...clips].sort((a, b) => (b.date || '').localeCompare(a.date || '')).map(c => {
                 const creator = CREATORS.find(cr => cr.id === c.creator);
                 const st = STATUSES[c.status];
-                return [c.date || '', c.title || '', typeInfo(c.type).label, c.channel || DEFAULT_CHANNEL,
+                return [c.date || '', c.postTime || '', c.title || '', typeInfo(c.type).label, c.channel || DEFAULT_CHANNEL,
                         creator ? creator.name : '-', st ? st.label : (c.status || ''),
                         c.uploaded ? 'ลงแล้ว' : 'ยังไม่ลง', c.desc || '', linksText(c)].map(csvCell).join(',');
             });
@@ -3805,11 +3884,12 @@
             document.querySelectorAll('.clips-only').forEach(el => { el.style.display = name === 'Clips' ? '' : 'none'; });
             try { localStorage.setItem('clipTracker.tab', name); } catch (e) {}
             window.scrollTo({ top: 0, behavior: 'smooth' });
+            if (name === 'Schedule' && typeof schedScrollToday === 'function') setTimeout(schedScrollToday, 60);
         }
         function initTab() {
             let saved = 'Clips';
             try { saved = localStorage.getItem('clipTracker.tab') || 'Clips'; } catch (e) {}
-            setTab(['Kpi', 'Products'].includes(saved) ? saved : 'Clips');
+            setTab(['Kpi', 'Products', 'Schedule'].includes(saved) ? saved : 'Clips');
             window.scrollTo({ top: 0 });
         }
         function kpiJump(n) {
@@ -4048,6 +4128,7 @@
                 channel, type: f.photo ? 'photo' : 'clip', uploaded: false,
                 date: productPlanDate(p, f, arrival, dates), links: [], productId: p.id, formatNo: f.no,
             };
+            clip.postTime = nextFreeSlot(channel, clip.date, id);
             clips.unshift(clip);
             syncClipSave(clip);
             made++;
@@ -4546,6 +4627,162 @@
     });
 
     renderProducts();
+    </script>
+    <script>
+    // ============ POSTING SCHEDULE ============
+    // The minimum each channel posts a day, by time. Busier days just have
+    // more clips: every clip carries its own postTime ('HH:MM', '' = not set).
+    const POST_SLOTS = {
+        'JS SPORT SHOP': ['09:00', '13:00', '17:00'],
+        'Me SPORT':      ['09:00'],
+    };
+    let schedWeekStart = null;   // Monday of the week on screen
+
+    function nextFreeSlot(channel, date, exceptId) {
+        const taken = new Set(clips
+            .filter(c => c.id !== exceptId && c.date === date && (c.channel || DEFAULT_CHANNEL) === channel && c.postTime)
+            .map(c => c.postTime));
+        return (POST_SLOTS[channel] || []).find(t => !taken.has(t)) || '';
+    }
+    function weekStartOf(dateStr) {
+        const [y, m, d] = dateStr.split('-').map(Number);
+        return addDaysStr(dateStr, -((new Date(y, m - 1, d).getDay() + 6) % 7));
+    }
+    function nowHM() {
+        const n = new Date();
+        return String(n.getHours()).padStart(2, '0') + ':' + String(n.getMinutes()).padStart(2, '0');
+    }
+
+    // posted · paused · ready (done, waiting to go up) · late (its time has
+    // passed and it is not up) · wait (still being made, time not reached).
+    function schedState(c, today, hm) {
+        if (c.uploaded) return 'posted';
+        if (c.status === 'paused') return 'paused';
+        const due = c.date < today || (c.date === today && !!c.postTime && c.postTime <= hm);
+        if (due) return 'late';
+        return c.status === 'done' ? 'ready' : 'wait';
+    }
+    const SCHED_FLAG = { posted: '✓ ลงแล้ว', ready: 'พร้อมลง', paused: '' };
+
+    function schedClipRow(c, today, hm) {
+        const state = schedState(c, today, hm);
+        const st = STATUSES[c.status] || STATUSES.idle;
+        const who = (CREATORS.find(x => x.id === c.creator) || {}).name || '';
+        const flag = state === 'late' ? (c.status === 'done' ? 'เลยเวลา ยังไม่ลง' : 'ถึงเวลาแล้ว ยังไม่เสร็จ') : (SCHED_FLAG[state] || '');
+        return `<div class="sch-slot">
+            <input type="text" inputmode="numeric" maxlength="5" placeholder="--:--" value="${escAttr(c.postTime || '')}" ${c.uploaded ? 'disabled' : ''} onchange="schedSetTime('${c.id}', this.value, this)" aria-label="เวลาลง ${escAttr(c.title)} (24 ชม.)">
+            <div class="sch-item ${state}">
+                <button type="button" class="t" onclick="editClip('${c.id}')" title="${escAttr(c.title)}">${escHtml(c.title)}</button>
+                <div class="m">
+                    <span class="sch-pill ${st.class}">${st.label}</span>
+                    ${who ? `<span>${escHtml(who)}</span>` : ''}
+                    ${c.type === 'photo' ? '<span>รูปภาพ</span>' : ''}
+                    ${flag ? `<span class="sch-flag">${flag}</span>` : ''}
+                    ${c.uploaded ? '' : `<button type="button" class="sch-post" onclick="markPosted('${c.id}')" title="ทำเครื่องหมายว่าลง TikTok แล้ว">กดว่าลงแล้ว</button>`}
+                </div>
+            </div>
+        </div>`;
+    }
+
+    function renderSchedule() {
+        const host = document.getElementById('schWeek');
+        if (!host) return;
+        const today = localDateStr(), hm = nowHM();
+        if (!schedWeekStart) schedWeekStart = weekStartOf(today);
+        document.getElementById('schLabel').textContent = `${formatDate(schedWeekStart)} – ${formatDate(addDaysStr(schedWeekStart, 6))}`;
+        const chOrder = Object.keys(CHANNELS);
+        let total = 0, up = 0, open = 0, late = 0;
+        const days = [];
+        for (let i = 0; i < 7; i++) {
+            const date = addDaysStr(schedWeekStart, i);
+            const dayClips = clips.filter(c => c.date === date);
+            const [y, m, d] = date.split('-').map(Number);
+            const dow = new Date(y, m - 1, d).getDay();
+            let dayUp = 0, dayN = 0;
+            const lanes = chOrder.filter(ch => (POST_SLOTS[ch] || []).length || dayClips.some(c => (c.channel || DEFAULT_CHANNEL) === ch)).map(ch => {
+                const mine = dayClips.filter(c => (c.channel || DEFAULT_CHANNEL) === ch);
+                const timed = mine.filter(c => c.postTime);
+                const untimed = mine.filter(c => !c.postTime);
+                const used = new Set(timed.map(c => c.postTime));
+                const free = (POST_SLOTS[ch] || []).filter(t => !used.has(t));
+                const rows = [...timed.map(c => ({ t: c.postTime, c })), ...free.map(t => ({ t, c: null }))]
+                    .sort((a, b) => a.t.localeCompare(b.t) || (a.c ? 0 : 1) - (b.c ? 0 : 1));
+                mine.forEach(c => {
+                    if (c.status === 'paused') return;
+                    dayN++; total++;
+                    if (c.uploaded) { dayUp++; up++; }
+                    if (schedState(c, today, hm) === 'late') late++;
+                });
+                if (date >= today) open += free.length;
+                const html = rows.map(r => r.c ? schedClipRow(r.c, today, hm)
+                    : `<div class="sch-slot"><span class="sch-time0">${r.t}</span><button type="button" class="sch-empty" onclick="schedAdd('${date}', '${escAttr(ch)}', '${r.t}')">ว่าง — เพิ่มคลิป</button></div>`).join('')
+                    + untimed.map(c => schedClipRow(c, today, hm)).join('');
+                return `<div class="sch-lane">
+                    <div class="sch-ch" style="color:var(${channelInfo(ch).varName})">${escHtml(ch)}</div>
+                    ${html}
+                    <button type="button" class="sch-add" onclick="schedAdd('${date}', '${escAttr(ch)}', '')">+ เพิ่มอีกคลิป</button>
+                </div>`;
+            });
+            days.push(`<div class="sch-day ${date === today ? 'today' : ''}" data-date="${date}">
+                <div class="sch-day-head"><b>${THAI_DAYS_SHORT[dow]} ${formatDate(date)}${date === today ? '<span class="now">วันนี้</span>' : ''}</b>
+                    <span class="cnt">ลงแล้ว ${dayUp}/${dayN}</span></div>
+                ${lanes.join('')}
+                <div class="sch-day-foot"><button type="button" class="sch-add" onclick="schedAdd('${date}', '', '')">+ เพิ่มคลิปช่องอื่น</button></div>
+            </div>`);
+        }
+        host.innerHTML = days.join('');
+        document.getElementById('schSum').innerHTML =
+            `<span>สัปดาห์นี้ <b>${total}</b> คลิป</span><span>ลงแล้ว <b>${up}</b></span>` +
+            `<span>ช่วงเวลาว่าง <b>${open}</b></span>` +
+            (late ? `<span style="color:var(--danger-text)">เลยเวลา <b style="color:inherit">${late}</b></span>` : '');
+    }
+
+    // On a phone the week is one long column: open it at today, not Monday.
+    function schedScrollToday() {
+        if (window.innerWidth >= 768) return;
+        const el = document.querySelector('#schWeek .sch-day.today');
+        if (el) el.scrollIntoView({ block: 'start', behavior: 'smooth' });
+    }
+    function schedShift(n) { schedWeekStart = addDaysStr(schedWeekStart || weekStartOf(localDateStr()), n); renderSchedule(); }
+    function schedThisWeek() { schedWeekStart = weekStartOf(localDateStr()); renderSchedule(); schedScrollToday(); }
+
+    // Opens the normal clip form, already filled in for this day, channel and time.
+    function schedAdd(date, channel, time) {
+        openModal();
+        document.getElementById('clipDate').value = date;
+        if (channel) document.getElementById('clipChannel').value = channel;
+        document.getElementById('clipTime').value = time || '';
+    }
+    // Typed, always 24-hour: "13:30", "13.30", "1330" and "9" all work. A
+    // native time picker shows AM/PM on 12-hour machines and got cut off.
+    function normTime(str) {
+        const v = String(str || '').trim().replace('.', ':');
+        const m = v.match(/^(\d{1,2})(?::?(\d{2}))?$/);
+        if (!m) return null;
+        const h = Number(m[1]), mi = Number(m[2] || 0);
+        if (h > 23 || mi > 59) return null;
+        return String(h).padStart(2, '0') + ':' + String(mi).padStart(2, '0');
+    }
+    function schedSetTime(id, raw, input) {
+        const clip = clips.find(c => c.id === id);
+        if (!clip || clip.uploaded) return;
+        const time = String(raw || '').trim() ? normTime(raw) : '';
+        if (time === null) {
+            showToast('เวลาไม่ถูกต้อง — พิมพ์แบบ 13:30', 'warning');
+            if (input) input.value = clip.postTime || '';
+            return;
+        }
+        clip.postTime = time;
+        syncClipSave(clip); render();
+        showToast(time ? `ลง ${time} น.` : 'ไม่ระบุเวลาลง', 'info');
+    }
+
+    // Lateness depends on the clock, so keep the open schedule current.
+    setInterval(() => {
+        const panel = document.getElementById('tabSchedule');
+        if (panel && panel.classList.contains('active') && !document.hidden) renderSchedule();
+    }, 60000);
+    renderSchedule();
     </script>
     <!-- KPI DASHBOARD LOGIC -->
     <script>
