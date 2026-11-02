@@ -782,6 +782,16 @@
         .sch-add { border: 0; background: none; font: inherit; font-size: 0.74rem; font-weight: 700; color: var(--brand-text); cursor: pointer; padding: 4px 0 0; }
         .sch-add:hover { text-decoration: underline; }
         .sch-day-foot { padding: 6px 12px 10px; border-top: 1px solid var(--border); margin-top: auto; }
+        .pick-all { display: flex; align-items: center; gap: 8px; font-size: 0.8rem; font-weight: 600; color: var(--text-2); cursor: pointer; }
+        .pick-all input { width: 16px; height: 16px; accent-color: var(--brand); }
+        .pick-list { display: flex; flex-direction: column; gap: 6px; margin-top: 10px; }
+        .pick-row { display: flex; align-items: center; gap: 10px; width: 100%; padding: 8px 10px; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--surface); font: inherit; text-align: left; cursor: pointer; }
+        .pick-row:hover, .pick-row:focus-visible { border-color: var(--brand); background: var(--brand-soft); outline: none; }
+        .pick-thumb { width: 38px; height: 50px; flex: none; border-radius: 4px; object-fit: cover; background: var(--surface-2); }
+        .pick-info { min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+        .pick-info b { font-size: 0.84rem; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .pick-info span { font-size: 0.72rem; color: var(--text-2); }
+        .pick-empty { padding: 18px 8px; text-align: center; font-size: 0.82rem; color: var(--text-2); }
         .arr-quick { display: flex; align-items: center; gap: 8px; font-size: 0.78rem; font-weight: 700; color: var(--text-2); }
         .arr-quick select { width: auto; flex: 1; }
         .arr-assign { display: flex; flex-direction: column; border: 1px solid var(--border); border-radius: var(--radius-md); }
@@ -2091,6 +2101,34 @@
             <div class="modal-footer">
                 <button class="btn" onclick="closeArrivalModal()">ยกเลิก</button>
                 <button class="btn btn-primary" id="btnSaveArrival" onclick="saveArrival()"><span class="material-icons-round">event_available</span>สร้างตาราง</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- PICK A FINISHED CLIP FOR A SCHEDULE SLOT -->
+    <div class="modal-overlay" id="pickModalOverlay">
+        <div class="modal" role="dialog" aria-modal="true" aria-labelledby="pickTitle">
+            <div class="modal-header">
+                <h3><span class="material-icons-round">playlist_add_check</span><span id="pickTitle">เลือกคลิปที่ทำเสร็จแล้ว</span></h3>
+                <button class="modal-close" onclick="closePickModal()" aria-label="ปิด"><span class="material-icons-round">close</span></button>
+            </div>
+            <div class="modal-body">
+                <div class="form-row-2">
+                    <div class="form-group">
+                        <label class="form-label" for="pickTime">เวลาลง</label>
+                        <input class="form-input" id="pickTime" type="text" inputmode="numeric" maxlength="5" placeholder="--:--">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="pickSearch">ค้นหาคลิป</label>
+                        <input class="form-input" id="pickSearch" type="search" placeholder="ชื่อคลิป" oninput="renderPickList()">
+                    </div>
+                </div>
+                <label class="pick-all" id="pickAllRow"><input type="checkbox" id="pickAll" onchange="renderPickList()"> แสดงคลิปทุกช่อง</label>
+                <div class="pick-list" id="pickList"></div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn" onclick="closePickModal()">ยกเลิก</button>
+                <button class="btn" onclick="pickCreateNew()"><span class="material-icons-round">add</span>สร้างคลิปใหม่</button>
             </div>
         </div>
     </div>
@@ -4715,19 +4753,19 @@
                 });
                 if (date >= today) open += free.length;
                 const html = rows.map(r => r.c ? schedClipRow(r.c, today, hm)
-                    : `<div class="sch-slot"><span class="sch-time0">${r.t}</span><button type="button" class="sch-empty" onclick="schedAdd('${date}', '${escAttr(ch)}', '${r.t}')">ว่าง — เพิ่มคลิป</button></div>`).join('')
+                    : `<div class="sch-slot"><span class="sch-time0">${r.t}</span><button type="button" class="sch-empty" onclick="openPickModal('${date}', '${escAttr(ch)}', '${r.t}')">ว่าง — เลือกคลิป</button></div>`).join('')
                     + untimed.map(c => schedClipRow(c, today, hm)).join('');
                 return `<div class="sch-lane">
                     <div class="sch-ch" style="color:var(${channelInfo(ch).varName})">${escHtml(ch)}</div>
                     ${html}
-                    <button type="button" class="sch-add" onclick="schedAdd('${date}', '${escAttr(ch)}', '')">+ เพิ่มอีกคลิป</button>
+                    <button type="button" class="sch-add" onclick="openPickModal('${date}', '${escAttr(ch)}', '')">+ เพิ่มอีกคลิป</button>
                 </div>`;
             });
             days.push(`<div class="sch-day ${date === today ? 'today' : ''}" data-date="${date}">
                 <div class="sch-day-head"><b>${THAI_DAYS_SHORT[dow]} ${formatDate(date)}${date === today ? '<span class="now">วันนี้</span>' : ''}</b>
                     <span class="cnt">ลงแล้ว ${dayUp}/${dayN}</span></div>
                 ${lanes.join('')}
-                <div class="sch-day-foot"><button type="button" class="sch-add" onclick="schedAdd('${date}', '', '')">+ เพิ่มคลิปช่องอื่น</button></div>
+                <div class="sch-day-foot"><button type="button" class="sch-add" onclick="openPickModal('${date}', '', '')">+ เพิ่มคลิปช่องอื่น</button></div>
             </div>`);
         }
         host.innerHTML = days.join('');
@@ -4776,6 +4814,89 @@
         syncClipSave(clip); render();
         showToast(time ? `ลง ${time} น.` : 'ไม่ระบุเวลาลง', 'info');
     }
+
+    // ---- Choosing a finished clip for a slot ----
+    // Finished and not yet up: the only clips a slot can usefully take. The
+    // clip itself moves to the slot, so the board and the schedule stay one
+    // record rather than a copy in each.
+    const PICK_LIMIT = 60;
+    let pickSlot = null;
+
+    function pickCandidates() {
+        const s = pickSlot;
+        const all = document.getElementById('pickAll').checked;
+        const q = document.getElementById('pickSearch').value.trim().toLowerCase();
+        // Clips that already hold a slot from today on go last: they can be
+        // moved, but the ones still waiting for a slot are what is wanted.
+        const today = localDateStr();
+        const placed = c => !!c.postTime && (c.date || '') >= today ? 1 : 0;
+        return clips
+            .filter(c => c.status === 'done' && !c.uploaded)
+            .filter(c => all || !s.channel || (c.channel || DEFAULT_CHANNEL) === s.channel)
+            .filter(c => !q || (c.title || '').toLowerCase().includes(q))
+            .filter(c => !(c.date === s.date && s.time && c.postTime === s.time && (c.channel || DEFAULT_CHANNEL) === s.channel))
+            .sort((a, b) => placed(a) - placed(b) || (b.date || '').localeCompare(a.date || ''));
+    }
+    function renderPickList() {
+        const host = document.getElementById('pickList');
+        const list = pickCandidates();
+        if (!list.length) {
+            host.innerHTML = '<div class="pick-empty">ไม่มีคลิปที่ทำเสร็จแล้วและยังไม่ลง — ลองแสดงคลิปทุกช่อง หรือสร้างคลิปใหม่</div>';
+            return;
+        }
+        host.innerHTML = list.slice(0, PICK_LIMIT).map(c => {
+            const who = (CREATORS.find(x => x.id === c.creator) || {}).name || '';
+            const now = `ตอนนี้ ${formatDate(c.date)}${c.postTime ? ' ' + c.postTime : ''}`;
+            const meta = [c.channel || DEFAULT_CHANNEL, who, now].filter(Boolean).map(escHtml).join(' · ');
+            const thumb = coverUrl(c) ? `<img class="pick-thumb" src="${coverUrl(c)}" alt="" loading="lazy">` : '<span class="pick-thumb"></span>';
+            return `<button type="button" class="pick-row" onclick="pickClip('${c.id}')">${thumb}<span class="pick-info"><b>${escHtml(c.title)}</b><span>${meta}</span></span></button>`;
+        }).join('') + (list.length > PICK_LIMIT ? `<div class="pick-empty">แสดง ${PICK_LIMIT} จาก ${list.length} คลิป — ค้นหาชื่อเพื่อดูคลิปอื่น</div>` : '');
+    }
+    function openPickModal(date, channel, time) {
+        pickSlot = { date, channel, time };
+        document.getElementById('pickTitle').textContent = `เลือกคลิปลง ${channel ? channel + ' · ' : ''}${formatDate(date)}`;
+        document.getElementById('pickTime').value = time || '';
+        document.getElementById('pickSearch').value = '';
+        document.getElementById('pickAll').checked = !channel;
+        document.getElementById('pickAllRow').style.display = channel ? '' : 'none';
+        renderPickList();
+        document.getElementById('pickModalOverlay').classList.add('open');
+    }
+    function closePickModal() { document.getElementById('pickModalOverlay').classList.remove('open'); }
+
+    function pickedTime() {
+        const raw = document.getElementById('pickTime').value;
+        return raw.trim() ? normTime(raw) : '';
+    }
+    function pickClip(id) {
+        const clip = clips.find(c => c.id === id);
+        const s = pickSlot;
+        if (!clip || !s) return;
+        const time = pickedTime();
+        if (time === null) { showToast('เวลาไม่ถูกต้อง — พิมพ์แบบ 13:30', 'warning'); return; }
+        const was = clip.date;
+        const channel = s.channel || clip.channel || DEFAULT_CHANNEL;
+        clip.date = s.date;
+        clip.channel = channel;
+        clip.postTime = time || nextFreeSlot(channel, s.date, clip.id);
+        syncClipSave(clip);
+        closePickModal();
+        render();
+        const moved = was && was !== s.date ? ` (เดิม ${formatDate(was)})` : '';
+        showToast(`ลง ${formatDate(s.date)}${clip.postTime ? ' ' + clip.postTime : ''}${moved}`, 'success');
+    }
+    function pickCreateNew() {
+        const s = pickSlot;
+        const time = pickedTime();
+        if (!s) return;
+        if (time === null) { showToast('เวลาไม่ถูกต้อง — พิมพ์แบบ 13:30', 'warning'); return; }
+        closePickModal();
+        schedAdd(s.date, s.channel, time);
+    }
+    document.getElementById('pickModalOverlay').addEventListener('click', e => {
+        if (e.target.id === 'pickModalOverlay') closePickModal();
+    });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closePickModal(); });
 
     // Lateness depends on the clock, so keep the open schedule current.
     setInterval(() => {
