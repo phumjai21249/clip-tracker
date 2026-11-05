@@ -624,6 +624,7 @@
         .avatar-1 { background: linear-gradient(135deg, #f59e0b, #ef4444); }
         .avatar-2 { background: linear-gradient(135deg, #3b82f6, #06b6d4); }
         .avatar-3 { background: linear-gradient(135deg, #10b981, #14b8a6); }
+        .avatar-4 { background: linear-gradient(135deg, #64748b, #0ea5e9); }
         .avatar-uploader { background: linear-gradient(135deg, #8b5cf6, #ec4899); }
         .assigned-name { font-weight: 600; font-size: 0.86rem; color: var(--text); }
 
@@ -2299,6 +2300,13 @@
                     </div>
                 </div>
                 <div class="form-group">
+                    <label class="form-label" for="teamName_c4">คนทำคลิป คนที่ 4</label>
+                    <div class="team-input-row">
+                        <div class="avatar avatar-4">C4</div>
+                        <input class="form-input" id="teamName_c4" type="text" placeholder="ชื่อคนทำคลิปคนที่ 4">
+                    </div>
+                </div>
+                <div class="form-group">
                     <label class="form-label" for="teamName_u1">คนลงคลิป</label>
                     <div class="team-input-row">
                         <div class="avatar avatar-uploader">UP</div>
@@ -2410,6 +2418,9 @@
             { id: 'c1', name: 'คนที่ 1', initials: 'C1', avatarClass: 'avatar-1', role: 'คนทำคลิป' },
             { id: 'c2', name: 'คนที่ 2', initials: 'C2', avatarClass: 'avatar-2', role: 'คนทำคลิป' },
             { id: 'c3', name: 'คนที่ 3', initials: 'C3', avatarClass: 'avatar-3', role: 'คนทำคลิป' },
+            // Joined 2026-11. The saved team list predates this slot, so the
+            // name lives here until someone saves the team names again.
+            { id: 'c4', name: 'ริว', initials: 'ริ', avatarClass: 'avatar-4', role: 'คนทำคลิป' },
         ];
         let UPLOADER = { id: 'u1', name: 'คนลงคลิป', initials: 'UP', avatarClass: 'avatar-uploader', role: 'คนลงคลิป' };
 
