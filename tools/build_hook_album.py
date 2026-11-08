@@ -4,7 +4,7 @@
 import json, re, sys, collections, datetime
 
 ROOT = r'D:\TikTok Claude\tiktok_master_export'
-IDMAP = r'C:\Users\MSI\AppData\Local\Temp\claude\060291f00fcfa22e\a91ee7b0-88f8-4bd1-992f-814230e101aa\scratchpad\idmap.json'
+IDMAP = sys.argv[2] if len(sys.argv) > 2 else 'idmap.json'   # 7-digit suffix -> full video ID + captions
 HANDLE = {'JS': 'j.s.sport_shop', 'ME': 'mesport80'}
 MIN_VIEWS = 500
 
