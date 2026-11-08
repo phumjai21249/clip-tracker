@@ -783,6 +783,48 @@
         .sch-add { border: 0; background: none; font: inherit; font-size: 0.74rem; font-weight: 700; color: var(--brand-text); cursor: pointer; padding: 4px 0 0; }
         .sch-add:hover { text-decoration: underline; }
         .sch-day-foot { padding: 6px 12px 10px; border-top: 1px solid var(--border); margin-top: auto; }
+
+        /* Hook album (the shop's own clips) */
+        .ha-meta { padding: 0 20px; font-size: 0.78rem; color: var(--text-2); }
+        .ha-rules { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px; padding: 14px 20px 0; }
+        .ha-rule { border: 1px solid var(--border); border-radius: var(--radius-md); padding: 10px 12px; background: var(--surface-2); }
+        .ha-rule b { display: block; font-size: 0.84rem; color: var(--text); margin-bottom: 2px; }
+        .ha-rule span { font-size: 0.78rem; color: var(--text-2); line-height: 1.5; }
+        .ha-funnels { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; padding: 14px 20px 0; }
+        .ha-funnel { border: 1px solid var(--border); border-radius: var(--radius-md); padding: 10px 12px; background: var(--surface); text-align: left; font: inherit; cursor: pointer; color: var(--text); }
+        .ha-funnel.on { border-color: var(--brand); box-shadow: 0 0 0 1px var(--brand); background: var(--brand-soft); }
+        .ha-funnel .k { font-size: 0.72rem; font-weight: 800; letter-spacing: 0.04em; color: var(--brand-text); }
+        .ha-funnel .t { display: block; font-size: 0.86rem; font-weight: 800; margin-top: 2px; }
+        .ha-funnel .d { display: block; font-size: 0.75rem; color: var(--text-2); margin-top: 2px; line-height: 1.45; }
+        .ha-funnel .n { display: block; font-size: 0.78rem; font-weight: 700; margin-top: 6px; color: var(--text); }
+        .ha-filters { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; padding: 14px 20px 0; }
+        .ha-filters .form-select { width: auto; padding-top: 7px; padding-bottom: 7px; font-size: 0.82rem; }
+        .ha-count { font-size: 0.8rem; color: var(--text-2); font-weight: 700; margin-left: auto; }
+        .ha-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 12px; padding: 16px 20px 20px; }
+        .ha-card { border: 1px solid var(--border); border-radius: var(--radius-md); background: var(--surface); padding: 12px; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+        .ha-top { display: flex; align-items: baseline; gap: 8px; }
+        .ha-hook { font-size: 1.6rem; font-weight: 800; color: var(--text); line-height: 1; }
+        .ha-hook small { font-size: 0.72rem; font-weight: 700; color: var(--text-2); margin-left: 4px; }
+        .ha-ch { margin-left: auto; font-size: 0.72rem; font-weight: 800; }
+        .ha-bar { height: 6px; border-radius: 99px; background: var(--surface-2); overflow: hidden; }
+        .ha-bar i { display: block; height: 100%; background: var(--st-done); border-radius: 99px; }
+        .ha-cap { font-size: 0.84rem; font-weight: 700; color: var(--text); line-height: 1.45; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; min-height: 2.9em; }
+        .ha-cap.empty { color: var(--text-2); font-weight: 600; }
+        .ha-tags { display: flex; flex-wrap: wrap; gap: 5px; }
+        .ha-tag { font-size: 0.7rem; font-weight: 700; padding: 2px 8px; border-radius: 99px; background: var(--surface-2); color: var(--text-2); }
+        .ha-tag.f-TOFU { background: var(--st-editing-bg); color: var(--st-editing-text); }
+        .ha-tag.f-MOFU { background: var(--st-filming-bg); color: var(--st-filming-text); }
+        .ha-tag.f-BOFU { background: var(--st-done-bg); color: var(--st-done-text); }
+        .ha-stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; font-size: 0.72rem; color: var(--text-2); }
+        .ha-stats b { display: block; font-size: 0.84rem; color: var(--text); }
+        .ha-actions { display: flex; gap: 6px; margin-top: auto; }
+        .ha-actions .queue-btn { flex: 1; justify-content: center; }
+        .ha-player { width: 100%; max-width: 340px; aspect-ratio: 9 / 16; border: 0; border-radius: var(--radius-md); background: #000; display: block; margin: 0 auto; }
+        .ha-empty { padding: 30px 20px; text-align: center; color: var(--text-2); font-size: 0.86rem; }
+        @media (max-width: 640px) {
+            .ha-funnels { grid-template-columns: 1fr; }
+            .ha-count { margin-left: 0; width: 100%; }
+        }
         .pick-all { display: flex; align-items: center; gap: 8px; font-size: 0.8rem; font-weight: 600; color: var(--text-2); cursor: pointer; }
         .pick-all input { width: 16px; height: 16px; accent-color: var(--brand); }
         .pick-list { display: flex; flex-direction: column; gap: 6px; margin-top: 10px; }
@@ -1575,6 +1617,9 @@
             <button type="button" class="tab-btn" id="tabBtnKpi" data-tab="Kpi" role="tab" onclick="setTab('Kpi')">
                 <span class="material-icons-round">insights</span> KPI คอนเทนต์
             </button>
+            <button type="button" class="tab-btn" id="tabBtnHooks" data-tab="Hooks" role="tab" onclick="setTab('Hooks')">
+                <span class="material-icons-round">local_fire_department</span> คลังฮุกร้านเรา
+            </button>
             <button type="button" class="tab-btn" id="tabBtnProducts" data-tab="Products" role="tab" onclick="setTab('Products')">
                 <span class="material-icons-round">inventory_2</span> สินค้าใหม่
             </button>
@@ -2010,6 +2055,39 @@
             </div>
         </div>
 
+        <!-- ===== TAB: HOOK ALBUM ===== -->
+        <div class="tab-panel" id="tabHooks">
+            <div class="section-card">
+                <div class="section-header">
+                    <h2><span class="material-icons-round">local_fire_department</span>คลังฮุกร้านเรา — คลิปของ JS / ME ที่รั้งคนดูได้</h2>
+                </div>
+                <p class="ha-meta" id="haMeta">กำลังโหลด…</p>
+                <div class="ha-rules">
+                    <div class="ha-rule"><b>วินาที 0–1: คน + กำลังทำอะไรบางอย่าง</b><span>ลองรองเท้า ถือ 2 คู่เทียบ ตั้งคำถาม · ตัวหนังสือเป็นคำถามหรือคำสัญญา</span></div>
+                    <div class="ha-rule"><b>วินาที 1–3: ช็อตเดียว ห้ามตัด</b><span>ไม่เด้งสติกเกอร์ ไม่เปลี่ยนตัวหนังสือ · คลิปฮุกดีตัดครั้งแรกราววินาทีที่ 5</span></div>
+                    <div class="ha-rule"><b>อย่าเปิดแบบโฆษณา</b><span>ราคา · SALE · LIVE · รองเท้าวางนิ่ง → ใส่หลังวินาทีที่ 3 เท่านั้น</span></div>
+                </div>
+                <div class="ha-funnels" id="haFunnels"></div>
+                <div class="ha-filters">
+                    <select class="form-select" id="haCh" onchange="renderHookAlbum()" aria-label="ช่อง">
+                        <option value="">ทั้ง 2 ช่อง</option><option value="JS">JS SPORT</option><option value="ME">ME SPORT</option>
+                    </select>
+                    <select class="form-select" id="haFormat" onchange="renderHookAlbum()" aria-label="รูปแบบคลิป"></select>
+                    <select class="form-select" id="haMin" onchange="renderHookAlbum()" aria-label="เกณฑ์ฮุก">
+                        <option value="0.4">ฮุกดี (ค้าง 2 วิ ≥ 40%)</option>
+                        <option value="0.33">ผ่านเป้า KPI (≥ 33%)</option>
+                        <option value="0">ทุกคลิป</option>
+                    </select>
+                    <select class="form-select" id="haSort" onchange="renderHookAlbum()" aria-label="เรียงตาม">
+                        <option value="c1">เรียงตามฮุก</option><option value="c3">เรียงตามดูต่อถึง 6 วิ</option>
+                        <option value="views">เรียงตามยอดวิว</option><option value="date">ใหม่สุดก่อน</option>
+                    </select>
+                    <span class="ha-count" id="haCount"></span>
+                </div>
+                <div class="ha-grid" id="haGrid"></div>
+            </div>
+        </div>
+
         <!-- ===== TAB: NEW PRODUCTS ===== -->
         <div class="tab-panel" id="tabProducts">
             <div class="section-card">
@@ -2102,6 +2180,21 @@
             <div class="modal-footer">
                 <button class="btn" onclick="closeArrivalModal()">ยกเลิก</button>
                 <button class="btn btn-primary" id="btnSaveArrival" onclick="saveArrival()"><span class="material-icons-round">event_available</span>สร้างตาราง</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- HOOK ALBUM PLAYER -->
+    <div class="modal-overlay" id="haModalOverlay">
+        <div class="modal" role="dialog" aria-modal="true" aria-labelledby="haModalTitle">
+            <div class="modal-header">
+                <h3><span class="material-icons-round">play_circle</span><span id="haModalTitle">ดูคลิป</span></h3>
+                <button class="modal-close" onclick="closeHookPlayer()" aria-label="ปิด"><span class="material-icons-round">close</span></button>
+            </div>
+            <div class="modal-body" id="haModalBody"></div>
+            <div class="modal-footer">
+                <a class="btn" id="haModalLink" href="#" target="_blank" rel="noopener"><span class="material-icons-round">open_in_new</span>เปิดใน TikTok</a>
+                <button class="btn btn-primary" onclick="closeHookPlayer()">ปิด</button>
             </div>
         </div>
     </div>
@@ -3934,11 +4027,12 @@
             try { localStorage.setItem('clipTracker.tab', name); } catch (e) {}
             window.scrollTo({ top: 0, behavior: 'smooth' });
             if (name === 'Schedule' && typeof schedScrollToday === 'function') setTimeout(schedScrollToday, 60);
+            if (name === 'Hooks' && typeof loadHookAlbum === 'function') loadHookAlbum();
         }
         function initTab() {
             let saved = 'Clips';
             try { saved = localStorage.getItem('clipTracker.tab') || 'Clips'; } catch (e) {}
-            setTab(['Kpi', 'Products', 'Schedule'].includes(saved) ? saved : 'Clips');
+            setTab(['Kpi', 'Products', 'Schedule', 'Hooks'].includes(saved) ? saved : 'Clips');
             window.scrollTo({ top: 0 });
         }
         function kpiJump(n) {
@@ -4908,6 +5002,92 @@
         if (e.target.id === 'pickModalOverlay') closePickModal();
     });
     document.addEventListener('keydown', e => { if (e.key === 'Escape') closePickModal(); });
+
+    // ============ HOOK ALBUM ============
+    // The shop's own clips, ranked by how many viewers were still watching at
+    // second 2 (TikTok Studio retention). Built offline into hook-album.json;
+    // the page only reads it.
+    const HA_FUNNELS = {
+        TOFU: { key: 'TOFU · Awareness', title: 'ให้คนรู้จักร้าน', desc: 'สโมสร ทีมบอล ทีเซอร์ ตลก กิจกรรม — คนที่ยังไม่ได้คิดจะซื้อ' },
+        MOFU: { key: 'MOFU · Consideration', title: 'ช่วยเลือก', desc: 'โชว์รุ่น เปรียบเทียบ รีวิว สอนเลือกไซซ์ — คนที่กำลังหาคู่ที่ใช่' },
+        BOFU: { key: 'BOFU · Conversion', title: 'ปิดการขาย', desc: 'ของเข้าแล้ว โปร ไลฟ์ สั่งทำเสื้อ — คนที่พร้อมกดซื้อหรือทัก' },
+    };
+    const HA_SEGMENTS = { A: 'หนุ่มนักเตะ', B: 'ผู้หญิง / คุณแม่', C: 'หัวหน้าทีม / สั่งเสื้อ', D: 'แฟนประจำ' };
+    let hookAlbum = null, haFunnel = '';
+
+    async function loadHookAlbum() {
+        if (hookAlbum) { renderHookAlbum(); return; }
+        try {
+            const res = await fetch('hook-album.json', { cache: 'no-cache' });
+            hookAlbum = await res.json();
+        } catch (e) {
+            document.getElementById('haMeta').textContent = 'โหลดคลังฮุกไม่สำเร็จ — ลองรีเฟรชหน้า';
+            return;
+        }
+        const formats = [...new Set(hookAlbum.clips.map(c => c.format))].sort();
+        document.getElementById('haFormat').innerHTML = '<option value="">ทุกรูปแบบคลิป</option>'
+            + formats.map(f => `<option value="${escAttr(f)}">${escHtml(f)}</option>`).join('');
+        const m = hookAlbum.meta;
+        document.getElementById('haMeta').textContent = `ที่มา: ${m.source} · ${m.rules} · ฮุก = สัดส่วนคนที่ยังดูอยู่ที่วินาทีที่ 2 (KPI C1) · แบ่ง TOFU / MOFU / BOFU และกลุ่มลูกค้าจากแคปชันอัตโนมัติ`;
+        renderHookAlbum();
+    }
+    function haPct(v) { return Math.round(v * 100) + '%'; }
+    function haFilter(withFunnel) {
+        const ch = document.getElementById('haCh').value;
+        const fmt = document.getElementById('haFormat').value;
+        const min = Number(document.getElementById('haMin').value);
+        return hookAlbum.clips.filter(c => (!ch || c.ch === ch) && (!fmt || c.format === fmt) && c.c1 >= min
+            && (!withFunnel || !haFunnel || c.funnel === haFunnel));
+    }
+    function renderHookAlbum() {
+        if (!hookAlbum) return;
+        const base = haFilter(false);
+        document.getElementById('haFunnels').innerHTML = Object.entries(HA_FUNNELS).map(([k, f]) => `
+            <button type="button" class="ha-funnel ${haFunnel === k ? 'on' : ''}" onclick="haSetFunnel('${k}')" aria-pressed="${haFunnel === k}">
+                <span class="k">${f.key}</span><span class="t">${f.title}</span><span class="d">${f.desc}</span>
+                <span class="n">${base.filter(c => c.funnel === k).length} คลิป</span>
+            </button>`).join('');
+        const sort = document.getElementById('haSort').value;
+        const list = haFilter(true).sort((a, b) => sort === 'date' ? b.date.localeCompare(a.date) : b[sort] - a[sort]);
+        document.getElementById('haCount').textContent = `${list.length} คลิป`;
+        const grid = document.getElementById('haGrid');
+        if (!list.length) { grid.innerHTML = '<div class="ha-empty">ไม่มีคลิปตามเงื่อนไขนี้ — ลองลดเกณฑ์ฮุก หรือเลือกทุกรูปแบบ</div>'; return; }
+        grid.innerHTML = list.map(c => {
+            const f = HA_FUNNELS[c.funnel];
+            const empty = c.caption === '(แฮชแท็กล้วน)';
+            return `<article class="ha-card">
+                <div class="ha-top"><span class="ha-hook">${haPct(c.c1)}<small>ค้าง 2 วิ</small></span>
+                    <span class="ha-ch" style="color:var(${channelInfo(c.ch === 'JS' ? 'JS SPORT SHOP' : 'Me SPORT').varName})">${c.ch === 'JS' ? 'JS SPORT' : 'ME SPORT'}</span></div>
+                <div class="ha-bar"><i style="width:${Math.min(100, c.c1 * 100)}%"></i></div>
+                <div class="ha-cap ${empty ? 'empty' : ''}">${escHtml(empty ? 'ไม่มีแคปชัน (ใส่แต่แฮชแท็ก)' : c.caption)}</div>
+                <div class="ha-tags"><span class="ha-tag f-${c.funnel}">${f.key.split(' · ')[0]} · ${f.title}</span>
+                    <span class="ha-tag">${escHtml(c.format)}</span><span class="ha-tag">${HA_SEGMENTS[c.segment] || ''}</span></div>
+                <div class="ha-stats"><span><b>${haPct(c.c3)}</b>ดูต่อถึง 6 วิ</span><span><b>${Number(c.views).toLocaleString()}</b>วิว</span><span><b>${formatDate(c.date).replace(/ \d{4}$/, '')}</b>${c.dur} วิ</span></div>
+                <div class="ha-actions">
+                    <button type="button" class="queue-btn primary" onclick="openHookPlayer('${c.id}')"><span class="material-icons-round">play_arrow</span>ดูคลิป</button>
+                    <a class="queue-btn" href="${escAttr(c.url)}" target="_blank" rel="noopener"><span class="material-icons-round">open_in_new</span>TikTok</a>
+                </div>
+            </article>`;
+        }).join('');
+    }
+    function haSetFunnel(k) { haFunnel = haFunnel === k ? '' : k; renderHookAlbum(); }
+
+    // The player loads only when asked: one embed, not one per card.
+    function openHookPlayer(id) {
+        const c = hookAlbum && hookAlbum.clips.find(x => x.id === id);
+        if (!c) return;
+        document.getElementById('haModalTitle').textContent = `ฮุก ${haPct(c.c1)} · ${c.ch === 'JS' ? 'JS SPORT' : 'ME SPORT'} · ${formatDate(c.date)}`;
+        document.getElementById('haModalBody').innerHTML = `<iframe class="ha-player" src="https://www.tiktok.com/embed/v2/${encodeURIComponent(c.id)}" allow="encrypted-media; fullscreen" allowfullscreen title="คลิป TikTok"></iframe>`;
+        document.getElementById('haModalLink').href = c.url;
+        document.getElementById('haModalOverlay').classList.add('open');
+    }
+    function closeHookPlayer() {
+        document.getElementById('haModalOverlay').classList.remove('open');
+        document.getElementById('haModalBody').innerHTML = '';   // stop playback
+    }
+    document.getElementById('haModalOverlay').addEventListener('click', e => { if (e.target.id === 'haModalOverlay') closeHookPlayer(); });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeHookPlayer(); });
+    if (document.getElementById('tabHooks').classList.contains('active')) loadHookAlbum();
 
     // Lateness depends on the clock, so keep the open schedule current.
     setInterval(() => {
