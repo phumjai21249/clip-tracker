@@ -1,7 +1,7 @@
 # Builds hook-album.json for the clip-tracker "คลังฮุกร้านเรา" tab from the
 # shop's own TikTok Studio retention data (Aug–Nov 2026).
 # usage: python tools/build_hook_album.py public/hook-album.json <idmap.json>
-import json, re, sys, collections, datetime
+import json, re, sys, os, collections, datetime
 
 ROOT = r'D:\TikTok Claude\tiktok_master_export'
 IDMAP = sys.argv[2] if len(sys.argv) > 2 else 'idmap.json'   # 7-digit suffix -> full video ID + captions
@@ -129,7 +129,15 @@ for x in out:
     if r.get('caption') and x['caption'] == '(แฮชแท็กล้วน)':
         x['caption'] = r['caption'][:140]
     x['note'] = r.get('note', '')
+    x['hook'] = r.get('hook', '')
+    x['trick'] = r.get('trick', '')
     x['reviewed'] = True
+
+# Covers fetched from each clip's page (tools/fetch_covers.py) live in
+# public/hook-covers/<id>.jpg; a clip without one shows a plain tile.
+COVERS = sys.argv[4] if len(sys.argv) > 4 else 'public/hook-covers'
+for x in out:
+    x['cover'] = os.path.exists(os.path.join(COVERS, x['id'] + '.jpg'))
 
 out.sort(key=lambda x: -x['c1'])
 meta = {

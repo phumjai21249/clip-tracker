@@ -800,32 +800,52 @@
         .ha-filters { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; padding: 14px 20px 0; }
         .ha-filters .form-select { width: auto; padding-top: 7px; padding-bottom: 7px; font-size: 0.82rem; }
         .ha-count { font-size: 0.8rem; color: var(--text-2); font-weight: 700; margin-left: auto; }
-        .ha-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 12px; padding: 16px 20px 20px; }
-        .ha-card { border: 1px solid var(--border); border-radius: var(--radius-md); background: var(--surface); padding: 12px; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
-        .ha-top { display: flex; align-items: baseline; gap: 8px; }
-        .ha-hook { font-size: 1.6rem; font-weight: 800; color: var(--text); line-height: 1; }
-        .ha-hook small { font-size: 0.72rem; font-weight: 700; color: var(--text-2); margin-left: 4px; }
-        .ha-ch { margin-left: auto; font-size: 0.72rem; font-weight: 800; }
-        .ha-bar { height: 6px; border-radius: 99px; background: var(--surface-2); overflow: hidden; }
-        .ha-bar i { display: block; height: 100%; background: var(--st-done); border-radius: 99px; }
-        .ha-cap { font-size: 0.84rem; font-weight: 700; color: var(--text); line-height: 1.45; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; min-height: 2.9em; }
-        .ha-cap.empty { color: var(--text-2); font-weight: 600; }
+        .ha-hooks { padding: 16px 20px 0; }
+        .ha-hooks h3 { font-size: 0.92rem; font-weight: 800; color: var(--text); margin: 0 0 2px; }
+        .ha-hooks p { font-size: 0.76rem; color: var(--text-2); margin: 0 0 10px; }
+        .ha-hook-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 8px; }
+        .ha-hk { display: grid; grid-template-columns: 26px minmax(0, 1fr) auto; gap: 4px 10px; align-items: start; text-align: left; font: inherit; color: var(--text);
+                 border: 1px solid var(--border); border-radius: var(--radius-md); padding: 10px 12px; background: var(--surface); cursor: pointer; }
+        .ha-hk:hover { border-color: var(--border-strong); }
+        .ha-hk.on { border-color: var(--brand); outline: 1px solid var(--brand); outline-offset: -2px; background: var(--brand-soft); }
+        .ha-hk .rk { font-size: 0.95rem; font-weight: 800; color: var(--text-2); grid-row: span 2; }
+        .ha-hk .nm { font-size: 0.86rem; font-weight: 800; }
+        .ha-hk .st { font-size: 0.74rem; font-weight: 700; color: var(--text-2); text-align: right; white-space: nowrap; }
+        .ha-hk .st b { display: block; font-size: 0.92rem; color: var(--st-done-text); }
+        .ha-hk .ex { grid-column: 2 / -1; font-size: 0.76rem; color: var(--text-2); line-height: 1.45; }
+        .ha-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 14px; padding: 16px 20px 20px; }
+        .ha-card { border: 1px solid var(--border); border-radius: var(--radius-md); background: var(--surface); overflow: hidden; display: flex; flex-direction: column; min-width: 0; }
+        .ha-cover { all: unset; position: relative; display: block; aspect-ratio: 9 / 13; background: #1c1f26; cursor: pointer; overflow: hidden; }
+        .ha-cover:focus-visible { outline: 2px solid var(--brand); outline-offset: -2px; }
+        .ha-cover img { width: 100%; height: 100%; object-fit: cover; display: block; }
+        .ha-cover .shade { position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(0,0,0,.55) 0%, rgba(0,0,0,0) 26%, rgba(0,0,0,0) 48%, rgba(0,0,0,.86) 100%); }
+        .ha-cover .src { position: absolute; top: 10px; left: 10px; right: 10px; font-size: 0.72rem; font-weight: 700; color: #fff; }
+        .ha-cover .pct { position: absolute; top: 30px; left: 10px; font-size: 0.74rem; font-weight: 800; color: #0b2e20; background: #7ee2b8; border-radius: 99px; padding: 2px 9px; }
+        .ha-cover .ttl { position: absolute; left: 12px; right: 12px; bottom: 32px; font-size: 0.98rem; font-weight: 800; color: #fff; line-height: 1.35;
+                         display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+        .ha-cover .vw { position: absolute; left: 12px; bottom: 10px; font-size: 0.8rem; font-weight: 800; color: #fff; }
+        .ha-cover .play { position: absolute; right: 10px; bottom: 8px; color: #fff; font-size: 30px; }
+        .ha-body { padding: 10px 12px 12px; display: flex; flex-direction: column; gap: 8px; flex: 1; }
         .ha-tags { display: flex; flex-wrap: wrap; gap: 5px; }
         .ha-tag { font-size: 0.7rem; font-weight: 700; padding: 2px 8px; border-radius: 99px; background: var(--surface-2); color: var(--text-2); }
+        .ha-tag.hk { background: var(--brand-soft); color: var(--brand-text); }
         .ha-tag.f-TOFU { background: var(--st-editing-bg); color: var(--st-editing-text); }
         .ha-tag.f-MOFU { background: var(--st-filming-bg); color: var(--st-filming-text); }
         .ha-tag.f-BOFU { background: var(--st-done-bg); color: var(--st-done-text); }
-        .ha-tag.seen { background: var(--brand-soft); color: var(--brand-text); }
-        .ha-note { font-size: 0.78rem; color: var(--text-2); line-height: 1.5; border-left: 3px solid var(--border-strong); padding-left: 8px; }
-        .ha-stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; font-size: 0.72rem; color: var(--text-2); }
-        .ha-stats b { display: block; font-size: 0.84rem; color: var(--text); }
-        .ha-actions { display: flex; gap: 6px; margin-top: auto; }
-        .ha-actions .queue-btn { flex: 1; justify-content: center; }
+        .ha-trick { font-size: 0.8rem; color: var(--text); line-height: 1.5; }
+        .ha-trick b { color: var(--brand-text); margin-right: 4px; }
+        .ha-trick.guess { color: var(--text-2); }
+        .ha-stats { display: flex; gap: 12px; font-size: 0.72rem; color: var(--text-2); margin-top: auto; padding-top: 2px; border-top: 1px solid var(--border); padding-top: 8px; }
+        .ha-stats b { color: var(--text); }
+        .ha-stats a { margin-left: auto; color: var(--text-2); display: inline-flex; align-items: center; gap: 2px; text-decoration: none; font-weight: 700; }
+        .ha-stats a:hover { color: var(--brand-text); }
         .ha-player { width: 100%; max-width: 340px; aspect-ratio: 9 / 16; border: 0; border-radius: var(--radius-md); background: #000; display: block; margin: 0 auto; }
         .ha-empty { padding: 30px 20px; text-align: center; color: var(--text-2); font-size: 0.86rem; }
         @media (max-width: 640px) {
             .ha-funnels { grid-template-columns: 1fr; }
             .ha-count { margin-left: 0; width: 100%; }
+            .ha-hook-list { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; padding-bottom: 6px; -webkit-overflow-scrolling: touch; }
+            .ha-hk { flex: 0 0 78%; scroll-snap-align: start; }
         }
         .pick-all { display: flex; align-items: center; gap: 8px; font-size: 0.8rem; font-weight: 600; color: var(--text-2); cursor: pointer; }
         .pick-all input { width: 16px; height: 16px; accent-color: var(--brand); }
@@ -2068,6 +2088,11 @@
                     <div class="ha-rule"><b>วินาที 0–1: คน + กำลังทำอะไรบางอย่าง</b><span>ลองรองเท้า ถือ 2 คู่เทียบ ตั้งคำถาม · ตัวหนังสือเป็นคำถามหรือคำสัญญา</span></div>
                     <div class="ha-rule"><b>วินาที 1–3: ช็อตเดียว ห้ามตัด</b><span>ไม่เด้งสติกเกอร์ ไม่เปลี่ยนตัวหนังสือ · คลิปฮุกดีตัดครั้งแรกราววินาทีที่ 5</span></div>
                     <div class="ha-rule"><b>อย่าเปิดแบบโฆษณา</b><span>ราคา · SALE · LIVE · รองเท้าวางนิ่ง → ใส่หลังวินาทีที่ 3 เท่านั้น</span></div>
+                </div>
+                <div class="ha-hooks">
+                    <h3>ฮุกแบบไหนได้ผลในร้านเรา</h3>
+                    <p id="haHooksNote">จาก 3 วินาทีแรกของคลิปฮุกดีที่ดูแล้ว · กดเพื่อดูเฉพาะแบบนั้น</p>
+                    <div class="ha-hook-list" id="haHooks"></div>
                 </div>
                 <div class="ha-funnels" id="haFunnels"></div>
                 <div class="ha-filters">
@@ -5015,7 +5040,7 @@
         BOFU: { key: 'BOFU · Conversion', title: 'ปิดการขาย', desc: 'ของเข้าแล้ว โปร ไลฟ์ สั่งทำเสื้อ — คนที่พร้อมกดซื้อหรือทัก' },
     };
     const HA_SEGMENTS = { A: 'หนุ่มนักเตะ', B: 'ผู้หญิง / คุณแม่', C: 'หัวหน้าทีม / สั่งเสื้อ', D: 'แฟนประจำ', '-': 'ไม่มีสินค้าในคลิป' };
-    let hookAlbum = null, haFunnel = '';
+    let hookAlbum = null, haFunnel = '', haHook = '';
 
     async function loadHookAlbum() {
         if (hookAlbum) { renderHookAlbum(); return; }
@@ -5039,10 +5064,30 @@
         const fmt = document.getElementById('haFormat').value;
         const min = Number(document.getElementById('haMin').value);
         return hookAlbum.clips.filter(c => (!ch || c.ch === ch) && (!fmt || c.format === fmt) && c.c1 >= min
-            && (!withFunnel || !haFunnel || c.funnel === haFunnel));
+            && (!withFunnel || ((!haFunnel || c.funnel === haFunnel) && (!haHook || c.hook === haHook))));
     }
+    // Opening types ranked by how often they appear among watched strong-hook
+    // clips, with their average hook rate and the best clip's trick as example.
+    function renderHookTypes() {
+        const ch = document.getElementById('haCh').value;
+        const seen = hookAlbum.clips.filter(c => c.hook && (!ch || c.ch === ch));
+        const groups = {};
+        seen.forEach(c => { (groups[c.hook] = groups[c.hook] || []).push(c); });
+        const rows = Object.entries(groups).sort((a, b) => b[1].length - a[1].length);
+        document.getElementById('haHooks').innerHTML = rows.map(([name, cs], i) => {
+            const best = cs.slice().sort((a, b) => b.c1 - a.c1)[0];
+            const avg = cs.reduce((s, c) => s + c.c1, 0) / cs.length;
+            return `<button type="button" class="ha-hk ${haHook === name ? 'on' : ''}" onclick="haSetHook('${escAttr(name)}')" aria-pressed="${haHook === name}">
+                <span class="rk">${i + 1}</span><span class="nm">${escHtml(name)}</span>
+                <span class="st"><b>${haPct(avg)}</b>${Math.round(cs.length / seen.length * 100)}% · ${cs.length} คลิป</span>
+                <span class="ex">ตัวอย่าง: ${escHtml(best.trick || best.caption)}</span>
+            </button>`;
+        }).join('') || '<div class="ha-empty">ยังไม่มีคลิปที่ดูแล้วในช่องนี้</div>';
+    }
+    function haSetHook(name) { haHook = haHook === name ? '' : name; renderHookAlbum(); }
     function renderHookAlbum() {
         if (!hookAlbum) return;
+        renderHookTypes();
         const base = haFilter(false);
         document.getElementById('haFunnels').innerHTML = Object.entries(HA_FUNNELS).map(([k, f]) => `
             <button type="button" class="ha-funnel ${haFunnel === k ? 'on' : ''}" onclick="haSetFunnel('${k}')" aria-pressed="${haFunnel === k}">
@@ -5053,23 +5098,32 @@
         const list = haFilter(true).sort((a, b) => sort === 'date' ? b.date.localeCompare(a.date) : b[sort] - a[sort]);
         document.getElementById('haCount').textContent = `${list.length} คลิป`;
         const grid = document.getElementById('haGrid');
-        if (!list.length) { grid.innerHTML = '<div class="ha-empty">ไม่มีคลิปตามเงื่อนไขนี้ — ลองลดเกณฑ์ฮุก หรือเลือกทุกรูปแบบ</div>'; return; }
+        if (!list.length) { grid.innerHTML = '<div class="ha-empty">ไม่มีคลิปตามเงื่อนไขนี้ — ลองลดเกณฑ์ฮุก เลือกทุกรูปแบบ หรือกดแบบฮุกซ้ำเพื่อยกเลิก</div>'; return; }
         grid.innerHTML = list.map(c => {
             const f = HA_FUNNELS[c.funnel];
             const empty = c.caption === '(แฮชแท็กล้วน)';
+            const handle = c.url.split('/@')[1].split('/')[0];
+            const title = empty ? (c.note || 'ไม่มีแคปชัน') : c.caption;
+            const views = c.views >= 1000 ? (c.views / 1000).toFixed(c.views >= 10000 ? 0 : 1) + 'K' : c.views;
             return `<article class="ha-card">
-                <div class="ha-top"><span class="ha-hook">${haPct(c.c1)}<small>ค้าง 2 วิ</small></span>
-                    <span class="ha-ch" style="color:var(${channelInfo(c.ch === 'JS' ? 'JS SPORT SHOP' : 'Me SPORT').varName})">${c.ch === 'JS' ? 'JS SPORT' : 'ME SPORT'}</span></div>
-                <div class="ha-bar"><i style="width:${Math.min(100, c.c1 * 100)}%"></i></div>
-                <div class="ha-cap ${empty ? 'empty' : ''}">${escHtml(empty ? 'ไม่มีแคปชัน (ใส่แต่แฮชแท็ก)' : c.caption)}</div>
-                <div class="ha-tags"><span class="ha-tag f-${c.funnel}">${f.key.split(' · ')[0]} · ${f.title}</span>
-                    <span class="ha-tag">${escHtml(c.format)}</span><span class="ha-tag">${HA_SEGMENTS[c.segment] || ''}</span>
-                    ${c.reviewed ? '<span class="ha-tag seen" title="จัดหมวดจากการดูคลิปจริง">ดูคลิปแล้ว</span>' : ''}</div>
-                ${c.note ? `<div class="ha-note">${escHtml(c.note)}</div>` : ''}
-                <div class="ha-stats"><span><b>${haPct(c.c3)}</b>ดูต่อถึง 6 วิ</span><span><b>${Number(c.views).toLocaleString()}</b>วิว</span><span><b>${formatDate(c.date).replace(/ \d{4}$/, '')}</b>${c.dur} วิ</span></div>
-                <div class="ha-actions">
-                    <button type="button" class="queue-btn primary" onclick="openHookPlayer('${c.id}')"><span class="material-icons-round">play_arrow</span>ดูคลิป</button>
-                    <a class="queue-btn" href="${escAttr(c.url)}" target="_blank" rel="noopener"><span class="material-icons-round">open_in_new</span>TikTok</a>
+                <button type="button" class="ha-cover" onclick="openHookPlayer('${c.id}')" aria-label="ดูคลิป ${escAttr(title)}">
+                    ${c.cover ? `<img src="hook-covers/${c.id}.jpg" alt="" loading="lazy">` : ''}
+                    <span class="shade"></span>
+                    <span class="src">TikTok · @${escHtml(handle)}</span>
+                    <span class="pct">ค้าง 2 วิ ${haPct(c.c1)}</span>
+                    <span class="ttl">${escHtml(title)}</span>
+                    <span class="vw">${views} วิว · ${c.dur} วิ</span>
+                    <span class="material-icons-round play">play_circle</span>
+                </button>
+                <div class="ha-body">
+                    <div class="ha-tags"><span class="ha-tag f-${c.funnel}">${f.key.split(' · ')[0]} · ${f.title}</span>
+                        ${c.hook ? `<span class="ha-tag hk">${escHtml(c.hook)}</span>` : ''}
+                        <span class="ha-tag">${escHtml(c.format)}</span>
+                        ${c.segment && c.segment !== 'A' ? `<span class="ha-tag">${HA_SEGMENTS[c.segment] || ''}</span>` : ''}</div>
+                    ${c.trick ? `<div class="ha-trick"><b>Trick</b>${escHtml(c.trick)}</div>`
+                        : `<div class="ha-trick guess">ยังไม่ได้ดูคลิปนี้ — จัดหมวดจากแคปชัน</div>`}
+                    <div class="ha-stats"><span>ดูต่อถึง 6 วิ <b>${haPct(c.c3)}</b></span><span>${formatDate(c.date).replace(/ \d{4}$/, '')}</span>
+                        <a href="${escAttr(c.url)}" target="_blank" rel="noopener">TikTok<span class="material-icons-round" style="font-size:14px">open_in_new</span></a></div>
                 </div>
             </article>`;
         }).join('');
