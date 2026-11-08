@@ -114,11 +114,29 @@ for c in clips:
         'caption': caption[:140], 'format': fmt, 'funnel': funnel_of(c, fmt), 'segment': segment_of(c, fmt),
     })
 
+# Clips someone has watched end to end override the caption guesses: format,
+# funnel and customer group from what is actually on screen, plus a note.
+REVIEW = sys.argv[3] if len(sys.argv) > 3 else 'tools/hook-review.json'
+try:
+    review = json.load(open(REVIEW, encoding='utf-8'))
+except FileNotFoundError:
+    review = {}
+for x in out:
+    r = review.get(x['id'])
+    if not r or r.get('unwatched'):
+        continue
+    x.update({k: r[k] for k in ('format', 'funnel', 'segment') if k in r})
+    if r.get('caption') and x['caption'] == '(แฮชแท็กล้วน)':
+        x['caption'] = r['caption'][:140]
+    x['note'] = r.get('note', '')
+    x['reviewed'] = True
+
 out.sort(key=lambda x: -x['c1'])
 meta = {
     'built': '2026-11-09', 'source': 'TikTok Studio (กราฟคนดูต่อรายคลิป) ส.ค.–6 พ.ย. 2026',
     'rules': f'ไม่นับคลิปตัดไลฟ์ ยิง Promote อายุไม่ถึง 24 ชม. และคลิปวิวต่ำกว่า {MIN_VIEWS}',
     'count': len(out),
+    'reviewed': sum(1 for x in out if x.get('reviewed')),
 }
 json.dump({'meta': meta, 'clips': out}, open(sys.argv[1], 'w', encoding='utf-8'), ensure_ascii=False, separators=(',', ':'))
 

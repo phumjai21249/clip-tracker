@@ -815,6 +815,8 @@
         .ha-tag.f-TOFU { background: var(--st-editing-bg); color: var(--st-editing-text); }
         .ha-tag.f-MOFU { background: var(--st-filming-bg); color: var(--st-filming-text); }
         .ha-tag.f-BOFU { background: var(--st-done-bg); color: var(--st-done-text); }
+        .ha-tag.seen { background: var(--brand-soft); color: var(--brand-text); }
+        .ha-note { font-size: 0.78rem; color: var(--text-2); line-height: 1.5; border-left: 3px solid var(--border-strong); padding-left: 8px; }
         .ha-stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; font-size: 0.72rem; color: var(--text-2); }
         .ha-stats b { display: block; font-size: 0.84rem; color: var(--text); }
         .ha-actions { display: flex; gap: 6px; margin-top: auto; }
@@ -5012,7 +5014,7 @@
         MOFU: { key: 'MOFU · Consideration', title: 'ช่วยเลือก', desc: 'โชว์รุ่น เปรียบเทียบ รีวิว สอนเลือกไซซ์ — คนที่กำลังหาคู่ที่ใช่' },
         BOFU: { key: 'BOFU · Conversion', title: 'ปิดการขาย', desc: 'ของเข้าแล้ว โปร ไลฟ์ สั่งทำเสื้อ — คนที่พร้อมกดซื้อหรือทัก' },
     };
-    const HA_SEGMENTS = { A: 'หนุ่มนักเตะ', B: 'ผู้หญิง / คุณแม่', C: 'หัวหน้าทีม / สั่งเสื้อ', D: 'แฟนประจำ' };
+    const HA_SEGMENTS = { A: 'หนุ่มนักเตะ', B: 'ผู้หญิง / คุณแม่', C: 'หัวหน้าทีม / สั่งเสื้อ', D: 'แฟนประจำ', '-': 'ไม่มีสินค้าในคลิป' };
     let hookAlbum = null, haFunnel = '';
 
     async function loadHookAlbum() {
@@ -5028,7 +5030,7 @@
         document.getElementById('haFormat').innerHTML = '<option value="">ทุกรูปแบบคลิป</option>'
             + formats.map(f => `<option value="${escAttr(f)}">${escHtml(f)}</option>`).join('');
         const m = hookAlbum.meta;
-        document.getElementById('haMeta').textContent = `ที่มา: ${m.source} · ${m.rules} · ฮุก = สัดส่วนคนที่ยังดูอยู่ที่วินาทีที่ 2 (KPI C1) · แบ่ง TOFU / MOFU / BOFU และกลุ่มลูกค้าจากแคปชันอัตโนมัติ`;
+        document.getElementById('haMeta').textContent = `ที่มา: ${m.source} · ${m.rules} · ฮุก = สัดส่วนคนที่ยังดูอยู่ที่วินาทีที่ 2 (KPI C1) · ${m.reviewed || 0} คลิปจัดหมวดจากการดูคลิปจริง (ป้าย "ดูคลิปแล้ว") ที่เหลือจัดจากแคปชัน`;
         renderHookAlbum();
     }
     function haPct(v) { return Math.round(v * 100) + '%'; }
@@ -5061,7 +5063,9 @@
                 <div class="ha-bar"><i style="width:${Math.min(100, c.c1 * 100)}%"></i></div>
                 <div class="ha-cap ${empty ? 'empty' : ''}">${escHtml(empty ? 'ไม่มีแคปชัน (ใส่แต่แฮชแท็ก)' : c.caption)}</div>
                 <div class="ha-tags"><span class="ha-tag f-${c.funnel}">${f.key.split(' · ')[0]} · ${f.title}</span>
-                    <span class="ha-tag">${escHtml(c.format)}</span><span class="ha-tag">${HA_SEGMENTS[c.segment] || ''}</span></div>
+                    <span class="ha-tag">${escHtml(c.format)}</span><span class="ha-tag">${HA_SEGMENTS[c.segment] || ''}</span>
+                    ${c.reviewed ? '<span class="ha-tag seen" title="จัดหมวดจากการดูคลิปจริง">ดูคลิปแล้ว</span>' : ''}</div>
+                ${c.note ? `<div class="ha-note">${escHtml(c.note)}</div>` : ''}
                 <div class="ha-stats"><span><b>${haPct(c.c3)}</b>ดูต่อถึง 6 วิ</span><span><b>${Number(c.views).toLocaleString()}</b>วิว</span><span><b>${formatDate(c.date).replace(/ \d{4}$/, '')}</b>${c.dur} วิ</span></div>
                 <div class="ha-actions">
                     <button type="button" class="queue-btn primary" onclick="openHookPlayer('${c.id}')"><span class="material-icons-round">play_arrow</span>ดูคลิป</button>
