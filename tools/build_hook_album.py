@@ -24,6 +24,7 @@ for r in rows['JS'] + rows['ME']:
         'c1': r['C1'], 'c2': r['C2'], 'c3': r['C3'], 'c4': r['C4'], 'tag': r['tag'],
         'desc': desc.get(fid) or (cause.get(r['id']) or {}).get('desc', ''),
         'cat0': (cause.get(r['id']) or {}).get('cat'),
+        'r1': r.get('r1'), 'vis': cause.get(r['id']),
     })
 
 seen = {c['id'] for c in clips}
@@ -38,6 +39,7 @@ for ch, f in (('JS', '_wk1107_js_studio.json'), ('ME', '_wk1107_me_studio.json')
             'dur': round(x['dur'] / 1000), 'c1': r2, 'c2': x['p25'] / r2, 'c3': x['r6'] / r2,
             'c4': x['p50'] / r2, 'tag': '<24ชม.' if (datetime.datetime(2026, 11, 7) - posted).total_seconds() < 86400 else '',
             'desc': x.get('desc', ''), 'cat0': None,
+            'r1': x.get('r1'), 'r3': x.get('r3'), 'eng': (x.get('l'), x.get('c'), x.get('s')),
         })
 
 def text_of(c):
@@ -101,6 +103,70 @@ def segment_of(c, fmt):
         return 'D'
     return 'A'
 
+# ---- Per-clip analysis inputs (shown when a clip is opened) ----
+# Full second-by-second retention exists for the October JS export; every other
+# clip gets the points Studio reports (1 s, 2 s, 3 s, 6 s, 25 % and 50 % of the
+# clip). Points are [second, % of viewers still watching].
+def load_curves():
+    try:
+        d = json.load(open(ROOT + r'\_wk1031_js_retfull.json', encoding='utf-8'))
+        return {k: v for k, v in d['ret'].items() if isinstance(v, list) and len(v) > 4}
+    except FileNotFoundError:
+        return {}
+CURVES = load_curves()
+
+# Likes / comments / shares from the Studio item lists (latest capture wins).
+def load_engagement():
+    eng = {}
+    for f in sorted(os.listdir(ROOT)):
+        if not (f.startswith('_wk') and f.endswith('.json')):
+            continue
+        try:
+            d = json.load(open(os.path.join(ROOT, f), encoding='utf-8'))
+        except ValueError:
+            continue
+        items = d.get('items') if isinstance(d, dict) else d
+        for x in items if isinstance(items, list) else []:
+            if isinstance(x, dict) and x.get('id') and x.get('l') is not None:
+                eng[str(x['id'])] = (int(x['l']), int(x.get('c') or 0), int(x.get('s') or 0))
+    return eng
+ENGAGEMENT = load_engagement()
+
+def analysis_of(c):
+    a = {}
+    full_curve = CURVES.get(c['id'])
+    # A curve captured while the clip was still young disagrees with the later
+    # C1; trust the curve only when its 2-second point matches C1.
+    if full_curve and not any(ms == 2000 and abs(v - c['c1']) <= 0.03 for ms, v in full_curve):
+        full_curve = None
+    if full_curve:
+        pts = [[round(ms / 1000, 1), round(v * 100)] for ms, v in full_curve]
+        step = max(1, len(pts) // 40)
+        a['ret'] = pts[::step] + ([pts[-1]] if (len(pts) - 1) % step else [])
+        a['retFull'] = True
+    else:
+        c1, dur = c['c1'], c['dur']
+        pts = {0: 100, 2: c1 * 100}
+        if c.get('r1') is not None:
+            pts[1] = c['r1'] * 100
+        if c.get('r3') is not None:
+            pts[3] = c['r3'] * 100
+        if dur > 6:
+            pts[6] = c1 * c['c3'] * 100
+        pts[round(dur * 0.25, 1)] = c1 * c['c2'] * 100
+        pts[round(dur * 0.5, 1)] = c1 * c['c4'] * 100
+        a['ret'] = [[t, round(v)] for t, v in sorted(pts.items())]
+    eng = ENGAGEMENT.get(c['id']) or (c.get('eng') if c.get('eng') and c['eng'][0] is not None else None)
+    if eng:
+        a['eng'] = [int(eng[0]), int(eng[1] or 0), int(eng[2] or 0)]
+    v = c.get('vis')
+    if v and v.get('m0') is not None:
+        # first frame brightness / colour / detail and how much the picture
+        # changes at 1 s and 2 s; flags: blank first frame, almost no motion
+        a['vis'] = {'m': v['m0'], 's': v['s0'], 'e': v['e0'], 'd1': v['d1'], 'd2': v['d2'],
+                    'blank': bool(v.get('dark')), 'still': bool(v.get('static'))}
+    return a
+
 out = []
 for c in clips:
     if c['tag'] or c['views'] < MIN_VIEWS:
@@ -112,6 +178,7 @@ for c in clips:
         'date': c['date'], 'views': c['views'], 'dur': c['dur'],
         'c1': round(c['c1'], 3), 'c2': round(c['c2'], 3), 'c3': round(c['c3'], 3), 'c4': round(c['c4'], 3),
         'caption': caption[:140], 'format': fmt, 'funnel': funnel_of(c, fmt), 'segment': segment_of(c, fmt),
+        **analysis_of(c),
     })
 
 # Clips someone has watched end to end override the caption guesses: format,

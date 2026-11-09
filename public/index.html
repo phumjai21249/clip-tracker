@@ -839,6 +839,78 @@
         .ha-stats b { color: var(--text); }
         .ha-stats a { margin-left: auto; color: var(--text-2); display: inline-flex; align-items: center; gap: 2px; text-decoration: none; font-weight: 700; }
         .ha-stats a:hover { color: var(--brand-text); }
+        .ha-open { justify-content: center; font-size: 0.8rem; padding: 7px 10px; }
+        .ha-open .material-icons-round { font-size: 18px; }
+        .modal.ha-modal { max-width: 1080px; }
+        .ha-an { display: grid; grid-template-columns: 300px minmax(0, 1fr); gap: 20px; align-items: start; }
+        .ha-an-left { position: sticky; top: 0; display: flex; flex-direction: column; gap: 10px; }
+        .ha-an-left .ha-player { max-width: none; }
+        .ha-facts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+        .ha-fact { background: var(--surface-2); border-radius: var(--radius-sm); padding: 7px 8px; }
+        .ha-fact span { display: block; font-size: 0.68rem; font-weight: 700; color: var(--text-2); }
+        .ha-fact b { font-size: 0.9rem; color: var(--text); }
+        .ha-an-right { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+        .ha-an-head h4 { font-size: 1rem; font-weight: 800; color: var(--text); margin: 0 0 8px; line-height: 1.45; }
+        .ha-sec { border: 1px solid var(--border); border-radius: var(--radius-md); padding: 14px 16px; background: var(--surface); }
+        .ha-sec-h { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 10px; margin-bottom: 10px; }
+        .ha-sec-h h5 { font-size: 0.9rem; font-weight: 800; color: var(--text); margin: 0; }
+        .ha-sec-h small { font-size: 0.7rem; color: var(--text-2); text-align: right; }
+        .ha-verdict { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+        .ha-verdict li { display: grid; grid-template-columns: 22px minmax(0, 1fr); gap: 8px; font-size: 0.84rem; line-height: 1.55; color: var(--text); }
+        .ha-verdict .material-icons-round { font-size: 20px; }
+        .ha-good { color: var(--st-done-text); }
+        .ha-bad { color: var(--danger-text); }
+        .ha-warn { color: var(--warning-text); }
+        .ha-unk { color: var(--text-3); }
+        .ha-scores { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+        .ha-score { border-radius: var(--radius-sm); background: var(--surface-2); padding: 10px; display: flex; flex-direction: column; gap: 3px; }
+        .ha-score .k { font-size: 0.7rem; font-weight: 800; color: var(--text-2); }
+        .ha-score .v { font-size: 1.35rem; font-weight: 800; color: var(--text); line-height: 1.1; }
+        .ha-score .n { font-size: 0.72rem; color: var(--text-2); line-height: 1.35; }
+        .ha-lv { align-self: flex-start; font-size: 0.68rem; font-weight: 800; border-radius: 99px; padding: 1px 8px; }
+        .ha-lv.lv-str, .ha-lv.lv-tgt { background: var(--st-done-bg); color: var(--st-done-text); }
+        .ha-lv.lv-min { background: var(--warning-bg); color: var(--warning-text); }
+        .ha-lv.lv-low { background: var(--danger-bg); color: var(--danger-text); }
+        .ha-chart { width: 100%; height: auto; display: block; }
+        .ha-chart .gl { stroke: var(--border); stroke-width: 1; }
+        .ha-chart .yl, .ha-chart .xl, .ha-chart .zl { fill: var(--text-2); font-size: 11px; font-family: inherit; }
+        .ha-chart .yl { text-anchor: end; }
+        .ha-chart .xl { text-anchor: middle; }
+        .ha-chart .z3 { fill: var(--brand-soft); }
+        .ha-chart .ln { fill: none; stroke: var(--brand); stroke-width: 2.5; stroke-linejoin: round; }
+        .ha-chart .ln.dash { stroke-dasharray: 6 4; }
+        .ha-chart .dr { stroke: var(--danger); stroke-width: 4; stroke-linecap: round; }
+        .ha-chart .pt { fill: var(--brand); }
+        .ha-chart .pl { fill: var(--text); font-size: 11px; font-weight: 700; text-anchor: middle; font-family: inherit; }
+        .ha-chart .ref { fill: var(--surface); stroke: var(--text-2); stroke-width: 1.5; }
+        .ha-legend { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 0.72rem; color: var(--text-2); margin-top: 6px; }
+        .ha-legend i { display: inline-block; width: 16px; height: 3px; vertical-align: middle; margin-right: 5px; border-radius: 2px; }
+        .ha-note { font-size: 0.8rem; color: var(--text); line-height: 1.55; margin-top: 8px; }
+        .ha-rows { display: flex; flex-direction: column; }
+        .ha-row { display: grid; grid-template-columns: 130px minmax(0, 1fr); gap: 10px; padding: 9px 0; border-top: 1px solid var(--border); font-size: 0.82rem; line-height: 1.55; color: var(--text); }
+        .ha-row:first-child { border-top: 0; padding-top: 0; }
+        .ha-row > span:first-child { font-weight: 800; color: var(--text-2); font-size: 0.76rem; }
+        .ha-row em { font-style: normal; color: var(--text-2); }
+        .ha-checks { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+        .ha-checks li { display: grid; grid-template-columns: 22px minmax(0, 1fr); gap: 8px; font-size: 0.82rem; line-height: 1.5; color: var(--text); }
+        .ha-checks .material-icons-round { font-size: 20px; }
+        .ha-checks small { display: block; color: var(--text-2); font-size: 0.74rem; }
+        .ha-brief { white-space: pre-wrap; overflow-wrap: anywhere; font-family: inherit; font-size: 0.8rem; line-height: 1.6; color: var(--text); background: var(--surface-2); border-radius: var(--radius-sm); padding: 12px; margin: 0; }
+        .ha-brief-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+        .ha-sim { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 8px; }
+        .ha-sim button { all: unset; cursor: pointer; display: grid; grid-template-columns: 44px minmax(0, 1fr); gap: 8px; align-items: center; border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 6px; }
+        .ha-sim button:hover { border-color: var(--border-strong); }
+        .ha-sim button:focus-visible { outline: 2px solid var(--brand); outline-offset: 1px; }
+        .ha-sim img, .ha-sim .ph { width: 44px; height: 60px; object-fit: cover; border-radius: 4px; background: #1c1f26; display: block; }
+        .ha-sim b { display: block; font-size: 0.8rem; color: var(--st-done-text); }
+        .ha-sim span { font-size: 0.74rem; color: var(--text); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        @media (max-width: 860px) {
+            .ha-an { grid-template-columns: 1fr; }
+            .ha-an-left { position: static; }
+            .ha-an-left .ha-player { max-width: 300px; }
+            .ha-scores { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+            .ha-row { grid-template-columns: 1fr; gap: 2px; }
+        }
         .ha-player { width: 100%; max-width: 340px; aspect-ratio: 9 / 16; border: 0; border-radius: var(--radius-md); background: #000; display: block; margin: 0 auto; }
         .ha-empty { padding: 30px 20px; text-align: center; color: var(--text-2); font-size: 0.86rem; }
         @media (max-width: 640px) {
@@ -2213,9 +2285,9 @@
 
     <!-- HOOK ALBUM PLAYER -->
     <div class="modal-overlay" id="haModalOverlay">
-        <div class="modal" role="dialog" aria-modal="true" aria-labelledby="haModalTitle">
+        <div class="modal ha-modal" role="dialog" aria-modal="true" aria-labelledby="haModalTitle">
             <div class="modal-header">
-                <h3><span class="material-icons-round">play_circle</span><span id="haModalTitle">ดูคลิป</span></h3>
+                <h3><span class="material-icons-round">insights</span><span id="haModalTitle">วิเคราะห์คลิป</span></h3>
                 <button class="modal-close" onclick="closeHookPlayer()" aria-label="ปิด"><span class="material-icons-round">close</span></button>
             </div>
             <div class="modal-body" id="haModalBody"></div>
@@ -5124,20 +5196,284 @@
                         : `<div class="ha-trick guess">ยังไม่ได้ดูคลิปนี้ — จัดหมวดจากแคปชัน</div>`}
                     <div class="ha-stats"><span>ดูต่อถึง 6 วิ <b>${haPct(c.c3)}</b></span><span>${formatDate(c.date).replace(/ \d{4}$/, '')}</span>
                         <a href="${escAttr(c.url)}" target="_blank" rel="noopener">TikTok<span class="material-icons-round" style="font-size:14px">open_in_new</span></a></div>
+                    <button type="button" class="btn ha-open" onclick="openHookPlayer('${c.id}')"><span class="material-icons-round">insights</span>ดูการวิเคราะห์</button>
                 </div>
             </article>`;
         }).join('');
     }
     function haSetFunnel(k) { haFunnel = haFunnel === k ? '' : k; renderHookAlbum(); }
 
-    // The player loads only when asked: one embed, not one per card.
+    // ---------- Per-clip analysis ----------
+    // Everything below is computed from hook-album.json: Studio retention
+    // (C1–C4 + the curve), what was seen when the clip was watched (hook,
+    // trick, note), first-frame picture stats, and the shop's own 3-second
+    // rules (ศึกษาการตัดต่อ 8 พ.ย.). Nothing is invented: a check the data
+    // cannot answer says so.
+    const HA_METRICS = [
+        { k: 'c1', id: 'C1', name: 'ค้างถึงวิ 2', what: 'คนที่ยังดูอยู่ที่วินาทีที่ 2' },
+        { k: 'c2', id: 'C2', name: 'ดูถึง 25%', what: 'ของคนที่ผ่านวิ 2 ดูถึง 1 ใน 4 ของคลิป' },
+        { k: 'c3', id: 'C3', name: 'ดูต่อถึงวิ 6', what: 'ของคนที่ผ่านวิ 2 ยังอยู่ที่วิ 6' },
+        { k: 'c4', id: 'C4', name: 'ดูถึงครึ่งคลิป', what: 'ของคนที่ผ่านวิ 2 ดูถึงครึ่งคลิป' },
+    ];
+    const HA_TEMPLATES = {
+        A: { name: 'A · ทีเซอร์ / เปิดลึกลับ', rule: 'เปิดภาพมืดหรือเห็นครึ่งเดียว ค่อยๆ เผยใน 1–5 วิ จบด้วยคำถาม "เดาสิสีอะไร" ยาว 15–35 วิ โพสต์ก่อนของเข้า 3–5 วัน' },
+        B: { name: 'B · VS จอแยก', rule: 'แบ่งจอ 2 รุ่นใส่เท้าจริงเคลื่อนไหวพร้อมกัน ยาว 5–8 วิ ไม่ต้องพูด แคปชันถาม "ชอบแบบไหน"' },
+        C: { name: 'C · ลิสต์คำตอบ / พูดหน้ากล้อง', rule: 'คนพูดหน้ากล้อง รองเท้าอยู่ในเฟรมตั้งแต่วิแรก หัวข้อใหญ่ครึ่งบนเป็นคำสัญญา แต่ละข้อมีป้ายหมวดแล้วหยิบรุ่นขึ้นมา' },
+        D: { name: 'D · ช่วงเวลาจริง / เรื่องเล่า', rule: 'ถ่ายมือถือ ไม่ต้องจัดไฟ คนจริงทำจริงหรือพนักงานเล่นเป็นเรื่อง ช็อตแรกยาว ตัวหนังสือไม่เกินหนึ่งประโยค' },
+    };
+    const HA_CTA = {
+        TOFU: 'ปิดด้วยคำถามให้คอมเมนต์ ยังไม่ต้องขาย',
+        MOFU: 'ปิดด้วยคำถาม "ชอบคู่ไหน" หรือชวนทักถามไซซ์',
+        BOFU: 'ราคา/โปรใส่หลังวิ 3 เท่านั้น แล้วชวนกดตะกร้าหรือทักแชท',
+    };
+    let haStatsCache = null;
+    function haMedian(arr) {
+        const a = arr.slice().sort((x, y) => x - y);
+        if (!a.length) return 0;
+        return a.length % 2 ? a[(a.length - 1) / 2] : (a[a.length / 2 - 1] + a[a.length / 2]) / 2;
+    }
+    function haStats() {
+        if (haStatsCache) return haStatsCache;
+        const cs = hookAlbum.clips, vis = cs.filter(c => c.vis).map(c => c.vis);
+        const st = { sorted: {}, med: {}, vis: {} };
+        HA_METRICS.forEach(m => { st.sorted[m.k] = cs.map(c => c[m.k]).sort((x, y) => x - y); st.med[m.k] = haMedian(st.sorted[m.k]); });
+        st.at2 = st.med.c1;
+        st.at6 = haMedian(cs.filter(c => c.dur > 6).map(c => c.c1 * c.c3));
+        ['m', 's', 'd1', 'd2'].forEach(k => { st.vis[k] = haMedian(vis.map(v => v[k])); });
+        return (haStatsCache = st);
+    }
+    // Share of album clips this clip beats on one measure.
+    function haBeats(k, v) {
+        const a = haStats().sorted[k];
+        let i = 0;
+        while (i < a.length && a[i] < v) i++;
+        return Math.round(i / a.length * 100);
+    }
+    function haLevel(id, v) {
+        const k = haKpi(id);
+        if (v >= k.str) return { t: 'เป้าสูง', c: 'lv-str' };
+        if (v >= k.tgt) return { t: 'ถึงเป้า', c: 'lv-tgt' };
+        if (v >= k.min) return { t: 'ขั้นต่ำ', c: 'lv-min' };
+        return { t: 'ต่ำกว่าเกณฑ์', c: 'lv-low' };
+    }
+    function haKpi(id) { return (window.KPI_DEFS || []).find(x => x.id === id); }
+    function haNum(n) { return n >= 1000 ? (n / 1000).toFixed(n >= 10000 ? 0 : 1) + 'K' : String(n); }
+    function haTemplate(c) {
+        const h = c.hook || '';
+        if (/ทีเซอร์/.test(c.format) || /เปิดลึกลับ/.test(h)) return 'A';
+        if (/เปรียบเทียบ/.test(c.format)) return 'B';
+        if (/พูดหน้ากล้อง/.test(h) || /ลิสต์|ความรู้/.test(c.format)) return 'C';
+        if (/คนจริง|ละคร|พิธีกร/.test(h) || /คนจริง|รีวิว|ละคร|เบื้องหลัง/.test(c.format)) return 'D';
+        return '';
+    }
+    // Biggest fall between two neighbouring points of the curve.
+    function haBiggestDrop(pts) {
+        let best = null;
+        for (let i = 1; i < pts.length; i++) {
+            const d = pts[i - 1][1] - pts[i][1];
+            if (!best || d > best.d) best = { a: pts[i - 1][0], b: pts[i][0], d, i };
+        }
+        return best;
+    }
+    function haRel(v, med) {
+        if (!med) return 'พอๆ กับคลิปทั่วไป';
+        if (v > med * 1.25) return 'มากกว่าคลิปทั่วไป';
+        if (v < med * 0.75) return 'น้อยกว่าคลิปทั่วไป';
+        return 'พอๆ กับคลิปทั่วไป';
+    }
+
+    function haChart(c) {
+        const pts = c.ret || [], st = haStats();
+        const W = 560, H = 210, L = 38, R = 14, T = 14, B = 26;
+        const xMax = Math.max(c.dur, pts.length ? pts[pts.length - 1][0] : 0) || 1;
+        const x = t => (L + t / xMax * (W - L - R)).toFixed(1);
+        const y = v => (T + (100 - v) / 100 * (H - T - B)).toFixed(1);
+        let g = '';
+        [0, 25, 50, 75, 100].forEach(v => { g += `<line class="gl" x1="${L}" x2="${W - R}" y1="${y(v)}" y2="${y(v)}"/><text class="yl" x="${L - 6}" y="${Number(y(v)) + 4}">${v}%</text>`; });
+        g += `<rect class="z3" x="${x(0)}" y="${T}" width="${(x(Math.min(3, xMax)) - x(0)).toFixed(1)}" height="${H - T - B}"/><text class="zl" x="${Number(x(0)) + 4}" y="${H - B - 6}">3 วิแรก</text>`;
+        const step = xMax <= 15 ? 3 : xMax <= 40 ? 5 : xMax <= 90 ? 10 : 20;
+        for (let t = 0; t <= xMax + 0.01; t += step) g += `<text class="xl" x="${x(t)}" y="${H - 6}">${t}</text>`;
+        if (pts.length > 1) {
+            g += `<path class="ln${c.retFull ? '' : ' dash'}" d="${pts.map((p, i) => (i ? 'L' : 'M') + x(p[0]) + ' ' + y(p[1])).join(' ')}"/>`;
+            const dr = haBiggestDrop(pts);
+            if (dr && dr.d > 0) g += `<line class="dr" x1="${x(dr.a)}" y1="${y(pts[dr.i - 1][1])}" x2="${x(dr.b)}" y2="${y(pts[dr.i][1])}"/>`;
+        }
+        g += `<circle class="ref" cx="${x(2)}" cy="${y(st.at2 * 100)}" r="5"/>`;
+        if (xMax > 6) g += `<circle class="ref" cx="${x(6)}" cy="${y(st.at6 * 100)}" r="5"/>`;
+        // Dots on the measured points; % labels go to second 2 and 6 first
+        // (the KPI points), then to others where they don't collide.
+        const shown = pts.filter((p, i) => i > 0 && (c.retFull ? [1, 2, 3, 6].includes(p[0]) || i === pts.length - 1 : true));
+        shown.forEach(p => { g += `<circle class="pt" cx="${x(p[0])}" cy="${y(p[1])}" r="3.5"/>`; });
+        const labelled = [];
+        shown.slice().sort((p, q) => ([2, 6].includes(q[0]) - [2, 6].includes(p[0]))).forEach(p => {
+            const px = Number(x(p[0]));
+            if (labelled.some(lx => Math.abs(lx - px) < 28)) return;
+            labelled.push(px);
+            g += `<text class="pl" x="${px}" y="${Number(y(p[1])) - 8}">${p[1]}%</text>`;
+        });
+        const label = `กราฟคนดู: วิ 2 เหลือ ${haPct(c.c1)}` + (pts.length ? `, จบที่ ${pts[pts.length - 1][1]}%` : '');
+        return `<svg class="ha-chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="${escAttr(label)}">${g}</svg>`;
+    }
+
+    function haVerdict(c) {
+        const st = haStats(), out = [];
+        const k1 = haKpi('C1'), k3 = haKpi('C3'), k4 = haKpi('C4');
+        const b1 = haBeats('c1', c.c1);
+        if (c.c1 >= k1.tgt) out.push(['good', `ฮุกแรง: วิ 2 ยังเหลือคนดู ${haPct(c.c1)} (คลิปทั่วไปในคลังเหลือ ${haPct(st.med.c1)}) ดีกว่า ${b1}% ของคลัง`]);
+        else out.push(['bad', `ฮุกยังไม่ถึงเป้า: วิ 2 เหลือคนดู ${haPct(c.c1)} เป้าคือ ${haPct(k1.tgt)}`]);
+        const dr = haBiggestDrop(c.ret || []);
+        if (dr && dr.d > 0) out.push(['warn', `คนหลุดมากสุดช่วงวิ ${dr.a}–${dr.b}: หายไป ${dr.d} จุด` + (dr.a < 2 ? ' (ปัดทิ้งตั้งแต่ต้นคลิป เป็นเรื่องปกติของทุกคลิป)' : '')]);
+        if (c.dur > 6) {
+            if (c.c3 >= k3.tgt) out.push(['good', `หลังฮุกยังรั้งคนได้: คนที่ผ่านวิ 2 อยู่ต่อถึงวิ 6 ได้ ${haPct(c.c3)}`]);
+            else out.push(['bad', `หลังฮุกคนหลุดเร็ว: คนที่ผ่านวิ 2 อยู่ถึงวิ 6 แค่ ${haPct(c.c3)} (เป้า ${haPct(k3.tgt)}) ควรเข้าเรื่องหรือให้คำตอบเร็วขึ้นช่วงวิ 3–5`]);
+        }
+        if (c.c4 >= k4.tgt) out.push(['good', `เนื้อกลางคลิปดึงคนได้: ดูถึงครึ่งคลิป ${haPct(c.c4)} ของคนที่ผ่านวิ 2`]);
+        else if (c.c4 < k4.min) out.push(['bad', `กลางคลิปยังยืด: ดูถึงครึ่งคลิปแค่ ${haPct(c.c4)}` + (c.dur > 30 ? ` คลิปยาว ${c.dur} วิ ลองตัดให้สั้นลง หรือเก็บคำตอบไว้ท้ายคลิป` : ' ลองเก็บคำตอบหรือเฉลยไว้ท้ายคลิป')]);
+        if (c.eng && c.views) {
+            const sh = c.eng[2] / c.views * 1000, kb5 = haKpi('B5');
+            if (sh >= kb5.tgt) out.push(['good', `คนแชร์ต่อ ${sh.toFixed(1)} ครั้งต่อ 1,000 วิว (เป้าช่อง ${kb5.tgt})`]);
+        }
+        return out;
+    }
+
+    function haChecks(c) {
+        const st = haStats(), v = c.vis, k1 = haKpi('C1'), k3 = haKpi('C3');
+        const promo = /โปร|ลดราคา|ไลฟ์/.test(c.format);
+        const rows = [];
+        rows.push(c.hook
+            ? [/สินค้าเต็มจอ/.test(c.hook) ? 'bad' : 'good', 'เปิดด้วยคน คำถาม หรือภาพลึกลับ', `จากการดูคลิป: ${c.hook}`]
+            : ['unk', 'เปิดด้วยคน คำถาม หรือภาพลึกลับ', 'ยังไม่ได้ดูคลิปนี้ ต้องเปิดดูเอง']);
+        rows.push(c.hook
+            ? [/สินค้าเต็มจอ/.test(c.hook) ? 'bad' : 'good', 'เฟรมแรกไม่ดูเหมือนโฆษณา (ไม่มีราคา SALE LIVE ภาพโปสเตอร์)', /สินค้าเต็มจอ/.test(c.hook) ? 'เปิดด้วยสินค้าเต็มจอ' : 'จากการดูคลิป']
+            : [promo ? 'warn' : 'unk', 'เฟรมแรกไม่ดูเหมือนโฆษณา (ไม่มีราคา SALE LIVE ภาพโปสเตอร์)', promo ? 'เป็นคลิปโปร/ไลฟ์ เสี่ยงเปิดด้วยราคา ต้องเปิดดู' : 'ยังไม่ได้ดูคลิปนี้ ต้องเปิดดูเอง']);
+        if (v) {
+            rows.push([v.still ? 'bad' : 'good', '3 วิแรกภาพขยับ ไม่ใช่ภาพนิ่ง', v.still ? 'ภาพแทบไม่เปลี่ยนเลยใน 2 วิแรก' : 'วัดจากความต่างของภาพวิ 0–2']);
+            const jump = v.d1 > st.vis.d1 * 1.8 || v.d2 > st.vis.d2 * 1.8;
+            rows.push([jump ? 'warn' : 'good', 'วิ 1–3 เป็นช็อตต่อเนื่อง ไม่ตัด ไม่เด้งสติกเกอร์', jump ? 'ภาพเปลี่ยนแรงช่วงวิ 1–2 อาจมีการตัดหรือเด้งกราฟิก ควรเปิดดูซ้ำ' : 'ภาพเปลี่ยนไม่แรงกว่าคลิปทั่วไป']);
+        } else {
+            rows.push(['unk', '3 วิแรกภาพขยับ ไม่ใช่ภาพนิ่ง', 'ไม่มีข้อมูลภาพของคลิปนี้']);
+            rows.push(['unk', 'วิ 1–3 เป็นช็อตต่อเนื่อง ไม่ตัด ไม่เด้งสติกเกอร์', 'ไม่มีข้อมูลภาพของคลิปนี้']);
+        }
+        rows.push([c.c1 >= k1.tgt ? 'good' : 'bad', `คนดูผ่านวิ 2 ได้ถึงเป้า ${haPct(k1.tgt)}`, `คลิปนี้ ${haPct(c.c1)}`]);
+        if (c.dur > 6) rows.push([c.c3 >= k3.tgt ? 'good' : 'bad', `หลังวิ 2 ยังรั้งคนไว้ถึงวิ 6 ได้ถึงเป้า ${haPct(k3.tgt)}`, `คลิปนี้ ${haPct(c.c3)} ของคนที่ผ่านวิ 2`]);
+        return rows;
+    }
+
+    function haBrief(c) {
+        const tp = haTemplate(c), seg = HA_SEGMENTS[c.segment] || '';
+        const k3 = haKpi('C3');
+        const lines = [
+            `สูตรจากคลิป: ${c.caption === '(แฮชแท็กล้วน)' ? (c.note || 'ไม่มีแคปชัน') : c.caption}`,
+            `ลิงก์ต้นฉบับ: ${c.url}`,
+            `ผล: วิ 2 เหลือคนดู ${haPct(c.c1)} · ดูต่อถึงวิ 6 ${haPct(c.c3)} · ยาว ${c.dur} วิ`,
+            `ฮุก 0–2 วิ: ${c.hook ? c.hook + (c.trick ? ' — ' + c.trick : '') : 'เปิดดูคลิปต้นฉบับแล้วเลียนแบบ 2 วิแรก'}`,
+            `แบบคลิป: ${c.format}${tp ? ' · เทมเพลต ' + HA_TEMPLATES[tp].name : ''}`,
+            tp ? `วิธีทำ: ${HA_TEMPLATES[tp].rule}` : '',
+            `วิ 1–3: ช็อตเดียวต่อเนื่อง ไม่ตัด ไม่เด้งสติกเกอร์` + (c.c3 < k3.tgt ? ' · คลิปต้นฉบับหลุดช่วงวิ 2–6 ให้เข้าเรื่องเร็วกว่าเดิม' : ''),
+            `ปิดท้าย: ${HA_CTA[c.funnel]}`,
+            `กลุ่มลูกค้า: ${seg} · ${HA_FUNNELS[c.funnel].key}`,
+        ];
+        return lines.filter(Boolean).join('\n');
+    }
+
+    function haSimilar(c) {
+        const same = x => x.id !== c.id && (c.hook ? x.hook === c.hook : x.format === c.format && x.funnel === c.funnel);
+        return hookAlbum.clips.filter(same).sort((a, b) => b.c1 - a.c1).slice(0, 4);
+    }
+
     function openHookPlayer(id) {
         const c = hookAlbum && hookAlbum.clips.find(x => x.id === id);
         if (!c) return;
-        document.getElementById('haModalTitle').textContent = `ฮุก ${haPct(c.c1)} · ${c.ch === 'JS' ? 'JS SPORT' : 'ME SPORT'} · ${formatDate(c.date)}`;
-        document.getElementById('haModalBody').innerHTML = `<iframe class="ha-player" src="https://www.tiktok.com/embed/v2/${encodeURIComponent(c.id)}" allow="encrypted-media; fullscreen" allowfullscreen title="คลิป TikTok"></iframe>`;
+        haCurrent = c;
+        const st = haStats(), f = HA_FUNNELS[c.funnel], tp = haTemplate(c);
+        const title = c.caption === '(แฮชแท็กล้วน)' ? (c.note || 'ไม่มีแคปชัน') : c.caption;
+        const chName = c.ch === 'JS' ? 'JS SPORT' : 'ME SPORT';
+        document.getElementById('haModalTitle').textContent = `วิเคราะห์คลิป · ${chName} · ${formatDate(c.date)}`;
+        const facts = [['วิว', haNum(c.views)], ['ยาว', c.dur + ' วิ'], ['ลง', formatDate(c.date).replace(/ \d{4}$/, '')]];
+        if (c.eng) {
+            facts.push(['ไลก์', haNum(c.eng[0])], ['คอมเมนต์', haNum(c.eng[1])], ['แชร์', haNum(c.eng[2])]);
+        }
+        const icon = { good: 'check_circle', bad: 'cancel', warn: 'error', unk: 'help' };
+        const v = c.vis;
+        const scores = HA_METRICS.map(m => {
+            const lv = haLevel(m.id, c[m.k]);
+            return `<div class="ha-score"><span class="k">${m.id} · ${m.name}</span><span class="v">${haPct(c[m.k])}</span>
+                <span class="ha-lv ${lv.c}">${lv.t}</span>
+                <span class="n">${m.what} · ดีกว่า ${haBeats(m.k, c[m.k])}% ของคลัง</span></div>`;
+        }).join('');
+        const sim = haSimilar(c);
+        document.getElementById('haModalBody').innerHTML = `<div class="ha-an">
+            <div class="ha-an-left">
+                <iframe class="ha-player" src="https://www.tiktok.com/embed/v2/${encodeURIComponent(c.id)}" allow="encrypted-media; fullscreen" allowfullscreen title="คลิป TikTok"></iframe>
+                <div class="ha-facts">${facts.map(([k, x]) => `<div class="ha-fact"><span>${k}</span><b>${x}</b></div>`).join('')}</div>
+            </div>
+            <div class="ha-an-right">
+                <div class="ha-an-head">
+                    <h4>${escHtml(title)}</h4>
+                    <div class="ha-tags"><span class="ha-tag f-${c.funnel}">${f.key.split(' · ')[0]} · ${f.title}</span>
+                        ${c.hook ? `<span class="ha-tag hk">${escHtml(c.hook)}</span>` : ''}
+                        <span class="ha-tag">${escHtml(c.format)}</span>
+                        <span class="ha-tag">${HA_SEGMENTS[c.segment] || ''}</span>
+                        <span class="ha-tag">${c.reviewed ? 'ดูคลิปแล้ว' : 'จัดหมวดจากแคปชัน'}</span></div>
+                </div>
+
+                <section class="ha-sec"><div class="ha-sec-h"><h5>สรุปคลิปนี้</h5><small>จาก TikTok Studio เทียบกับ ${hookAlbum.clips.length} คลิปในคลัง</small></div>
+                    <ul class="ha-verdict">${haVerdict(c).map(([t, x]) => `<li><span class="material-icons-round ha-${t}">${icon[t]}</span><span>${escHtml(x)}</span></li>`).join('')}</ul></section>
+
+                <section class="ha-sec"><div class="ha-sec-h"><h5>คะแนนการรั้งคนดู</h5><small>ป้ายสี = เทียบเกณฑ์ KPI C1–C4 ของร้าน</small></div>
+                    <div class="ha-scores">${scores}</div></section>
+
+                <section class="ha-sec"><div class="ha-sec-h"><h5>กราฟคนดูหลุดตามวินาที</h5><small>${c.retFull ? 'รายวินาทีจาก Studio' : 'จุดวัดจาก Studio (เส้นประ = ลากระหว่างจุด)'}</small></div>
+                    ${haChart(c)}
+                    <div class="ha-legend"><span><i style="background:var(--brand)"></i>คลิปนี้</span><span><i style="background:var(--danger)"></i>ช่วงที่คนหลุดมากสุด</span><span><i style="background:var(--text-2);height:8px;width:8px;border-radius:50%"></i>คลิปทั่วไปในคลัง (วิ 2 ${haPct(st.at2)} · วิ 6 ${haPct(st.at6)})</span></div></section>
+
+                <section class="ha-sec"><div class="ha-sec-h"><h5>แกะสูตรคลิป</h5><small>${c.reviewed ? 'จากการดูคลิปจริง' : 'ยังไม่ได้ดูคลิป ข้อมูลบางช่องมาจากแคปชัน'}</small></div>
+                    <div class="ha-rows">
+                        <div class="ha-row"><span>ฮุก 0–2 วิ</span><span>${c.hook ? `<b>${escHtml(c.hook)}</b>${c.trick ? ' — ' + escHtml(c.trick) : ''}` : '<em>ยังไม่ได้ดูคลิปนี้ กดเล่นคลิปด้านซ้ายแล้วดู 2 วิแรก</em>'}</span></div>
+                        ${c.note ? `<div class="ha-row"><span>เกิดอะไรในคลิป</span><span>${escHtml(c.note)}</span></div>` : ''}
+                        <div class="ha-row"><span>รูปแบบคลิป</span><span>${escHtml(c.format)}${tp ? `<br><em>ตรงกับเทมเพลต ${HA_TEMPLATES[tp].name}: ${HA_TEMPLATES[tp].rule}</em>` : ''}</span></div>
+                        <div class="ha-row"><span>ภาพช่วงเปิดคลิป</span><span>${v ? `${v.blank ? 'เฟรมแรกเป็นจอว่าง (ดำหรือขาว) · ' : ''}ความสว่างเฟรมแรก${haRel(v.m, st.vis.m)} · สี${haRel(v.s, st.vis.s)} · ภาพเปลี่ยนที่วิ 1 ${haRel(v.d1, st.vis.d1)} · ที่วิ 2 ${haRel(v.d2, st.vis.d2)}<br><em>วัดจากภาพเฟรมของคลิป</em>` : '<em>ไม่มีข้อมูลภาพของคลิปนี้</em>'}</span></div>
+                        <div class="ha-row"><span>ความยาว</span><span>${c.dur} วิ · <em>${c.dur <= 15 ? 'สั้น เหมาะกับคลิปวนลูป คนดูจบมากสุด' : c.dur <= 30 ? 'กลางๆ ช่วงที่ร้านทำบ่อยสุด' : c.dur <= 60 ? 'ยาว ต้องมีเนื้อหาให้ดูต่อ เช่น ลิสต์ รีวิว VS' : 'ยาวมาก เวลาดูสูง แต่ดูจบน้อย'}</em></span></div>
+                        <div class="ha-row"><span>ลูกค้า & ช่วงซื้อ</span><span>${HA_SEGMENTS[c.segment] || ''} · ${f.key}<br><em>${f.desc}</em></span></div>
+                    </div></section>
+
+                <section class="ha-sec"><div class="ha-sec-h"><h5>เช็กกับกฎ 3 วินาทีแรกของร้าน</h5><small>จากการศึกษาการตัดต่อ 8 พ.ย.</small></div>
+                    <ul class="ha-checks">${haChecks(c).map(([t, x, why]) => `<li><span class="material-icons-round ha-${t}">${icon[t]}</span><span>${escHtml(x)}<small>${escHtml(why)}</small></span></li>`).join('')}</ul></section>
+
+                <section class="ha-sec"><div class="ha-sec-h"><h5>เอาสูตรนี้ไปใช้</h5><small>สรุปเป็นโจทย์ให้คนถ่าย/ตัด</small></div>
+                    <pre class="ha-brief" id="haBrief">${escHtml(haBrief(c))}</pre>
+                    <div class="ha-brief-actions">
+                        <button type="button" class="btn" onclick="haCopyBrief()"><span class="material-icons-round">content_copy</span>คัดลอกสูตร</button>
+                        <button type="button" class="btn btn-primary" onclick="haUseBrief()"><span class="material-icons-round">add</span>ทำคลิปใหม่จากสูตรนี้</button>
+                    </div></section>
+
+                ${sim.length ? `<section class="ha-sec"><div class="ha-sec-h"><h5>${c.hook ? 'คลิปฮุกแบบเดียวกัน' : 'คลิปแบบเดียวกัน'}</h5><small>เรียงตามคนค้างถึงวิ 2</small></div>
+                    <div class="ha-sim">${sim.map(x => `<button type="button" onclick="openHookPlayer('${x.id}')">
+                        ${x.cover ? `<img src="hook-covers/${x.id}.jpg" alt="" loading="lazy">` : '<span class="ph"></span>'}
+                        <span><b>ค้าง 2 วิ ${haPct(x.c1)}</b>${escHtml(x.caption === '(แฮชแท็กล้วน)' ? (x.note || 'ไม่มีแคปชัน') : x.caption)}</span></button>`).join('')}</div></section>` : ''}
+            </div>
+        </div>`;
+        document.getElementById('haModalBody').scrollTop = 0;
         document.getElementById('haModalLink').href = c.url;
         document.getElementById('haModalOverlay').classList.add('open');
+    }
+    let haCurrent = null;
+    function haCopyBrief() {
+        if (!haCurrent) return;
+        const text = haBrief(haCurrent);
+        (navigator.clipboard ? navigator.clipboard.writeText(text) : Promise.reject())
+            .then(() => showToast('คัดลอกสูตรแล้ว', 'success'))
+            .catch(() => showToast('คัดลอกไม่ได้ เลือกข้อความในกล่องแล้วกด Ctrl+C', 'error'));
+    }
+    // Opens the normal "new clip" form with the formula as its description.
+    function haUseBrief() {
+        if (!haCurrent) return;
+        const c = haCurrent;
+        closeHookPlayer();
+        openModal(false);
+        document.getElementById('clipName').value = `สูตร${c.hook ? ' ' + c.hook : ''}: `;
+        document.getElementById('clipDesc').value = haBrief(c);
+        document.getElementById('clipChannel').value = c.ch === 'JS' ? 'JS SPORT SHOP' : 'Me SPORT';
     }
     function closeHookPlayer() {
         document.getElementById('haModalOverlay').classList.remove('open');
@@ -5159,6 +5495,8 @@
     (function () {
 
 const KPI = [{"id": "A1", "grp": "A. ปริมาณ & วินัยรายวัน", "name": "คลิปผลิตใหม่รวมทั้งเดือน", "defn": "คลิปถ่าย/ตัดใหม่ที่โพสต์ในเดือน (2 ช่องรวมกัน) — ไม่นับคลิปตัดไลฟ์ รีโพสต์ สไลด์ภาพนิ่ง", "base": 96, "min": 100, "tgt": 120, "str": 140, "unit": "คลิป", "wt": 5, "dir": "up", "why": "เกณฑ์ผู้บริหาร 4 คลิป/วัน × 30 วัน = 120 · ฐานจริง 96/เดือน · ก.ค. ทำได้ 4.58/วันแล้ว"}, {"id": "A2", "grp": "A. ปริมาณ & วินัยรายวัน", "name": "คลิปช่อง @j.s.sport_shop", "defn": "คลิปผลิตใหม่ของช่อง JS เท่านั้น", "base": 84, "min": 78, "tgt": 90, "str": 100, "unit": "คลิป", "wt": 4, "dir": "up", "why": "★ รีเบสไลน์จากรายการโพสต์จริง: พ.ค. 85 · มิ.ย. 79 · ก.ค. 88 คลิป = 2.63–3.03 คลิป/วัน (ฐาน 84) — ของเดิม 55 ต่ำกว่าจริงมาก เพราะนับเฉพาะคลิปที่ปักตะกร้า · ทีมเกือบถึง 3 คลิป/วันอยู่แล้ว งานที่เหลือคือความสม่ำเสมอ ไม่ใช่การเร่งปริมาณ"}, {"id": "A3", "grp": "A. ปริมาณ & วินัยรายวัน", "name": "คลิปช่อง @mesport80", "defn": "คลิปผลิตใหม่ของช่อง ME เท่านั้น", "base": 40, "min": 26, "tgt": 30, "str": 40, "unit": "คลิป", "wt": 2, "dir": "up", "why": "เกณฑ์ 1 คลิป/วัน = 30 · ฐาน 48/31/42 — ช่องนี้ทำเกินเป้าอยู่แล้ว 1 คลิปคือขั้นต่ำไม่ใช่เพดาน"}, {"id": "A4", "grp": "A. ปริมาณ & วินัยรายวัน", "name": "วันที่ทำครบโควตา (≥ 4 คลิป)", "defn": "จำนวนวันในเดือนที่มีคลิปผลิตใหม่ขึ้นครบ 4 คลิป", "base": 8, "min": 15, "tgt": 22, "str": 26, "unit": "วัน", "wt": 4, "dir": "up", "why": "ฐานเฉลี่ย 8 วัน/เดือน — บางวันลง 0–1 คลิป บางวันลงทีเดียว 11–21 คลิป"}, {"id": "A5", "grp": "A. ปริมาณ & วินัยรายวัน", "name": "จำนวนคลิปที่ปักตะกร้า", "defn": "นับจำนวนคลิปที่มีสินค้าติดในเดือน (นับจาก Clip Tracker) — ไม่ใช่อัตราส่วน เพราะการปักเยอะไม่ได้ดีกว่า", "base": null, "min": 24, "tgt": 32, "str": 45, "unit": "คลิป", "wt": 2, "dir": "up", "why": "เกณฑ์ผู้บริหาร: JS 3 คลิปมีปัก 1 คลิป บางวันไม่มีเลยก็ได้ → ราว 1 คลิป/วัน = 30 คลิป/เดือน · ตั้งเป็นจำนวนไม่ใช่ % เพื่อไม่ให้ตีความว่า 'ปักยิ่งเยอะยิ่งดี'"}, {"id": "A6", "grp": "A. ปริมาณ & วินัยรายวัน", "name": "เพดานคลิปตัดไลฟ์", "defn": "จำนวนคลิปตัดไลฟ์/รีโพสต์ที่ลงได้ — เกินเพดานหักคะแนนรวมอีก 5 คะแนน", "base": 54, "min": 40, "tgt": 30, "str": 20, "unit": "คลิป", "wt": 1, "dir": "down", "why": "163 คลิปตัดไลฟ์ใน 3 เดือน วิวเฉลี่ย 212 — และไม่นับรวมใน A1"}, {"id": "B1", "grp": "B. Reach", "name": "วิวรวมทั้งช่อง JS (Video Views)", "defn": "★ ผลรวม Video Views รายวันของ @j.s.sport_shop จาก TikTok Studio → Analytics → Overview (รวมวิวที่ไหลเข้าคลิปเก่าด้วย) — กรอกรายวันในชีทบันทึกรายวัน", "base": 2645000, "min": 2400000, "tgt": 3100000, "str": 3900000, "unit": "วิว", "wt": 3, "dir": "up", "why": "★ รีเบสไลน์ 29 ก.ค. จาก Studio CSV จริง: พ.ค. 62,364/วัน · มิ.ย. 76,275/วัน · ก.ค. 121,703/วัน → ฐาน 85,313/วัน = 2.645M/เดือน (ของเดิม 1.24M มาจากคลิปที่ปักตะกร้าเท่านั้น = ต่ำกว่าจริง 2 เท่า) · Target 100K/วัน · Stretch = รักษาระดับ ก.ค. ไว้ได้"}, {"id": "B2", "grp": "B. Reach", "name": "Median วิวต่อคลิป", "defn": "ค่ากลางของวิวต่อคลิป (ไม่ใช่ค่าเฉลี่ย เพราะคลิปดัง 10% กินวิวรวม 88%)", "base": 2238, "min": 2000, "tgt": 2600, "str": 3400, "unit": "วิว", "wt": 6, "dir": "up", "why": "★ รีเบสไลน์ 29 ก.ค. จากคลิปจริง 252 ตัวใน TikTok Studio: พ.ค. 1,902 · มิ.ย. 2,865 · ก.ค. 2,238 (ฐาน 2,238) — ของเดิม 1,038 ต่ำกว่าจริง 2.2 เท่า เพราะนับเฉพาะคลิปที่ปักตะกร้า · ตัวเลข ก.ค. 288 ที่เคยรายงานไปนั้นผิด ค่าจริงคือ 2,238"}, {"id": "B3", "grp": "B. Reach", "name": "Hit rate ≥ 10,000 วิว", "defn": "สัดส่วนคลิปผลิตใหม่ที่ทำวิวถึง 10,000 ขึ้นไป", "base": 0.2103, "min": 0.2, "tgt": 0.25, "str": 0.32, "unit": "%", "wt": 3, "dir": "up", "why": "★ รีเบสไลน์จากคลิปจริง 252 ตัว: พ.ค. 18.8% · มิ.ย. 21.5% · ก.ค. 22.7% (ฐาน 21.0%) — ก.ค. ดีที่สุด ไม่ใช่ 8.2% อย่างที่เคยรายงาน"}, {"id": "B4", "grp": "B. Reach", "name": "คลิปที่ทำวิวถึง 100,000", "defn": "จำนวนคลิปผลิตใหม่ที่ทำวิวทะลุแสน (นับจากรายการโพสต์ใน TikTok Studio)", "base": 3.3, "min": 3, "tgt": 5, "str": 7, "unit": "คลิป", "wt": 2, "dir": "up", "why": "★ รีเบสไลน์: 10 คลิปใน 3 เดือน = 3.3/เดือน (พ.ค. 3 · มิ.ย. 5 · ก.ค. 2) — คลิประดับนี้คือตัวที่เอาไปยิงแอดแล้วคุ้มที่สุด"}, {"id": "B5", "grp": "B. Reach", "name": "แชร์ต่อ 1,000 วิว", "defn": "★ Shares ÷ Video Views × 1,000 จาก Studio Overview — แชร์คือสัญญาณที่อัลกอริทึม TikTok ให้น้ำหนักสูงสุดในการปล่อยวิวรอบถัดไป", "base": 1.135, "min": 1.1, "tgt": 1.4, "str": 1.8, "unit": "ครั้ง", "wt": 3, "dir": "up", "why": "★ ตัวชี้วัดใหม่ 29 ก.ค. — ฐานจริงจาก Studio: ม.ค. 0.47 · เม.ย. 0.48 · พ.ค. 1.02 · มิ.ย. 0.82 · ก.ค. 1.43 (ดีที่สุด) · ทีมคุมได้ตรง ๆ ผ่านการออกแบบคลิปให้ 'ส่งต่อได้' และมาก่อนวิว ไม่ใช่ตามหลัง"}, {"id": "C1", "grp": "C. Creative — ฮุก & ดึงคนอยู่", "name": "Hook rate (ยังดูอยู่ที่วินาทีที่ 2)", "defn": "สัดส่วนคนที่ยังดูอยู่ที่วินาทีที่ 2 · ค่าจาก TikTok Studio ของคลิปที่ผลิตทั้ง 2 ช่องรวมกัน (ไม่ใช่แอด) — ค่าเฉลี่ยต่อคลิป นับคลิปที่โพสต์ในเดือน อายุ ≥ 24 ชม. ไม่นับคลิปตัดไลฟ์และคลิปยิง Promote", "base": 0.32, "min": 0.3, "tgt": 0.33, "str": 0.36, "unit": "%", "wt": 6, "dir": "up", "why": "ฐาน = เฉลี่ย ส.ค.–ต.ค. 2026 (33.4 / 32.9 / 29.8%)"}, {"id": "C2", "grp": "C. Creative — ฮุก & ดึงคนอยู่", "name": "Hold rate (ดูถึง 25% ÷ วินาทีที่ 2)", "defn": "คนดูที่ 25% ของความยาวคลิป ÷ คนดูที่วินาทีที่ 2 · ค่าจาก TikTok Studio ของคลิปที่ผลิตทั้ง 2 ช่องรวมกัน (ไม่ใช่แอด) — ค่าเฉลี่ยต่อคลิป นับคลิปที่โพสต์ในเดือน อายุ ≥ 24 ชม. ไม่นับคลิปตัดไลฟ์และคลิปยิง Promote", "base": 0.589, "min": 0.57, "tgt": 0.61, "str": 0.66, "unit": "%", "wt": 8, "dir": "up", "why": "★ ตัวชี้วัดสำคัญที่สุด · ฐาน = เฉลี่ย ส.ค.–ต.ค. 2026 (58.7 / 56.1 / 62.0%)"}, {"id": "C3", "grp": "C. Creative — ฮุก & ดึงคนอยู่", "name": "Deep hold (วินาทีที่ 6 ÷ วินาทีที่ 2)", "defn": "คนดูที่วินาทีที่ 6 ÷ คนดูที่วินาทีที่ 2 · ค่าจาก TikTok Studio ของคลิปที่ผลิตทั้ง 2 ช่องรวมกัน (ไม่ใช่แอด) — ค่าเฉลี่ยต่อคลิป นับคลิปที่โพสต์ในเดือน อายุ ≥ 24 ชม. ไม่นับคลิปตัดไลฟ์และคลิปยิง Promote", "base": 0.423, "min": 0.41, "tgt": 0.44, "str": 0.48, "unit": "%", "wt": 5, "dir": "up", "why": "ฐาน = เฉลี่ย ส.ค.–ต.ค. 2026 (41.7 / 41.8 / 43.4%)"}, {"id": "C4", "grp": "C. Creative — ฮุก & ดึงคนอยู่", "name": "ดูถึงครึ่งคลิป (ครึ่งคลิป ÷ วินาทีที่ 2)", "defn": "คนดูที่ครึ่งคลิป ÷ คนดูที่วินาทีที่ 2 · ค่าจาก TikTok Studio ของคลิปที่ผลิตทั้ง 2 ช่องรวมกัน (ไม่ใช่แอด) — ค่าเฉลี่ยต่อคลิป นับคลิปที่โพสต์ในเดือน อายุ ≥ 24 ชม. ไม่นับคลิปตัดไลฟ์และคลิปยิง Promote", "base": 0.314, "min": 0.3, "tgt": 0.34, "str": 0.37, "unit": "%", "wt": 5, "dir": "up", "why": "ฐาน = เฉลี่ย ส.ค.–ต.ค. 2026 (30.8 / 29.2 / 34.1%) · ตัวนี้บอกว่าเนื้อกลางคลิปมีน้ำหนักพอให้อยู่ต่อไหม"}, {"id": "D1", "grp": "D. Creative → ความสนใจ", "name": "Engagement Rate", "defn": "★ (ไลก์ + คอมเมนต์ + แชร์) ÷ Video Views ทั้งช่อง JS จาก Studio Overview", "base": 0.01153, "min": 0.011, "tgt": 0.013, "str": 0.015, "unit": "%", "wt": 5, "dir": "up", "why": "★ รีเบสไลน์ 29 ก.ค. จาก Studio CSV จริง: พ.ค. 0.96% · มิ.ย. 1.12% · ก.ค. 1.29% (ฐานถ่วงน้ำหนัก 1.15%) — ของเดิม 0.87% ต่ำกว่าจริงเพราะนับเฉพาะคลิปที่ปักตะกร้า · ค่าเฉลี่ยแพลตฟอร์ม 3.85% ยังห่างมาก แต่เทรนด์เราขึ้น 3 เดือนติด"}, {"id": "D2", "grp": "D. Creative → ความสนใจ", "name": "CTR คลิป → สินค้า (organic)", "defn": "คลิกสินค้า ÷ อิมเพรสชันสินค้า ถ่วงน้ำหนักด้วยวิวที่ผูกสินค้า", "base": 0.0598, "min": 0.06, "tgt": 0.068, "str": 0.075, "unit": "%", "wt": 6, "dir": "up", "why": "ช่องเรา 5.98% vs ค่าเฉลี่ยทั้งร้าน 7.1–7.4% — ตัวนี้คือ 'ครีเอทีฟทำให้อยากกดดูสินค้าไหม' ยังไม่ใช่การขาย"}, {"id": "D3", "grp": "D. Creative → ความสนใจ", "name": "CTR ครีเอทีฟแอด", "defn": "CTR เฉลี่ยของแอด auction ทั้งเดือน — วัดฝีมือครีเอทีฟล้วน ไม่มีผลจากราคา", "base": 0.0437, "min": 0.04, "tgt": 0.05, "str": 0.065, "unit": "%", "wt": 4, "dir": "up", "why": "ฐาน 4.37% · ก.ค. ร่วงเหลือ 2.48% · เกณฑ์ Sports & Outdoors อยู่ที่ 0.52% เราสูงกว่ามากแต่เทรนด์ลง"}, {"id": "D4", "grp": "D. Creative → ความสนใจ", "name": "CPC (ต้นทุนต่อคลิก)", "defn": "งบแอด ÷ คลิก — ยิ่งต่ำยิ่งดี · ตัวนี้บอกว่าครีเอทีฟทำงานคุ้มเงินแค่ไหน", "base": 0.366, "min": 0.45, "tgt": 0.35, "str": 0.26, "unit": "฿", "wt": 2, "dir": "down", "why": "★ CPC แพงขึ้น 112% (฿0.26→฿0.55) ทั้งที่ CPM ถูกลง 24% = พิสูจน์ว่าปัญหาคือครีเอทีฟ ไม่ใช่ค่าสื่อ"}, {"id": "E1", "grp": "E. ทดลอง & ฟอร์แมตใหม่", "name": "ฟอร์แมตใหม่ที่ทดลองครบชุด", "defn": "ฟอร์แมตที่ไม่เคยทำมาก่อน และผลิตครบ ≥ 5 คลิปในเดือน (น้อยกว่านี้ตัดสินไม่ได้)", "base": 0, "min": 2, "tgt": 3, "str": 4, "unit": "ฟอร์แมต", "wt": 4, "dir": "up", "why": "ปัจจุบันวนอยู่ 6 ฟอร์แมตเดิม โดย 65% เป็น 'ไซซ์/ฟิต' — ยิ่งลงวันละ 4 คลิป ยิ่งซ้ำเร็ว"}, {"id": "E2", "grp": "E. ทดลอง & ฟอร์แมตใหม่", "name": "ฮุก 3 วินาทีแรกแบบใหม่ที่ทดสอบ", "defn": "จำนวนรูปแบบฮุกที่ไม่เคยใช้ และทดสอบครบ ≥ 3 คลิปต่อแบบ (เช่น ถามคำถาม / โชว์ผลลัพธ์ก่อน / เสียงจริงจากสนาม)", "base": null, "min": 4, "tgt": 6, "str": 8, "unit": "แบบ", "wt": 5, "dir": "up", "why": "★ ตัวนี้คือกลไกที่จะทำให้ C1–C3 ขยับจริง — hold rate จะไม่ดีขึ้นถ้าไม่มีฮุกใหม่เข้ามาทดสอบ"}, {"id": "E3", "grp": "E. ทดลอง & ฟอร์แมตใหม่", "name": "สัดส่วนคลิป 'เปรียบเทียบ/อธิบายความต่าง'", "defn": "คลิปที่เอาสินค้า 2 ตัวขึ้นไปมาเทียบ หรืออธิบายว่าต่างกันยังไง ÷ คลิปผลิตใหม่", "base": 0.049, "min": 0.1, "tgt": 0.15, "str": 0.2, "unit": "%", "wt": 3, "dir": "up", "why": "ฟอร์แมตนี้ ER 3.15% (สูงสุด 3.6 เท่า) เพราะมีเหตุผลให้ดูจนจบ — ตรงกับปัญหา hold rate พอดี"}, {"id": "E4", "grp": "E. ทดลอง & ฟอร์แมตใหม่", "name": "Winner replication", "defn": "คลิป Top-3 ของสัปดาห์ก่อน ต้องถูกทำซ้ำ/ต่อยอด ≥ 2 เวอร์ชันทุกสัปดาห์ (ผ่าน = ครบทั้ง 4 สัปดาห์)", "base": null, "min": 1, "tgt": 1, "str": 1, "unit": "ผ่าน", "wt": 1, "dir": "pass", "why": "คลิปดังกินวิวรวม 88% — การไม่ต่อยอดคลิปที่ติดคือการทิ้งของฟรี"}, {"id": "E5", "grp": "E. ทดลอง & ฟอร์แมตใหม่", "name": "Test log ครบถ้วน", "defn": "ทุกฮุก/ฟอร์แมตที่ทดลองต้องบันทึก: สมมติฐาน / ฮุกที่ใช้ / hold rate 7 วัน / ตัดสินใจ scale หรือ kill", "base": null, "min": 1, "tgt": 1, "str": 1, "unit": "ผ่าน", "wt": 1, "dir": "pass", "why": "ไม่มีบันทึก = ทดลองแล้วไม่ได้ความรู้ ทำซ้ำความผิดเดิมทุกเดือน"}, {"id": "G1", "grp": "G. ระบบ & ประชุม", "name": "ประชุมวันจันทร์ครบทุกสัปดาห์", "defn": "ประชุม 30 นาทีทุกวันจันทร์ พร้อมติ๊กเช็กลิสต์รายสัปดาห์ครบทุกช่อง (ผ่าน = ครบทุกสัปดาห์ในเดือน)", "base": null, "min": 1, "tgt": 1, "str": 1, "unit": "ผ่าน", "wt": 2, "dir": "pass", "why": "ระบบ KPI ที่ไม่มีจังหวะทบทวนจะกลายเป็นตัวเลขที่ดูตอนสิ้นเดือนแล้วแก้อะไรไม่ทัน"}, {"id": "G2", "grp": "G. ระบบ & ประชุม", "name": "Clip Tracker อัปเดตครบ", "defn": "ทุกคลิปถูกบันทึกพร้อมแท็กฮุก/ฟอร์แมต/ช่อง/ปักตะกร้า ภายในวันที่ลง (ผ่าน = ขาดไม่เกิน 3 วัน)", "base": null, "min": 1, "tgt": 1, "str": 1, "unit": "ผ่าน", "wt": 2, "dir": "pass", "why": "ตัวชี้วัด A1–A6 E1–E3 นับจาก Clip Tracker ทั้งหมด — ถ้าไม่บันทึกก็ให้คะแนนไม่ได้"}];
+// The hook album's per-clip analysis grades clips against the same ladders.
+window.KPI_DEFS = KPI;
 const fmtVal = (v,u) => v===null||v===undefined ? "—"
   : u==="%" ? (v*100).toFixed(v<0.10?2:1)+"%"
   : u==="฿" ? "฿"+Number(v).toLocaleString(undefined,{maximumFractionDigits: (v<100 && !Number.isInteger(v))?1:0})
