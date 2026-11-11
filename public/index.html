@@ -913,6 +913,15 @@
             .pb-wrow.head { display: none; }
             .pb-meter::before { content: attr(data-ch); font-size: 0.7rem; color: var(--text-2); grid-column: 1 / -1; }
         }
+        .ha-switch { display: inline-flex; gap: 4px; margin: 0 20px 12px; padding: 4px; border-radius: 99px; background: var(--surface-2); border: 1px solid var(--border); }
+        .ha-switch button { font: inherit; font-size: 0.82rem; font-weight: 800; color: var(--text-2); background: none; border: 0; border-radius: 99px; padding: 6px 16px; cursor: pointer; }
+        .ha-switch button.on { background: var(--surface); color: var(--text); box-shadow: var(--shadow-sm); }
+        .ha-switch button:focus-visible { outline: 2px solid var(--brand); outline-offset: 1px; }
+        .hc-patterns { margin: 12px 20px 0; }
+        .ha-cover.hc { aspect-ratio: 9 / 8; background: #1c1f26; }
+        .ha-cover.hc .ttl { bottom: 34px; -webkit-line-clamp: 4; }
+        .hc-adapt { font-size: 0.8rem; line-height: 1.5; color: var(--text); background: var(--surface-2); border-radius: var(--radius-sm); padding: 7px 10px; }
+        .hc-adapt b { display: block; font-size: 0.7rem; color: var(--text-2); }
         .modal.ha-modal { max-width: 1080px; }
         .ha-an { display: grid; grid-template-columns: 300px minmax(0, 1fr); gap: 20px; align-items: start; }
         .ha-an-left { position: sticky; top: 0; display: flex; flex-direction: column; gap: 10px; }
@@ -2230,6 +2239,23 @@
                 <div class="section-header">
                     <h2><span class="material-icons-round">local_fire_department</span>คลังฮุกร้านเรา — คลิปของ JS / ME ที่รั้งคนดูได้</h2>
                 </div>
+                <div class="ha-switch" role="tablist" aria-label="แหล่งคลิป">
+                    <button type="button" class="on" id="haSrcOwn" role="tab" aria-selected="true" onclick="haSetSource('own')">คลิปร้านเรา</button>
+                    <button type="button" id="haSrcComp" role="tab" aria-selected="false" onclick="haSetSource('comp')">คลิปคู่แข่ง</button>
+                </div>
+                <div id="haCompView" style="display:none">
+                    <p class="ha-meta" id="hcMeta">กำลังโหลด…</p>
+                    <div class="pb-box hc-patterns"><h4>สิ่งที่เห็นซ้ำในคลิปดังของร้านอื่น</h4><ul class="pb-list" id="hcPatterns"></ul></div>
+                    <div class="ha-filters">
+                        <select class="form-select" id="hcSort" onchange="renderCompetitor()" aria-label="เรียงตาม">
+                            <option value="views">เรียงตามยอดวิว</option><option value="share">เรียงตามแชร์ต่อ 1,000 วิว</option>
+                            <option value="save">เรียงตามเซฟต่อ 1,000 วิว</option><option value="date">ใหม่สุดก่อน</option>
+                        </select>
+                        <span class="ha-count" id="hcCount"></span>
+                    </div>
+                    <div class="ha-grid" id="hcGrid"></div>
+                </div>
+                <div id="haOwnView">
                 <p class="ha-meta" id="haMeta">กำลังโหลด…</p>
                 <div class="ha-rules">
                     <div class="ha-rule"><b>วินาที 0–1: คน + กำลังทำอะไรบางอย่าง</b><span>ลองรองเท้า ถือ 2 คู่เทียบ ตั้งคำถาม · ตัวหนังสือเป็นคำถามหรือคำสัญญา</span></div>
@@ -2259,6 +2285,7 @@
                     <span class="ha-count" id="haCount"></span>
                 </div>
                 <div class="ha-grid" id="haGrid"></div>
+                </div>
             </div>
         </div>
 
@@ -5604,6 +5631,126 @@
     document.getElementById('haModalOverlay').addEventListener('click', e => { if (e.target.id === 'haModalOverlay') closeHookPlayer(); });
     document.addEventListener('keydown', e => { if (e.key === 'Escape') closeHookPlayer(); });
     if (document.getElementById('tabHooks').classList.contains('active')) loadHookAlbum();
+
+    // ============ COMPETITOR CLIPS ============
+    // Other shops' most-viewed public clips, broken down by hand into
+    // competitor-hooks.json. No retention data exists for them, so the page
+    // shows views and per-1,000-view rates instead of hook %.
+    let compAlbum = null, compCurrent = null;
+    function haSetSource(src) {
+        const comp = src === 'comp';
+        document.getElementById('haOwnView').style.display = comp ? 'none' : '';
+        document.getElementById('haCompView').style.display = comp ? '' : 'none';
+        [['haSrcOwn', !comp], ['haSrcComp', comp]].forEach(([id, on]) => {
+            const b = document.getElementById(id); b.classList.toggle('on', on); b.setAttribute('aria-selected', on);
+        });
+        if (comp) loadCompetitor();
+    }
+    async function loadCompetitor() {
+        if (!compAlbum) {
+            try { compAlbum = await (await fetch('competitor-hooks.json', { cache: 'no-cache' })).json(); }
+            catch (e) { document.getElementById('hcMeta').textContent = 'โหลดคลิปคู่แข่งไม่สำเร็จ — ลองรีเฟรชหน้า'; return; }
+        }
+        await loadPlaybook();
+        const m = compAlbum.meta;
+        document.getElementById('hcMeta').textContent = `ที่มา: ${m.source} · ${m.method} · ${m.caveat}`;
+        document.getElementById('hcPatterns').innerHTML = m.patterns.map(x => `<li>${escHtml(x)}</li>`).join('');
+        renderCompetitor();
+    }
+    function hcViews(n) { return n >= 1e6 ? (n / 1e6).toFixed(1) + 'M' : haNum(n); }
+    function hcRate(c, k) { return c.views ? c[k] / c.views * 1000 : 0; }
+    function renderCompetitor() {
+        if (!compAlbum) return;
+        const sort = document.getElementById('hcSort').value;
+        const key = c => sort === 'share' ? hcRate(c, 'shares') : sort === 'save' ? hcRate(c, 'saves') : sort === 'date' ? Date.parse(c.date) : c.views;
+        const list = compAlbum.clips.slice().sort((a, b) => key(b) - key(a));
+        document.getElementById('hcCount').textContent = `${list.length} คลิป`;
+        document.getElementById('hcGrid').innerHTML = list.map(c => `<article class="ha-card">
+            <button type="button" class="ha-cover hc" onclick="openCompetitor('${c.id}')" aria-label="ดูการถอดสูตร ${escAttr(c.caption)}">
+                <span class="shade"></span>
+                <span class="src">TikTok · ${escHtml(c.shop)}</span>
+                <span class="pct">${hcViews(c.views)} วิว</span>
+                <span class="ttl">${escHtml(c.caption)}</span>
+                <span class="vw">${c.dur} วิ · แชร์ ${hcRate(c, 'shares').toFixed(1)} / 1,000 วิว</span>
+                <span class="material-icons-round play">play_circle</span>
+            </button>
+            <div class="ha-body">
+                <div class="ha-tags"><span class="ha-tag hk">${escHtml(c.hook)}</span><span class="ha-tag">${escHtml(c.format)}</span>
+                    ${PILLARS[c.pillar] ? `<span class="ha-tag">เสา ${c.pillar.slice(1)}</span>` : ''}
+                    ${c.seen === 'transcript' ? '<span class="ha-tag">ถอดจากบทพูด</span>' : ''}</div>
+                <div class="ha-trick"><b>Trick</b>${escHtml(c.trick)}</div>
+                <div class="hc-adapt"><b>เอามาปรับใช้</b>${escHtml(c.adapt)}</div>
+                <button type="button" class="btn ha-open" onclick="openCompetitor('${c.id}')"><span class="material-icons-round">insights</span>ดูการถอดสูตร</button>
+            </div>
+        </article>`).join('');
+    }
+    function hcBrief(c) {
+        const pl = playbook && pbPillar(c.pillar);
+        return [`สูตรจากคลิปนอกร้าน (อ้างอิง): ${c.url}`,
+            `ผลของคลิปต้นแบบ: ${hcViews(c.views)} วิว · ยาว ${c.dur} วิ · แชร์ ${hcRate(c, 'shares').toFixed(1)} ต่อ 1,000 วิว`,
+            `ฮุก: ${c.hook}${c.opening ? ' — ' + c.opening : ''}`,
+            c.said ? `ประโยคเปิดของต้นแบบ: “${c.said}” (ห้ามลอกคำ ให้เขียนเป็นเสียงร้านเรา)` : '',
+            `ปรับใช้กับร้านเรา: ${c.adapt}`,
+            'กฎร้าน: ไม่เอ่ยชื่อร้านอื่น · ราคาหลังวิ 3 · วิ 1–3 ช็อตเดียวไม่ตัด',
+            pl ? `ลงท้ายแคปชัน: ${pl.endings.join(' / ')} · ปิดท้าย: ${pl.cta}` : ''].filter(Boolean).join('\n');
+    }
+    function openCompetitor(id) {
+        const c = compAlbum && compAlbum.clips.find(x => x.id === id);
+        if (!c) return;
+        compCurrent = c;
+        const b5 = haKpi('B5');
+        const rates = [['แชร์', 'shares'], ['เซฟ', 'saves'], ['คอมเมนต์', 'comments'], ['ไลก์', 'likes']];
+        document.getElementById('haModalTitle').textContent = `ถอดสูตรคลิป · ${c.shop} · ${formatDate(c.date)}`;
+        const facts = [['วิว', hcViews(c.views)], ['ยาว', c.dur + ' วิ'], ['ลง', formatDate(c.date)], ['ไลก์', haNum(c.likes)], ['คอมเมนต์', haNum(c.comments)], ['แชร์', haNum(c.shares)]];
+        document.getElementById('haModalBody').innerHTML = `<div class="ha-an">
+            <div class="ha-an-left">
+                <iframe class="ha-player" src="https://www.tiktok.com/embed/v2/${encodeURIComponent(c.id)}" allow="encrypted-media; fullscreen" allowfullscreen title="คลิป TikTok"></iframe>
+                <div class="ha-facts">${facts.map(([k, x]) => `<div class="ha-fact"><span>${k}</span><b>${x}</b></div>`).join('')}</div>
+            </div>
+            <div class="ha-an-right">
+                <div class="ha-an-head"><h4>${escHtml(c.caption)}</h4>
+                    <div class="ha-tags"><span class="ha-tag hk">${escHtml(c.hook)}</span><span class="ha-tag">${escHtml(c.format)}</span>
+                        ${PILLARS[c.pillar] ? `<span class="ha-tag">เสา ${c.pillar.slice(1)} · ${escHtml(PILLARS[c.pillar])}</span>` : ''}
+                        <span class="ha-tag">${c.seen === 'transcript' ? 'ถอดจากบทพูด ไม่เห็นภาพ' : 'ดูจากภาพ 8 เฟรม + บทพูด'}</span></div></div>
+
+                <section class="ha-sec"><div class="ha-sec-h"><h5>ทำไมคลิปนี้ดัง</h5><small>ความเห็นจากการดูคลิป ไม่ใช่ตัวเลขวัดผล</small></div>
+                    <p class="ha-note" style="margin:0">${escHtml(c.trick)}</p></section>
+
+                <section class="ha-sec"><div class="ha-sec-h"><h5>แกะ 3 วินาทีแรก</h5><small>${c.seen === 'transcript' ? 'คลิปนี้เปิดภาพไม่ได้ตอนไม่ล็อกอิน' : 'จากเฟรมวิ 0.3 / 1.2 / 2.2 / 3.2'}</small></div>
+                    <div class="ha-rows">
+                        <div class="ha-row"><span>ภาพบนจอ</span><span>${c.opening ? escHtml(c.opening) : '<em>ไม่ได้เห็นภาพ ต้องเปิดดูเองที่คลิปด้านซ้าย</em>'}</span></div>
+                        <div class="ha-row"><span>ประโยคแรกที่พูด</span><span>${c.said ? '“' + escHtml(c.said) + '”<br><em>จากซับอัตโนมัติของ TikTok อาจสะกดเพี้ยน</em>' : '<em>ไม่มีเสียงพูด (เพลงอย่างเดียว)</em>'}</span></div>
+                        <div class="ha-row"><span>ฮุก & รูปแบบ</span><span><b>${escHtml(c.hook)}</b> · ${escHtml(c.format)}</span></div>
+                    </div></section>
+
+                <section class="ha-sec"><div class="ha-sec-h"><h5>คนดูทำอะไรกับคลิปนี้</h5><small>ต่อ 1,000 วิว · ยอดวิวอาจรวมแอด</small></div>
+                    <div class="ha-scores">${rates.map(([n, k]) => `<div class="ha-score"><span class="k">${n}</span><span class="v">${hcRate(c, k).toFixed(1)}</span><span class="n">${haNum(c[k])} ครั้ง${k === 'shares' && b5 ? ` · เป้าช่องเรา ${b5.tgt}` : ''}</span></div>`).join('')}</div>
+                    <p class="ha-note">ไม่มีกราฟคนดูหลุดของคลิปร้านอื่น จึงเทียบ % ฮุกกับคลิปร้านเราไม่ได้</p></section>
+
+                <section class="ha-sec"><div class="ha-sec-h"><h5>เอามาปรับใช้กับร้านเรา</h5><small>ใช้โครง ไม่ลอกคำ</small></div>
+                    <p class="ha-note" style="margin:0 0 10px">${escHtml(c.adapt)}</p>
+                    <pre class="ha-brief">${escHtml(hcBrief(c))}</pre>
+                    <div class="ha-brief-actions">
+                        <button type="button" class="btn btn-primary" onclick="hcUseBrief()"><span class="material-icons-round">add</span>ทำคลิปใหม่จากสูตรนี้</button>
+                    </div></section>
+            </div>
+        </div>`;
+        document.getElementById('haModalBody').scrollTop = 0;
+        document.getElementById('haModalLink').href = c.url;
+        document.getElementById('haModalOverlay').classList.add('open');
+    }
+    function hcUseBrief() {
+        if (!compCurrent) return;
+        const c = compCurrent;
+        loadPlaybook().then(() => {
+            closeHookPlayer();
+            openModal(false);
+            document.getElementById('clipName').value = `สูตร ${c.hook}: `;
+            document.getElementById('clipDesc').value = hcBrief(c);
+            document.getElementById('clipPillar').value = PILLARS[c.pillar] ? c.pillar : '';
+            pillarTip();
+        });
+    }
 
     // ============ PLAYBOOK (คู่มือทำคลิป) ============
     // The shop's content pillars, customer groups and voice, written from its
