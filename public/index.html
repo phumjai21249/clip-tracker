@@ -896,7 +896,7 @@
         .pb-list { margin: 0; padding-left: 18px; font-size: 0.8rem; line-height: 1.6; color: var(--text); }
         .pb-two { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px; }
         .pb-box { border: 1px solid var(--border); border-radius: var(--radius-md); padding: 12px 14px; min-width: 0; }
-        .pb-box h4 { font-size: 0.84rem; font-weight: 800; color: var(--text); margin: 0 0 6px; display: flex; align-items: center; gap: 6px; }
+        .pb-box h4, .pb-box h3 { font-size: 0.84rem; font-weight: 800; color: var(--text); margin: 0 0 6px; display: flex; align-items: center; gap: 6px; }
         .pb-box h4 .material-icons-round { font-size: 18px; }
         .pb-box.no h4 .material-icons-round { color: var(--danger-text); }
         .pb-box.ok h4 .material-icons-round { color: var(--st-done-text); }
@@ -2245,7 +2245,7 @@
                 </div>
                 <div id="haCompView" style="display:none">
                     <p class="ha-meta" id="hcMeta">กำลังโหลด…</p>
-                    <div class="pb-box hc-patterns"><h4>สิ่งที่เห็นซ้ำในคลิปดังของร้านอื่น</h4><ul class="pb-list" id="hcPatterns"></ul></div>
+                    <div class="pb-box hc-patterns"><h3>สิ่งที่เห็นซ้ำในคลิปดังของร้านอื่น</h3><ul class="pb-list" id="hcPatterns"></ul></div>
                     <div class="ha-filters">
                         <select class="form-select" id="hcSort" onchange="renderCompetitor()" aria-label="เรียงตาม">
                             <option value="views">เรียงตามยอดวิว</option><option value="share">เรียงตามแชร์ต่อ 1,000 วิว</option>
