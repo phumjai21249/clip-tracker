@@ -841,6 +841,78 @@
         .ha-stats a:hover { color: var(--brand-text); }
         .ha-open { justify-content: center; font-size: 0.8rem; padding: 7px 10px; }
         .ha-open .material-icons-round { font-size: 18px; }
+        .pillar-tag { align-self: flex-start; font-size: 0.68rem; font-weight: 700; padding: 1px 8px; border-radius: 99px; background: var(--brand-soft); color: var(--brand-text); }
+        .pillar-tip { border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--surface-2); padding: 10px 12px; font-size: 0.78rem; line-height: 1.55; color: var(--text); }
+        .pillar-tip b { display: block; font-size: 0.74rem; color: var(--text-2); margin-top: 6px; }
+        .pillar-tip b:first-child { margin-top: 0; }
+        .pillar-tip ul { margin: 2px 0 0; padding-left: 18px; }
+        .pb-body { padding: 0 20px 20px; display: flex; flex-direction: column; gap: 18px; }
+        .pb-sec h3 { font-size: 0.95rem; font-weight: 800; color: var(--text); margin: 0 0 2px; }
+        .pb-sec > p { font-size: 0.78rem; color: var(--text-2); margin: 0 0 10px; line-height: 1.5; }
+        .pb-nav { display: flex; flex-wrap: wrap; gap: 6px; padding: 12px 20px 14px; }
+        .pb-nav button { font: inherit; font-size: 0.78rem; font-weight: 700; color: var(--text-2); background: var(--surface-2); border: 1px solid var(--border); border-radius: 99px; padding: 5px 12px; cursor: pointer; }
+        .pb-nav button:hover { color: var(--text); border-color: var(--border-strong); }
+        .pb-weekbar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 10px; }
+        .pb-weekbar .lbl { font-size: 0.86rem; font-weight: 800; color: var(--text); min-width: 150px; text-align: center; }
+        .pb-weekbar .btn { padding: 6px 10px; }
+        .pb-week { display: grid; gap: 8px; }
+        .pb-wrow { display: grid; grid-template-columns: minmax(150px, 1.1fr) minmax(0, 1fr) minmax(0, 1fr); gap: 12px; align-items: center; border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 9px 12px; }
+        .pb-wrow.head { border: 0; padding: 0 12px; font-size: 0.72rem; font-weight: 800; color: var(--text-2); }
+        .pb-wrow .nm { font-size: 0.84rem; font-weight: 800; color: var(--text); }
+        .pb-meter { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px; align-items: center; font-size: 0.78rem; font-weight: 700; color: var(--text); }
+        .pb-meter .track { height: 8px; border-radius: 99px; background: var(--surface-3); overflow: hidden; }
+        .pb-meter .fill { display: block; height: 100%; border-radius: 99px; background: var(--brand); }
+        .pb-meter.met .fill { background: var(--st-done); }
+        .pb-meter .num { display: inline-flex; align-items: center; gap: 3px; white-space: nowrap; }
+        .pb-meter .num .material-icons-round { font-size: 15px; color: var(--st-done-text); }
+        .pb-meter.none { color: var(--text-3); font-weight: 600; }
+        .pb-weeknote { font-size: 0.76rem; color: var(--text-2); margin-top: 8px; line-height: 1.5; }
+        .pb-pillars { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 12px; }
+        .pb-pillar { border: 1px solid var(--border); border-radius: var(--radius-md); background: var(--surface); padding: 14px 16px; display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+        .pb-pillar header { display: grid; grid-template-columns: 30px minmax(0, 1fr) auto; gap: 10px; align-items: center; }
+        .pb-pillar .no { width: 30px; height: 30px; border-radius: 50%; background: var(--brand-soft); color: var(--brand-text); font-weight: 800; display: flex; align-items: center; justify-content: center; font-size: 0.9rem; }
+        .pb-pillar h4 { font-size: 0.95rem; font-weight: 800; color: var(--text); margin: 0; line-height: 1.3; }
+        .pb-pillar .meta { font-size: 0.72rem; color: var(--text-2); }
+        .pb-pillar .share { font-size: 1.2rem; font-weight: 800; color: var(--text); text-align: right; line-height: 1.1; }
+        .pb-pillar .share small { display: block; font-size: 0.68rem; font-weight: 700; color: var(--text-2); }
+        .pb-pillar .stat { font-size: 0.78rem; font-weight: 700; color: var(--st-done-text); background: var(--st-done-bg); border-radius: var(--radius-sm); padding: 5px 9px; align-self: flex-start; }
+        .pb-pillar h5 { font-size: 0.74rem; font-weight: 800; color: var(--text-2); margin: 0 0 3px; }
+        .pb-pillar ul { margin: 0; padding-left: 18px; font-size: 0.8rem; line-height: 1.55; color: var(--text); }
+        .pb-pillar details summary { font-size: 0.76rem; font-weight: 700; color: var(--text-2); cursor: pointer; }
+        .pb-pillar details ul { margin-top: 4px; color: var(--text-2); }
+        .pb-topics { display: flex; flex-direction: column; gap: 5px; }
+        .pb-topic { all: unset; cursor: pointer; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px; align-items: center; border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 6px 10px; font-size: 0.8rem; color: var(--text); }
+        .pb-topic:hover { border-color: var(--brand); }
+        .pb-topic:focus-visible { outline: 2px solid var(--brand); outline-offset: 1px; }
+        .pb-topic span:last-child { font-size: 0.7rem; font-weight: 700; color: var(--brand-text); white-space: nowrap; }
+        .pb-ends { display: flex; flex-wrap: wrap; gap: 5px; align-items: center; font-size: 0.76rem; color: var(--text-2); }
+        .pb-ends i { font-style: normal; font-weight: 800; color: var(--text); background: var(--surface-2); border-radius: 99px; padding: 1px 9px; }
+        .pb-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
+        .pb-table th { text-align: left; font-size: 0.72rem; font-weight: 800; color: var(--text-2); padding: 6px 10px; border-bottom: 1px solid var(--border-strong); white-space: nowrap; }
+        .pb-table td { padding: 8px 10px; border-bottom: 1px solid var(--border); color: var(--text); line-height: 1.5; vertical-align: top; }
+        .pb-table td b { font-weight: 800; }
+        .pb-table .end { font-weight: 800; white-space: nowrap; }
+        .pb-scroll { overflow-x: auto; border: 1px solid var(--border); border-radius: var(--radius-md); }
+        .pb-list { margin: 0; padding-left: 18px; font-size: 0.8rem; line-height: 1.6; color: var(--text); }
+        .pb-two { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px; }
+        .pb-box { border: 1px solid var(--border); border-radius: var(--radius-md); padding: 12px 14px; min-width: 0; }
+        .pb-box h4 { font-size: 0.84rem; font-weight: 800; color: var(--text); margin: 0 0 6px; display: flex; align-items: center; gap: 6px; }
+        .pb-box h4 .material-icons-round { font-size: 18px; }
+        .pb-box.no h4 .material-icons-round { color: var(--danger-text); }
+        .pb-box.ok h4 .material-icons-round { color: var(--st-done-text); }
+        .pb-chips { display: flex; flex-wrap: wrap; gap: 5px; }
+        .pb-chips span { font-size: 0.76rem; font-weight: 700; background: var(--surface-2); color: var(--text); border-radius: 99px; padding: 2px 10px; }
+        .pb-segs { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 10px; }
+        .pb-seg { border: 1px solid var(--border); border-radius: var(--radius-md); padding: 12px 14px; font-size: 0.78rem; line-height: 1.55; color: var(--text); min-width: 0; }
+        .pb-seg h4 { font-size: 0.88rem; font-weight: 800; margin: 0 0 6px; color: var(--text); }
+        .pb-seg dt { font-size: 0.7rem; font-weight: 800; color: var(--text-2); margin-top: 5px; }
+        .pb-seg dd { margin: 0; }
+        .pb-seg dl { margin: 0; }
+        @media (max-width: 640px) {
+            .pb-wrow { grid-template-columns: 1fr; gap: 6px; }
+            .pb-wrow.head { display: none; }
+            .pb-meter::before { content: attr(data-ch); font-size: 0.7rem; color: var(--text-2); grid-column: 1 / -1; }
+        }
         .modal.ha-modal { max-width: 1080px; }
         .ha-an { display: grid; grid-template-columns: 300px minmax(0, 1fr); gap: 20px; align-items: start; }
         .ha-an-left { position: sticky; top: 0; display: flex; flex-direction: column; gap: 10px; }
@@ -1714,6 +1786,9 @@
             <button type="button" class="tab-btn" id="tabBtnHooks" data-tab="Hooks" role="tab" onclick="setTab('Hooks')">
                 <span class="material-icons-round">local_fire_department</span> คลังฮุกร้านเรา
             </button>
+            <button type="button" class="tab-btn" id="tabBtnPlaybook" data-tab="Playbook" role="tab" onclick="setTab('Playbook')">
+                <span class="material-icons-round">menu_book</span> คู่มือทำคลิป
+            </button>
             <button type="button" class="tab-btn" id="tabBtnProducts" data-tab="Products" role="tab" onclick="setTab('Products')">
                 <span class="material-icons-round">inventory_2</span> สินค้าใหม่
             </button>
@@ -2187,6 +2262,18 @@
             </div>
         </div>
 
+        <!-- ===== TAB: PLAYBOOK ===== -->
+        <div class="tab-panel" id="tabPlaybook">
+            <div class="section-card">
+                <div class="section-header">
+                    <h2><span class="material-icons-round">menu_book</span>คู่มือทำคลิป — ทำคลิปต่อไปเรื่องอะไร พูดกับใคร พูดยังไง</h2>
+                </div>
+                <p class="ha-meta" id="pbMeta">กำลังโหลด…</p>
+                <div class="pb-nav" id="pbNav"></div>
+                <div class="pb-body" id="pbBody"></div>
+            </div>
+        </div>
+
         <!-- ===== TAB: NEW PRODUCTS ===== -->
         <div class="tab-panel" id="tabProducts">
             <div class="section-card">
@@ -2427,6 +2514,18 @@
                     </select>
                 </div>
                 <div class="form-group">
+                    <label class="form-label" for="clipPillar">เสาคอนเทนต์</label>
+                    <select class="form-select" id="clipPillar" onchange="pillarTip()">
+                        <option value="">-- ยังไม่ระบุ --</option>
+                        <option value="p1">1 · ของใหม่ &amp; ทีเซอร์</option>
+                        <option value="p2">2 · ช่วยเลือกให้ถูกคู่</option>
+                        <option value="p3">3 · สนาม สโมสร ชุมชน</option>
+                        <option value="p4">4 · คนในร้าน เรื่องจริง มุกขำ</option>
+                        <option value="p5">5 · ปิดการขาย &amp; สั่งทำ</option>
+                    </select>
+                    <div class="pillar-tip" id="clipPillarTip" style="display:none"></div>
+                </div>
+                <div class="form-group">
                     <label class="form-label" for="clipChannel">ช่องที่จะลง <span class="req">*</span></label>
                     <select class="form-select" id="clipChannel">
                         <option value="JS SPORT SHOP">JS SPORT SHOP</option>
@@ -2638,6 +2737,9 @@
         // What was posted. Every clip written before this field existed has no
         // `type`, so the fallback has to be 'clip' — that is what they all were.
         const DEFAULT_TYPE = 'clip';
+        // Content pillars (details live in playbook.json, shown in the คู่มือทำคลิป tab).
+        const PILLARS = { p1: 'ของใหม่ & ทีเซอร์', p2: 'ช่วยเลือกให้ถูกคู่', p3: 'สนาม สโมสร ชุมชน', p4: 'คนในร้าน เรื่องจริง มุกขำ', p5: 'ปิดการขาย & สั่งทำ' };
+        function pillarTag(clip) { return PILLARS[clip.pillar] ? `<span class="pillar-tag">เสา ${clip.pillar.slice(1)} · ${escHtml(PILLARS[clip.pillar])}</span>` : ''; }
         const TYPES = {
             clip:  { label: 'คลิป',   cls: 'ty-clip',  icon: 'videocam' },
             photo: { label: 'รูปภาพ', cls: 'ty-photo', icon: 'image' },
@@ -2801,6 +2903,8 @@
 
         // ============ RENDER ============
         function render() {
+            // The playbook's weekly count follows every clip change.
+            if (typeof renderPlaybookWeek === 'function') renderPlaybookWeek();
             renderStats();
             renderProgress();
             renderCalendar();
@@ -3244,6 +3348,7 @@
                     <td>
                         <div class="clip-title-cell">
                             <span class="clip-title">${escHtml(clip.title)}</span>
+                            ${pillarTag(clip)}
                             ${descHtml(clip)}
                             ${linksHtml(clip)}
                         </div>
@@ -3293,6 +3398,7 @@
                             <div class="clip-card-meta" style="margin-top:6px;">
                                 ${typeTag(clip)}
                                 ${channelTag(clip)}
+                                ${pillarTag(clip)}
                                 <span class="date-cell num">${formatDate(clip.date)}${clip.postTime ? ' · ' + escHtml(clip.postTime) : ''}</span>
                             </div>
                         </div>
@@ -3634,10 +3740,12 @@
                 document.getElementById('clipStatus').value = 'idle';
                 document.getElementById('clipChannel').value = 'JS SPORT SHOP';
                 document.getElementById('clipType').value = DEFAULT_TYPE;
+                document.getElementById('clipPillar').value = '';
                 document.getElementById('clipDate').value = localDateStr();
                 document.getElementById('clipTime').value = '';
                 document.getElementById('linkRows').innerHTML = '';
             }
+            if (typeof pillarTip === 'function') pillarTip();
             setTimeout(() => document.getElementById('clipName').focus(), 300);
         }
         function closeModal() {
@@ -3659,6 +3767,7 @@
             const status = document.getElementById('clipStatus').value;
             const channel = document.getElementById('clipChannel').value;
             const type = document.getElementById('clipType').value;
+            const pillar = document.getElementById('clipPillar').value;
             const date = document.getElementById('clipDate').value;
             const postTime = document.getElementById('clipTime').value;
             // undefined = leave whatever cover is on the server alone.
@@ -3685,14 +3794,14 @@
                 savedClip.title = name; savedClip.desc = desc; savedClip.creator = creator;
                 savedClip.status = status; savedClip.channel = channel; savedClip.date = date;
                 savedClip.type = type; savedClip.links = linkResult.links;
-                savedClip.postTime = postTime;
+                savedClip.postTime = postTime; savedClip.pillar = pillar;
                 showToast('แก้ไขคลิปเรียบร้อย', 'success');
             } else {
                 // Not found covers a genuine add, and also an edit of a clip a
                 // teammate deleted while this modal was open — re-create it
                 // rather than throw away what was just typed.
                 // A new clip with no time takes the channel's next free slot.
-                savedClip = { id, title: name, desc, creator, status, channel, type, uploaded: false, date, links: linkResult.links,
+                savedClip = { id, title: name, desc, creator, status, channel, type, pillar, uploaded: false, date, links: linkResult.links,
                               postTime: postTime || nextFreeSlot(channel, date, id) };
                 clips.unshift(savedClip);
                 showToast('เพิ่มคลิปใหม่เรียบร้อย', 'success');
@@ -3736,6 +3845,7 @@
             document.getElementById('clipStatus').value = clip.status;
             document.getElementById('clipChannel').value = clip.channel || 'JS SPORT SHOP';
             document.getElementById('clipType').value = clip.type || DEFAULT_TYPE;
+            document.getElementById('clipPillar').value = PILLARS[clip.pillar] ? clip.pillar : '';
             document.getElementById('clipDate').value = clip.date;
             document.getElementById('clipTime').value = clip.postTime || '';
             document.getElementById('linkRows').innerHTML = '';
@@ -4127,11 +4237,12 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
             if (name === 'Schedule' && typeof schedScrollToday === 'function') setTimeout(schedScrollToday, 60);
             if (name === 'Hooks' && typeof loadHookAlbum === 'function') loadHookAlbum();
+            if (name === 'Playbook' && typeof loadPlaybook === 'function') loadPlaybook().then(renderPlaybook);
         }
         function initTab() {
             let saved = 'Clips';
             try { saved = localStorage.getItem('clipTracker.tab') || 'Clips'; } catch (e) {}
-            setTab(['Kpi', 'Products', 'Schedule', 'Hooks'].includes(saved) ? saved : 'Clips');
+            setTab(['Kpi', 'Products', 'Schedule', 'Hooks', 'Playbook'].includes(saved) ? saved : 'Clips');
             window.scrollTo({ top: 0 });
         }
         function kpiJump(n) {
@@ -5474,6 +5585,17 @@
         document.getElementById('clipName').value = `สูตร${c.hook ? ' ' + c.hook : ''}: `;
         document.getElementById('clipDesc').value = haBrief(c);
         document.getElementById('clipChannel').value = c.ch === 'JS' ? 'JS SPORT SHOP' : 'Me SPORT';
+        document.getElementById('clipPillar').value = haPillar(c);
+        pillarTip();
+    }
+    // Which pillar a hook-album clip belongs to, from its format.
+    function haPillar(c) {
+        const f = c.format;
+        if (/โปร|เสื้อทีม/.test(f)) return 'p5';
+        if (/สโมสร|กิจกรรม/.test(f)) return 'p3';
+        if (/ตลก|เบื้องหลัง|คนจริง|ทัวร์ร้าน/.test(f)) return 'p4';
+        if (/ทีเซอร์|รุ่นใหม่/.test(f)) return 'p1';
+        return 'p2';
     }
     function closeHookPlayer() {
         document.getElementById('haModalOverlay').classList.remove('open');
@@ -5482,6 +5604,172 @@
     document.getElementById('haModalOverlay').addEventListener('click', e => { if (e.target.id === 'haModalOverlay') closeHookPlayer(); });
     document.addEventListener('keydown', e => { if (e.key === 'Escape') closeHookPlayer(); });
     if (document.getElementById('tabHooks').classList.contains('active')) loadHookAlbum();
+
+    // ============ PLAYBOOK (คู่มือทำคลิป) ============
+    // The shop's content pillars, customer groups and voice, written from its
+    // own numbers into playbook.json. This tab reads it, counts this week's
+    // clips per pillar, and can start a new clip from a suggested topic.
+    let playbook = null, pbLoading = null, pbWeek = '';
+    const PB_CH = { JS: 'JS SPORT SHOP', ME: 'Me SPORT' };
+    function loadPlaybook() {
+        if (playbook) return Promise.resolve(playbook);
+        if (!pbLoading) {
+            pbLoading = fetch('playbook.json', { cache: 'no-cache' }).then(r => r.json())
+                .then(j => (playbook = j))
+                .catch(() => { pbLoading = null; return null; });
+        }
+        return pbLoading;
+    }
+    function pbPillar(id) { return playbook && playbook.pillars.find(x => x.id === id); }
+    // Short brief that goes into a new clip's description.
+    function pbBrief(pl) {
+        return [`เสา ${pl.no}: ${pl.name} (${pl.funnel})`,
+            `พูดกับ: ${pl.segments}`,
+            `ทำยังไง: ${pl.how[0]}`,
+            'กฎ 3 วิแรก: เปิดด้วยคนหรือคำถาม ช็อตเดียวไม่ตัด ไม่เปิดด้วยราคา',
+            `ลงท้ายแคปชัน: ${pl.endings.join(' / ')}`,
+            `ปิดท้าย: ${pl.cta}`].join('\n');
+    }
+    // Tip under the pillar select in the clip form.
+    function pillarTip() {
+        const box = document.getElementById('clipPillarTip');
+        const id = document.getElementById('clipPillar').value;
+        if (!id) { box.style.display = 'none'; return; }
+        loadPlaybook().then(() => {
+            const pl = pbPillar(id);
+            if (!pl || document.getElementById('clipPillar').value !== id) return;
+            box.innerHTML = `<b>ทำยังไง</b><ul>${pl.how.slice(0, 3).map(h => `<li>${escHtml(h)}</li>`).join('')}</ul>
+                <b>ลงท้ายแคปชัน</b>${escHtml(pl.endings.join(' / '))}
+                <b>ปิดท้ายคลิป</b>${escHtml(pl.cta)}`;
+            box.style.display = '';
+        });
+    }
+    function pbNewClip(pillarId, topicIdx, compareIdx) {
+        const pl = pbPillar(pillarId);
+        if (!pl) return;
+        const title = compareIdx != null ? playbook.compare.types[compareIdx].example
+            : topicIdx != null ? pl.topics[topicIdx] : '';
+        openModal(false);
+        document.getElementById('clipName').value = title;
+        document.getElementById('clipDesc').value = pbBrief(pl)
+            + (compareIdx != null ? '\nเทียบ: ' + playbook.compare.rules.slice(0, 3).join(' · ') : '');
+        document.getElementById('clipPillar').value = pillarId;
+        pillarTip();
+    }
+    function pbShiftWeek(n) { pbWeek = n === 0 ? weekStartOf(localDateStr()) : addDaysStr(pbWeek, n * 7); renderPlaybookWeek(); }
+    function pbMeter(ch, n, quota) {
+        if (!quota) return `<span class="pb-meter none" data-ch="${ch}">${n ? n + ' คลิป (ไม่มีโควตา)' : 'ไม่มีโควตา'}</span>`;
+        const met = n >= quota;
+        return `<span class="pb-meter ${met ? 'met' : ''}" data-ch="${ch}">
+            <span class="track"><span class="fill" style="width:${Math.min(100, Math.round(n / quota * 100))}%"></span></span>
+            <span class="num">${met ? '<span class="material-icons-round" aria-label="ครบแล้ว">check_circle</span>' : ''}${n} / ${quota}</span></span>`;
+    }
+    function renderPlaybookWeek() {
+        const host = document.getElementById('pbWeek');
+        if (!playbook || !host) return;
+        if (!pbWeek) pbWeek = weekStartOf(localDateStr());
+        const end = addDaysStr(pbWeek, 6);
+        const inWeek = clips.filter(c => c.date >= pbWeek && c.date <= end && (c.type || 'clip') !== 'photo');
+        const count = (chName, pid) => inWeek.filter(c => c.channel === chName && (pid ? c.pillar === pid : !PILLARS[c.pillar])).length;
+        const isNow = pbWeek === weekStartOf(localDateStr());
+        document.getElementById('pbWeekLbl').textContent = `${formatDate(pbWeek).replace(/ \d{4}$/, '')} – ${formatDate(end)}${isNow ? ' (สัปดาห์นี้)' : ''}`;
+        const untagged = { JS: count(PB_CH.JS, ''), ME: count(PB_CH.ME, '') };
+        const missing = playbook.pillars.filter(pl => count(PB_CH.JS, pl.id) < pl.week.JS).map(pl => `เสา ${pl.no} อีก ${pl.week.JS - count(PB_CH.JS, pl.id)}`);
+        host.innerHTML = `<div class="pb-wrow head"><span>เสา</span><span>JS SPORT</span><span>ME SPORT</span></div>`
+            + playbook.pillars.map(pl => `<div class="pb-wrow">
+                <span class="nm">${pl.no} · ${escHtml(pl.name)}</span>
+                ${pbMeter('JS SPORT', count(PB_CH.JS, pl.id), pl.week.JS)}
+                ${pbMeter('ME SPORT', count(PB_CH.ME, pl.id), pl.week.ME)}
+            </div>`).join('')
+            + `<p class="pb-weeknote">${missing.length ? 'ช่อง JS ยังขาด: ' + missing.join(' · ') : 'ช่อง JS ครบทุกเสาแล้ว'}
+                ${untagged.JS + untagged.ME ? ` · มีคลิปที่ยังไม่ได้ระบุเสา JS ${untagged.JS} · ME ${untagged.ME} คลิป (เปิดแก้ไขคลิปแล้วเลือก “เสาคอนเทนต์”)` : ''}
+                <br>นับคลิปตามวันที่ลงในสัปดาห์นี้ ไม่นับงานรูปภาพ · โควตาเป็นข้อเสนอ รอเจ้าของยืนยัน</p>`;
+    }
+    function renderPlaybook() {
+        if (!playbook) { document.getElementById('pbMeta').textContent = 'โหลดคู่มือไม่สำเร็จ — ลองรีเฟรชหน้า'; return; }
+        const P = playbook, V = P.voice, C = P.compare, cmpPillar = pbPillar(C.pillar);
+        document.getElementById('pbMeta').textContent = `ที่มา: ${P.meta.source} · ${P.meta.caveat}`;
+        const secs = [['pbSecWeek', 'สัปดาห์นี้'], ['pbSecPillars', '5 เสาคอนเทนต์'], ['pbSecCompare', 'เทียบรุ่น / แบรนด์'], ['pbSecSeg', 'กลุ่มลูกค้า'], ['pbSecVoice', 'เสียงร้าน & คำลงท้าย'], ['pbSecNever', 'คำต้องห้าม']];
+        document.getElementById('pbNav').innerHTML = secs.map(([id, t]) => `<button type="button" onclick="document.getElementById('${id}').scrollIntoView({behavior:'smooth',block:'start'})">${t}</button>`).join('');
+        const li = a => a.map(x => `<li>${escHtml(x)}</li>`).join('');
+        document.getElementById('pbBody').innerHTML = `
+            <section class="pb-sec" id="pbSecWeek">
+                <h3>สัปดาห์นี้ทำเสาไหนไปแล้ว</h3>
+                <p>นับจากคลิปในตารางที่ระบุ “เสาคอนเทนต์” ไว้ เทียบกับโควตาต่อสัปดาห์</p>
+                <div class="pb-weekbar">
+                    <button type="button" class="btn" onclick="pbShiftWeek(-1)" aria-label="สัปดาห์ก่อน"><span class="material-icons-round">chevron_left</span></button>
+                    <span class="lbl" id="pbWeekLbl"></span>
+                    <button type="button" class="btn" onclick="pbShiftWeek(1)" aria-label="สัปดาห์ถัดไป"><span class="material-icons-round">chevron_right</span></button>
+                    <button type="button" class="btn" onclick="pbShiftWeek(0)">สัปดาห์นี้</button>
+                </div>
+                <div class="pb-week" id="pbWeek"></div>
+            </section>
+
+            <section class="pb-sec" id="pbSecPillars">
+                <h3>5 เสาคอนเทนต์</h3>
+                <p>${escHtml(P.meta.proposed)} · กดหัวข้อตัวอย่างเพื่อเปิดฟอร์มคลิปใหม่พร้อมโจทย์</p>
+                <div class="pb-pillars">${P.pillars.map(pl => `<article class="pb-pillar">
+                    <header><span class="no">${pl.no}</span>
+                        <div><h4>${escHtml(pl.name)}</h4><span class="meta">${escHtml(pl.funnel)} · ${escHtml(pl.segments)}</span></div>
+                        <span class="share">${pl.share}%<small>JS ${pl.week.JS} · ME ${pl.week.ME} / สัปดาห์</small></span></header>
+                    <span class="stat">${escHtml(pl.stat)}</span>
+                    <div><h5>ทำยังไง</h5><ul>${li(pl.how)}</ul></div>
+                    <div><h5>หัวข้อตัวอย่าง</h5><div class="pb-topics">${pl.topics.map((t, i) => `<button type="button" class="pb-topic" onclick="pbNewClip('${pl.id}', ${i})"><span>${escHtml(t)}</span><span>+ ทำคลิปนี้</span></button>`).join('')}</div></div>
+                    <div class="pb-ends">ลงท้ายแคปชัน ${pl.endings.map(e => `<i>${escHtml(e)}</i>`).join('')}</div>
+                    <div class="pb-ends">ปิดท้ายคลิป: ${escHtml(pl.cta)}</div>
+                    <details><summary>ทำไมต้องมีเสานี้ (ตัวเลข)</summary><ul>${li(pl.why)}</ul></details>
+                    <button type="button" class="btn" style="align-self:flex-start" onclick="pbNewClip('${pl.id}')"><span class="material-icons-round">add</span>เพิ่มคลิปเสานี้</button>
+                </article>`).join('')}</div>
+            </section>
+
+            <section class="pb-sec" id="pbSecCompare">
+                <h3>${escHtml(C.title)}</h3>
+                <p>อยู่ในเสา ${cmpPillar.no} · ${escHtml(C.quota)}</p>
+                <div class="pb-two" style="margin-bottom:12px">
+                    <div class="pb-box"><h4>ที่ร้านทำมาแล้ว</h4><ul class="pb-list">${li(C.facts)}</ul></div>
+                    <div class="pb-box"><h4>แบรนด์ที่เทียบได้</h4><ul class="pb-list">${C.brands.map(b => `<li><b>${escHtml(b.label)}:</b> ${escHtml(b.list)}</li>`).join('')}</ul></div>
+                </div>
+                <div class="pb-scroll"><table class="pb-table"><thead><tr><th>แบบ</th><th>หัวข้อตัวอย่าง</th><th>สถานะ</th><th></th></tr></thead>
+                    <tbody>${C.types.map((t, i) => `<tr><td><b>${escHtml(t.name)}</b></td><td>${escHtml(t.example)}</td><td>${escHtml(t.status)}</td>
+                        <td><button type="button" class="btn" style="padding:5px 10px;white-space:nowrap" onclick="pbNewClip('${C.pillar}', null, ${i})"><span class="material-icons-round">add</span>ทำคลิปนี้</button></td></tr>`).join('')}</tbody></table></div>
+                <div class="pb-box" style="margin-top:12px"><h4>กติกาคลิปเปรียบเทียบ</h4><ul class="pb-list">${li(C.rules)}</ul></div>
+            </section>
+
+            <section class="pb-sec" id="pbSecSeg">
+                <h3>กลุ่มลูกค้า 4 กลุ่ม</h3>
+                <p>พูดกับใคร เขาอยากได้ยินอะไร และตอนนี้ร้านทำคลิปให้กลุ่มนี้กี่คลิป</p>
+                <div class="pb-segs">${P.segments.map(g => `<article class="pb-seg"><h4>${g.id}. ${escHtml(g.name)}</h4><dl>
+                    <dt>ใคร</dt><dd>${escHtml(g.who)}</dd><dt>ซื้ออะไร</dt><dd>${escHtml(g.buys)}</dd>
+                    <dt>อยากได้ยิน</dt><dd>${escHtml(g.wants)}</dd><dt>คำที่ค้น</dt><dd>${escHtml(g.search)}</dd>
+                    <dt>คลิปของร้านตอนนี้</dt><dd>${escHtml(g.clips)}</dd></dl></article>`).join('')}</div>
+            </section>
+
+            <section class="pb-sec" id="pbSecVoice">
+                <h3>เสียงร้าน & คำลงท้ายแคปชัน</h3>
+                <p>เลือกคำลงท้ายตามจุดประสงค์ของคลิป · ตัวอย่างทั้งหมดมาจากแคปชันจริงของร้าน</p>
+                <div class="pb-box" style="margin-bottom:12px"><ul class="pb-list">${li(V.basics)}</ul></div>
+                <div class="pb-scroll"><table class="pb-table"><thead><tr><th>ใช้เมื่อ</th><th>ลงท้าย</th><th>ตัวอย่างจากร้าน</th><th>ค้างถึงวิ 2</th></tr></thead>
+                    <tbody>${V.endings.map(e => `<tr><td>${escHtml(e.when)}</td><td class="end">${escHtml(e.end)}</td><td>${escHtml(e.example)}</td><td>${e.c1}%</td></tr>`).join('')}</tbody></table></div>
+                <div class="pb-two" style="margin-top:12px">
+                    <div class="pb-box ok"><h4><span class="material-icons-round">check_circle</span>คำที่ใช้แล้วได้ผล</h4><div class="pb-chips">${V.use.map(w => `<span>${escHtml(w)}</span>`).join('')}</div></div>
+                    <div class="pb-box ok"><h4><span class="material-icons-round">search</span>คำที่ลูกค้าค้น</h4><div class="pb-chips">${V.search.map(w => `<span>${escHtml(w)}</span>`).join('')}</div>
+                        <p class="pb-weeknote">${escHtml(V.searchNote)}</p></div>
+                    <div class="pb-box"><h4><span class="material-icons-round">subtitles</span>ซับบนจอ</h4><ul class="pb-list">${li(V.subtitle)}</ul></div>
+                </div>
+            </section>
+
+            <section class="pb-sec" id="pbSecNever">
+                <h3>คำต้องห้าม</h3>
+                <p>${escHtml(V.competitorNote)}</p>
+                <div class="pb-two">
+                    <div class="pb-box no"><h4><span class="material-icons-round">block</span>ห้ามในคลิปและแคปชัน</h4><ul class="pb-list">${li(V.never)}</ul></div>
+                    <div class="pb-box no"><h4><span class="material-icons-round">block</span>ชื่อร้านอื่นที่ห้ามเอ่ย</h4>
+                        <ul class="pb-list">${V.competitors.map(c => `<li><b>${escHtml(c.name)}</b> (${escHtml(c.where)}) — ${escHtml(c.aliases)}</li>`).join('')}</ul></div>
+                </div>
+            </section>`;
+        renderPlaybookWeek();
+    }
+    if (document.getElementById('tabPlaybook').classList.contains('active')) loadPlaybook().then(renderPlaybook);
 
     // Lateness depends on the clock, so keep the open schedule current.
     setInterval(() => {
