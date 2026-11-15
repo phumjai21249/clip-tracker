@@ -42,6 +42,12 @@ const products = require('./products').createProducts({
     ref: db.collection('clipTracker').doc('products').collection('items'),
     FieldValue: admin.firestore.FieldValue,
 });
+// Hook album entries pushed weekly by the KPI check — see hooks.js.
+const hooks = require('./hooks').createHooks({
+    itemsRef: db.collection('clipTracker').doc('hooks').collection('items'),
+    coversRef: db.collection('clipTracker').doc('hookCovers').collection('items'),
+    staticFile: path.join(__dirname, 'public', 'hook-album.json'),
+});
 
 // ============ INITIAL DATA ============
 function getDefaultClips() {
@@ -140,6 +146,7 @@ async function initDB() {
     startCoversListener();
     startKpiListener();
     products.startListener();
+    hooks.start();
     backfillHasCoverOnce();
 }
 // Started at the bottom of this file, once the cache bindings below exist.
@@ -402,6 +409,7 @@ app.get('/__diag', async (req, res) => {
         kpiMonths: Object.keys(kpiCache).sort(),
         productsReady: products.isReady(),
         products: products.count(),
+        hookAlbumPushed: hooks.count(),
         lastError: clipsCacheError ? clipsCacheError.message : null
     };
     out.backfill = lastBackfillResult;
@@ -436,7 +444,9 @@ app.get('/__diag', async (req, res) => {
 });
 
 // ============ SERVE STATIC ============
+hooks.routes(app, express);
 app.use(express.static(path.join(__dirname, 'public')));
+hooks.coverRoute(app);
 
 // ============ SOCKET.IO ============
 let onlineCount = 0;

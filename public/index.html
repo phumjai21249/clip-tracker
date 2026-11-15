@@ -5265,7 +5265,7 @@
         document.getElementById('haFormat').innerHTML = '<option value="">ทุกรูปแบบคลิป</option>'
             + formats.map(f => `<option value="${escAttr(f)}">${escHtml(f)}</option>`).join('');
         const m = hookAlbum.meta;
-        document.getElementById('haMeta').textContent = `ที่มา: ${m.source} · ${m.rules} · ฮุก = สัดส่วนคนที่ยังดูอยู่ที่วินาทีที่ 2 (KPI C1) · ${m.reviewed || 0} คลิปจัดหมวดจากการดูคลิปจริง (ป้าย "ดูคลิปแล้ว") ที่เหลือจัดจากแคปชัน`;
+        document.getElementById('haMeta').textContent = `ที่มา: ${m.source}${m.pushed ? ` (ล่าสุด ${m.pushed})` : ''} · ${m.rules} · ฮุก = สัดส่วนคนที่ยังดูอยู่ที่วินาทีที่ 2 (KPI C1) · ${m.reviewed || 0} คลิปจัดหมวดจากการดูคลิปจริง (ป้าย "ดูคลิปแล้ว") ที่เหลือจัดจากแคปชัน`;
         renderHookAlbum();
     }
     function haPct(v) { return Math.round(v * 100) + '%'; }
