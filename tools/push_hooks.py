@@ -67,10 +67,20 @@ def read_raw(path):
             {'desc': desc, 'exclude': excl, 'covers': covers}.get(section, {})[k.strip()] = v.strip()
     if ch not in ('JS', 'ME') or not captured:
         raise SystemExit(f'{path}: needs "# ch: JS|ME" and "# captured: <ISO time>" lines')
+    # desc / exclude lines are keyed by the end of the id (6 digits is usual;
+    # write more digits or the full id when two clips share the same ending).
+    def lookup(table, cid, what):
+        hits = [k for k in table if cid.endswith(k)]
+        if not hits:
+            return ''
+        best = max(hits, key=len)
+        if sum(1 for r in rows if r['id'].endswith(best)) > 1:
+            raise SystemExit(f'{path}: {what} key {best} matches more than one clip; use more digits')
+        return table[best]
     for x in rows:
         x['ch'] = ch
-        x['desc'] = desc.get(x['id'][-6:], '')
-        x['exclude'] = excl.get(x['id'][-6:], '')
+        x['desc'] = lookup(desc, x['id'], 'desc')
+        x['exclude'] = lookup(excl, x['id'], 'exclude')
         if x['id'] in covers:
             x['cover_url'] = covers[x['id']]
     return {'captured': captured, 'clips': rows}

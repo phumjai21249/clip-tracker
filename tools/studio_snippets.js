@@ -61,11 +61,11 @@ await (async () => {
     const rows = window.__items.filter(x => window.__curves[x.item_id]);
     window.__csv = rows.map(x => { const c = window.__curves[x.item_id], d = Math.round(x.duration / 100) / 10;
         return [x.item_id, x.post_time, x.play_count, x.like_count, x.comment_count, x.share_count, d, at(c, 1), at(c, 2), at(c, 3), at(c, 6), at(c, d * 0.25), at(c, d * 0.5)].join(','); });
-    window.__desc = rows.map(x => x.item_id.slice(-6) + '|' + (x.desc || '').replace(/#\S+/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 45));
+    window.__desc = rows.map(x => x.item_id.slice(-8) + '|' + (x.desc || '').replace(/#\S+/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 90));
     return { rows: rows.length };
 })();
 // window.__csv.slice(0, 13).join('\n')   … then 13–26, 26–39, …
-// window.__desc.slice(0, 22).join('\n')  … then 22–44, …
+// window.__desc.slice(0, 15).join('\n')  … then 15–30, …  (keys = last 8 digits of the id)
 
 // ---- 5. built-in browser (logged out), once per clip that has no cover yet:
 //      navigate to https://www.tiktok.com/@<handle>/video/<id>, then run
