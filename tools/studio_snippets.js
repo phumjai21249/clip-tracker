@@ -9,13 +9,22 @@
 // Competitor clips never go through this flow; they are looked at logged out only.
 
 // ---- 1. on https://www.tiktok.com/tiktokstudio/analytics : catch the post list, open Posts
+//      Studio loads the list with XMLHttpRequest (since Nov 2026; it used fetch before), so both are caught.
+//      Run this on a freshly loaded page, before the Posts list has scrolled: pages loaded
+//      before the catch is in place are lost, and step 2 then skips a stretch of days.
 window.__il = [];
 if (!window.__hooked) {
+    const keep = (u, read) => { try { if (/item_list/.test(String(u))) read().then(j => window.__il.push(j)).catch(() => {}); } catch (e) {} };
     const of = window.fetch;
     window.fetch = async function (...a) {
         const r = await of.apply(this, a);
-        try { if (/item_list/.test(String(a[0] && a[0].url || a[0]))) r.clone().json().then(j => window.__il.push(j)).catch(() => {}); } catch (e) {}
+        keep(a[0] && a[0].url || a[0], () => r.clone().json());
         return r;
+    };
+    const oo = XMLHttpRequest.prototype.open;
+    XMLHttpRequest.prototype.open = function (m, u) {
+        this.addEventListener('load', () => keep(u, async () => JSON.parse(this.responseText)));
+        return oo.apply(this, arguments);
     };
     window.__hooked = true;
 }
@@ -30,7 +39,7 @@ await (async () => {
     await sleep(6000);
     for (let i = 0; i < 10; i++) {
         const it = uniq().filter(x => !x.is_pinned);
-        if (Math.min(...it.map(x => Number(x.post_time))) < since) break;
+        if (it.length && Math.min(...it.map(x => Number(x.post_time))) < since) break;
         const s = scroller(); s.scrollTop = s.scrollHeight;
         await sleep(2500);
     }
