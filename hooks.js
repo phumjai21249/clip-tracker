@@ -84,7 +84,8 @@ function mergeAlbum(base, pushed) {
     const clips = [...byId.values()].sort((a, b) => b.c1 - a.c1);
     const meta = { ...(base.meta || {}), count: clips.length, reviewed: clips.filter(c => c.reviewed).length };
     if (latest) {
-        meta.pushed = latest.slice(0, 10);
+        // shown to the team as a Thai calendar date (UTC+7), not the UTC one
+        meta.pushed = new Date(Date.parse(latest) + 7 * 3600e3).toISOString().slice(0, 10);
         meta.source = 'TikTok Studio (กราฟคนดูต่อรายคลิป) · อัปเดตอัตโนมัติทุกรอบเช็ค KPI รายสัปดาห์';
     }
     return { meta, clips };

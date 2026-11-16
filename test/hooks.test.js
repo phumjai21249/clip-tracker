@@ -61,7 +61,7 @@ const t = async (name, fn) => { await fn(); n++; console.log('ok', name); };
         ] };
         const m = mergeAlbum(base, [
             { id: '1', c1: 0.3, views: 99, format: 'โชว์สินค้า / รุ่นใหม่', hasCover: false, pushedAt: '2026-11-15T01:00:00Z' },
-            { id: '3', c1: 0.9, views: 7, format: 'B', hasCover: true, pushedAt: '2026-11-16T01:00:00Z' },
+            { id: '3', c1: 0.9, views: 7, format: 'B', hasCover: true, pushedAt: '2026-11-15T18:00:00Z' },
         ]);
         const byId = Object.fromEntries(m.clips.map(c => [c.id, c]));
         assert.strictEqual(byId['1'].views, 99);
