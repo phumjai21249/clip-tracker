@@ -5677,7 +5677,7 @@
             <div class="ha-body">
                 <div class="ha-tags"><span class="ha-tag hk">${escHtml(c.hook)}</span><span class="ha-tag">${escHtml(c.format)}</span>
                     ${PILLARS[c.pillar] ? `<span class="ha-tag">เสา ${c.pillar.slice(1)}</span>` : ''}
-                    ${c.seen === 'transcript' ? '<span class="ha-tag">ถอดจากบทพูด</span>' : ''}</div>
+                    ${c.seen === 'transcript' ? '<span class="ha-tag">ถอดจากบทพูด</span>' : ''}${c.ad ? '<span class="ha-tag">มีแอด</span>' : ''}</div>
                 <div class="ha-trick"><b>Trick</b>${escHtml(c.trick)}</div>
                 <div class="hc-adapt"><b>เอามาปรับใช้</b>${escHtml(c.adapt)}</div>
                 <button type="button" class="btn ha-open" onclick="openCompetitor('${c.id}')"><span class="material-icons-round">insights</span>ดูการถอดสูตร</button>
@@ -5711,17 +5711,24 @@
                 <div class="ha-an-head"><h4>${escHtml(c.caption)}</h4>
                     <div class="ha-tags"><span class="ha-tag hk">${escHtml(c.hook)}</span><span class="ha-tag">${escHtml(c.format)}</span>
                         ${PILLARS[c.pillar] ? `<span class="ha-tag">เสา ${c.pillar.slice(1)} · ${escHtml(PILLARS[c.pillar])}</span>` : ''}
-                        <span class="ha-tag">${c.seen === 'transcript' ? 'ถอดจากบทพูด ไม่เห็นภาพ' : 'ดูจากภาพ 8 เฟรม + บทพูด'}</span></div></div>
+                        <span class="ha-tag">${c.seen === 'transcript' ? 'ถอดจากบทพูดเต็มคลิป ไม่เห็นภาพ' : c.seen === 'full' ? 'ดูทั้งคลิป: ภาพ 20 เฟรม + บทพูดเต็ม' : 'ดูจากภาพ 8 เฟรม + บทพูด'}</span>
+                        ${c.ad ? '<span class="ha-tag">TikTok ติดป้ายว่าใช้เป็นโฆษณา</span>' : ''}</div></div>
 
                 <section class="ha-sec"><div class="ha-sec-h"><h5>ทำไมคลิปนี้ดัง</h5><small>ความเห็นจากการดูคลิป ไม่ใช่ตัวเลขวัดผล</small></div>
                     <p class="ha-note" style="margin:0">${escHtml(c.trick)}</p></section>
 
-                <section class="ha-sec"><div class="ha-sec-h"><h5>แกะ 3 วินาทีแรก</h5><small>${c.seen === 'transcript' ? 'คลิปนี้เปิดภาพไม่ได้ตอนไม่ล็อกอิน' : 'จากเฟรมวิ 0.3 / 1.2 / 2.2 / 3.2'}</small></div>
+                <section class="ha-sec"><div class="ha-sec-h"><h5>แกะ 3 วินาทีแรก</h5><small>${c.seen === 'transcript' ? 'คลิปนี้เปิดภาพไม่ได้ตอนไม่ล็อกอิน' : c.seen === 'full' ? 'จากเฟรมวิ 0.2 / 1 / 2 / 3' : 'จากเฟรมวิ 0.3 / 1.2 / 2.2 / 3.2'}</small></div>
                     <div class="ha-rows">
                         <div class="ha-row"><span>ภาพบนจอ</span><span>${c.opening ? escHtml(c.opening) : '<em>ไม่ได้เห็นภาพ ต้องเปิดดูเองที่คลิปด้านซ้าย</em>'}</span></div>
                         <div class="ha-row"><span>ประโยคแรกที่พูด</span><span>${c.said ? '“' + escHtml(c.said) + '”<br><em>จากซับอัตโนมัติของ TikTok อาจสะกดเพี้ยน</em>' : '<em>ไม่มีเสียงพูด (เพลงอย่างเดียว)</em>'}</span></div>
                         <div class="ha-row"><span>ฮุก & รูปแบบ</span><span><b>${escHtml(c.hook)}</b> · ${escHtml(c.format)}</span></div>
                     </div></section>
+
+                ${c.flow || c.speech ? `<section class="ha-sec"><div class="ha-sec-h"><h5>ทั้งคลิปเดินเรื่องยังไง</h5><small>${c.flow ? 'ไล่ดูภาพตั้งแต่ต้นจนจบ ไม่ได้ฟังเสียง' : 'จากบทพูดเต็มคลิป ไม่เห็นภาพ'}</small></div>
+                    <div class="ha-rows">
+                        ${c.flow ? `<div class="ha-row"><span>ภาพทีละช่วง</span><span>${escHtml(c.flow)}</span></div>` : ''}
+                        ${c.speech ? `<div class="ha-row"><span>ลำดับที่พูด</span><span>${escHtml(c.speech)}</span></div>` : ''}
+                    </div></section>` : ''}
 
                 <section class="ha-sec"><div class="ha-sec-h"><h5>คนดูทำอะไรกับคลิปนี้</h5><small>ต่อ 1,000 วิว · ยอดวิวอาจรวมแอด</small></div>
                     <div class="ha-scores">${rates.map(([n, k]) => `<div class="ha-score"><span class="k">${n}</span><span class="v">${hcRate(c, k).toFixed(1)}</span><span class="n">${haNum(c[k])} ครั้ง${k === 'shares' && b5 ? ` · เป้าช่องเรา ${b5.tgt}` : ''}</span></div>`).join('')}</div>
