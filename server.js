@@ -47,6 +47,9 @@ const hooks = require('./hooks').createHooks({
     itemsRef: db.collection('clipTracker').doc('hooks').collection('items'),
     coversRef: db.collection('clipTracker').doc('hookCovers').collection('items'),
     staticFile: path.join(__dirname, 'public', 'hook-album.json'),
+    // Competitor clips added after the shipped public/competitor-hooks.json.
+    compRef: db.collection('clipTracker').doc('competitorHooks').collection('items'),
+    compStaticFile: path.join(__dirname, 'public', 'competitor-hooks.json'),
 });
 
 // ============ INITIAL DATA ============
@@ -410,6 +413,7 @@ app.get('/__diag', async (req, res) => {
         productsReady: products.isReady(),
         products: products.count(),
         hookAlbumPushed: hooks.count(),
+        competitorClipsPushed: hooks.competitorCount(),
         lastError: clipsCacheError ? clipsCacheError.message : null
     };
     out.backfill = lastBackfillResult;

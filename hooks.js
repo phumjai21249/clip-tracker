@@ -91,6 +91,67 @@ function mergeAlbum(base, pushed) {
     return { meta, clips };
 }
 
+// ---- Competitor clips ("คลิปคู่แข่ง") ----
+// Other shops' public clips, watched logged out and broken down by hand. The
+// shipped public/competitor-hooks.json is the base; clips pushed later live one
+// Firestore doc each and are added to it. A push only ever adds a clip or
+// updates the one with the same id: nothing already in the album is removed.
+const SEEN = new Set(['full', 'frames', 'transcript']);
+const COMP_TEXT = ['opening', 'said', 'trick', 'adapt', 'flow', 'speech'];
+const COMP_COUNTS = ['views', 'likes', 'comments', 'shares', 'saves'];
+const OWN_HANDLES = new Set(['j.s.sport_shop', 'mesport80']);
+const MAX_COMP_BYTES = 16 * 1024;
+
+// Returns the cleaned competitor entry, or a string saying what is wrong.
+function cleanCompetitor(x) {
+    if (!x || typeof x !== 'object' || Array.isArray(x)) return 'not an object';
+    if (typeof x.id !== 'string' || !ID.test(x.id)) return 'bad id';
+    if (!isStr(x.shop, 80) || !x.shop.trim()) return `${x.id}: bad shop`;
+    const m = /^https:\/\/www\.tiktok\.com\/@([\w.]{1,40})\/video\/(\d{15,25})$/.exec(x.url || '');
+    if (!m || m[2] !== x.id) return `${x.id}: bad url`;
+    if (OWN_HANDLES.has(m[1])) return `${x.id}: own clip, push it to /api/hooks`;
+    if (!DATE.test(x.date || '')) return `${x.id}: bad date`;
+    if (!isNum(x.dur, 0, 3600)) return `${x.id}: bad dur`;
+    for (const k of COMP_COUNTS) if (!isNum(x[k], 0, 1e10)) return `${x.id}: bad ${k}`;
+    if (!SEEN.has(x.seen)) return `${x.id}: bad seen`;
+    if (!isStr(x.caption, 300) || !x.caption.trim()) return `${x.id}: bad caption`;
+    for (const k of ['hook', 'format']) if (!isStr(x[k], 60) || !x[k].trim()) return `${x.id}: bad ${k}`;
+    const out = { id: x.id, shop: x.shop.trim(), url: x.url, date: x.date, dur: x.dur };
+    COMP_COUNTS.forEach(k => { out[k] = Math.round(x[k]); });
+    Object.assign(out, { seen: x.seen, caption: x.caption, hook: x.hook, format: x.format });
+    if (x.pillar !== undefined) {
+        if (!PILLARS.has(x.pillar)) return `${x.id}: bad pillar`;
+        out.pillar = x.pillar;
+    }
+    for (const k of COMP_TEXT) {
+        const v = x[k] === undefined ? '' : x[k];
+        if (!isStr(v, 1500)) return `${x.id}: bad ${k}`;
+        out[k] = v;
+    }
+    if (!out.trick.trim() || !out.adapt.trim()) return `${x.id}: trick and adapt are required`;
+    out.ad = !!x.ad;
+    if (Buffer.byteLength(JSON.stringify(out), 'utf8') > MAX_COMP_BYTES) return `${x.id}: too big`;
+    return out;
+}
+
+// Pushed competitor clips added to the shipped ones. Shipped clips keep their
+// order, new ones follow in the order they were pushed; a clip pushed again
+// replaces only itself.
+function mergeCompetitor(base, pushed) {
+    const byId = new Map();
+    (base.clips || []).forEach(c => byId.set(c.id, c));
+    let latest = '';
+    for (const p of pushed.slice().sort((a, b) => String(a.pushedAt || '').localeCompare(String(b.pushedAt || '')) || String(a.id).localeCompare(String(b.id)))) {
+        const { pushedAt, ...fields } = p;
+        byId.set(p.id, { ...(byId.get(p.id) || {}), ...fields });
+        if (pushedAt && pushedAt > latest) latest = pushedAt;
+    }
+    const clips = [...byId.values()];
+    const meta = { ...(base.meta || {}), count: clips.length, ads: clips.filter(c => c.ad).length };
+    if (latest) meta.added = new Date(Date.parse(latest) + 7 * 3600e3).toISOString().slice(0, 10);
+    return { meta, clips };
+}
+
 function tokenOk(header, expectedHash) {
     const m = /^Bearer (\S{16,200})$/.exec(header || '');
     if (!m) return false;
@@ -99,12 +160,17 @@ function tokenOk(header, expectedHash) {
     return want.length === got.length && crypto.timingSafeEqual(got, want);
 }
 
-function createHooks({ itemsRef, coversRef, staticFile, tokenSha256 = process.env.HOOKS_TOKEN_SHA256 || DEFAULT_TOKEN_SHA256, log = console }) {
+// compRef / compStaticFile are optional: without them the competitor routes are not mounted.
+function createHooks({ itemsRef, coversRef, staticFile, compRef, compStaticFile, tokenSha256 = process.env.HOOKS_TOKEN_SHA256 || DEFAULT_TOKEN_SHA256, log = console }) {
     const items = new Map();
     const coverCache = new Map();
     let base = { meta: {}, clips: [] };
     let cached = null;
     let ready = false;
+    const compItems = new Map();
+    let compBase = { meta: {}, clips: [] };
+    let compCached = null;
+    let compReady = false;
 
     function loadBase() {
         try { base = JSON.parse(fs.readFileSync(staticFile, 'utf8')); } catch (e) { log.error('hook album base unreadable:', e.message); }
@@ -119,6 +185,40 @@ function createHooks({ itemsRef, coversRef, staticFile, tokenSha256 = process.en
             cached = null;
             ready = true;
         }, err => log.error('hooks snapshot error:', err && err.message));
+        if (!compRef) return;
+        try { compBase = JSON.parse(fs.readFileSync(compStaticFile, 'utf8')); } catch (e) { log.error('competitor clips base unreadable:', e.message); }
+        compRef.onSnapshot(snap => {
+            compItems.clear();
+            snap.forEach(d => compItems.set(d.id, d.data()));
+            compCached = null;
+            compReady = true;
+        }, err => log.error('competitor clips snapshot error:', err && err.message));
+    }
+
+    function competitorAlbum() {
+        if (!compCached) compCached = JSON.stringify(mergeCompetitor(compBase, [...compItems.values()]));
+        return compCached;
+    }
+
+    // Adds the clips (or updates the ones with the same id). Never deletes.
+    async function ingestCompetitor(body) {
+        const list = body && body.clips;
+        if (!Array.isArray(list) || !list.length) return { ok: false, error: 'no clips' };
+        if (list.length > MAX_BATCH) return { ok: false, error: `max ${MAX_BATCH} clips per push` };
+        const clean = [];
+        for (const x of list) {
+            const c = cleanCompetitor(x);
+            if (typeof c === 'string') return { ok: false, error: c };
+            clean.push(c);
+        }
+        const known = new Set((compBase.clips || []).map(c => c.id));
+        const added = clean.filter(c => !known.has(c.id) && !compItems.has(c.id)).length;
+        const now = new Date().toISOString();
+        for (const c of clean) {
+            const prev = compItems.get(c.id);
+            await compRef.doc(c.id).set({ ...c, pushedAt: (prev && prev.pushedAt) || now });
+        }
+        return { ok: true, clips: clean.length, added, updated: clean.length - added };
     }
 
     function album() {
@@ -172,6 +272,23 @@ function createHooks({ itemsRef, coversRef, staticFile, tokenSha256 = process.en
                 res.status(500).json({ ok: false, error: String(e && e.message || e), code: (e && e.code) || null });
             }
         });
+        if (!compRef) return;
+        // Also before express.static, for the same reason.
+        app.get('/competitor-hooks.json', (req, res) => {
+            res.set('Cache-Control', 'no-cache');
+            res.type('application/json').send(competitorAlbum());
+        });
+        app.post('/api/competitor-hooks', express.json({ limit: '2mb' }), async (req, res) => {
+            if (!tokenOk(req.get('authorization'), tokenSha256)) return res.status(401).json({ ok: false, error: 'unauthorized' });
+            if (!compReady) return res.status(503).json({ ok: false, error: 'not ready, retry shortly' });
+            try {
+                const r = await ingestCompetitor(req.body);
+                res.status(r.ok ? 200 : 400).json(r);
+            } catch (e) {
+                log.error('competitor clips ingest failed:', e);
+                res.status(500).json({ ok: false, error: String(e && e.message || e), code: (e && e.code) || null });
+            }
+        });
     }
 
     // Mount after express.static: a cover shipped in public/hook-covers is served
@@ -195,7 +312,7 @@ function createHooks({ itemsRef, coversRef, staticFile, tokenSha256 = process.en
         });
     }
 
-    return { start, routes, coverRoute, ingest, album, count: () => items.size };
+    return { start, routes, coverRoute, ingest, album, count: () => items.size, ingestCompetitor, competitorAlbum, competitorCount: () => compItems.size };
 }
 
-module.exports = { createHooks, cleanEntry, mergeAlbum, tokenOk, toDoc, fromDoc };
+module.exports = { createHooks, cleanEntry, mergeAlbum, cleanCompetitor, mergeCompetitor, tokenOk, toDoc, fromDoc };

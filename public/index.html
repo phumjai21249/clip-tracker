@@ -5653,7 +5653,10 @@
         }
         await loadPlaybook();
         const m = compAlbum.meta;
-        document.getElementById('hcMeta').textContent = `ที่มา: ${m.source} · ${m.method} · ${m.caveat}`;
+        // Clips are added over time, so the counts are worked out here, not written into the text.
+        const ads = compAlbum.clips.filter(c => c.ad).length;
+        const adNote = ads ? `TikTok ติดป้ายว่า ${ads} จาก ${compAlbum.clips.length} คลิปนี้ถูกใช้เป็นโฆษณา ยอดวิวจึงรวมวิวจากแอด · ` : '';
+        document.getElementById('hcMeta').textContent = `ที่มา: ${m.source} · ${m.method} · ${adNote}${m.caveat}${m.added ? ` · เพิ่มคลิปล่าสุด ${formatDate(m.added)}` : ''}`;
         document.getElementById('hcPatterns').innerHTML = m.patterns.map(x => `<li>${escHtml(x)}</li>`).join('');
         renderCompetitor();
     }

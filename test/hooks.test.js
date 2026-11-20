@@ -4,7 +4,7 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const crypto = require('crypto');
-const { createHooks, cleanEntry, mergeAlbum, tokenOk, toDoc, fromDoc } = require('../hooks');
+const { createHooks, cleanEntry, mergeAlbum, cleanCompetitor, mergeCompetitor, tokenOk, toDoc, fromDoc } = require('../hooks');
 
 function mockCollection() {
     const docs = {};
@@ -108,6 +108,62 @@ const t = async (name, fn) => { await fn(); n++; console.log('ok', name); };
         assert.strictEqual(Object.keys(items.docs).length, before);
         assert.strictEqual((await h.ingest({ clips: [] })).ok, false);
         assert.strictEqual((await h.ingest({ clips: [good()], covers: { '7703146302502112519': 'not base64!' } })).ok, false);
+    });
+    const comp = (over = {}) => ({
+        id: '7600000000000000001', shop: 'ร้านตัวอย่าง', url: 'https://www.tiktok.com/@some.shop/video/7600000000000000001',
+        date: '2026-10-01', dur: 30, views: 50000, likes: 900, comments: 12, shares: 40, saves: 55, seen: 'full',
+        caption: 'c', hook: 'h', format: 'f', pillar: 'p2', opening: 'o', said: '', trick: 't', adapt: 'a', ad: true, flow: 'fl', speech: '', ...over,
+    });
+    await t('cleanCompetitor accepts a valid clip, rejects bad ones and own clips', () => {
+        const c = cleanCompetitor(comp({ evil: '<script>' }));
+        assert.strictEqual(typeof c, 'object');
+        assert.strictEqual(c.evil, undefined);
+        assert.strictEqual(c.ad, true);
+        assert.match(cleanCompetitor(comp({ id: 'x' })), /bad id/);
+        assert.match(cleanCompetitor(comp({ url: 'https://evil.example/@a/video/7600000000000000001' })), /bad url/);
+        assert.match(cleanCompetitor(comp({ url: 'https://www.tiktok.com/@some.shop/video/7600000000000000002' })), /bad url/);
+        assert.match(cleanCompetitor(comp({ url: 'https://www.tiktok.com/@j.s.sport_shop/video/7600000000000000001' })), /own clip/);
+        assert.match(cleanCompetitor(comp({ seen: 'no' })), /seen/);
+        assert.match(cleanCompetitor(comp({ saves: -1 })), /saves/);
+        assert.match(cleanCompetitor(comp({ trick: ' ' })), /required/);
+        assert.match(cleanCompetitor(comp({ pillar: 'p9' })), /pillar/);
+    });
+    await t('mergeCompetitor adds pushed clips after the shipped ones and removes nothing', () => {
+        const base = { meta: { source: 's' }, clips: [{ id: '1', views: 10, ad: true, trick: 'old' }, { id: '2', views: 5, ad: false }] };
+        const m = mergeCompetitor(base, [
+            { id: '4', views: 1, ad: true, pushedAt: '2026-11-20T18:00:00Z' },
+            { id: '3', views: 7, ad: false, pushedAt: '2026-11-19T01:00:00Z' },
+            { id: '1', views: 99, ad: true, trick: 'new', pushedAt: '2026-11-19T01:00:00Z' },
+        ]);
+        assert.deepStrictEqual(m.clips.map(c => c.id), ['1', '2', '3', '4']);
+        assert.strictEqual(m.clips[0].views, 99);
+        assert.strictEqual(m.clips[0].trick, 'new');
+        assert.strictEqual(m.clips[0].pushedAt, undefined);
+        assert.deepStrictEqual([m.meta.count, m.meta.ads, m.meta.added, m.meta.source], [4, 2, '2026-11-21', 's']);
+        assert.strictEqual(mergeCompetitor(base, []).meta.added, undefined);
+    });
+    await t('ingestCompetitor adds to the album; a second push leaves earlier clips in place', async () => {
+        const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'comp-'));
+        const file = path.join(dir, 'hook-album.json'), cfile = path.join(dir, 'competitor-hooks.json');
+        fs.writeFileSync(file, JSON.stringify({ meta: {}, clips: [] }));
+        fs.writeFileSync(cfile, JSON.stringify({ meta: { source: 's' }, clips: [comp({ id: '7500000000000000001', url: 'https://www.tiktok.com/@some.shop/video/7500000000000000001' })] }));
+        const store = mockCollection();
+        const h = createHooks({ itemsRef: mockCollection(), coversRef: mockCollection(), staticFile: file, compRef: store, compStaticFile: cfile, log: { error() {} } });
+        h.start();
+        assert.strictEqual(JSON.parse(h.competitorAlbum()).clips.length, 1);
+        assert.deepStrictEqual(await h.ingestCompetitor({ clips: [comp()] }), { ok: true, clips: 1, added: 1, updated: 0 });
+        const second = comp({ id: '7600000000000000002', url: 'https://www.tiktok.com/@other/video/7600000000000000002' });
+        assert.deepStrictEqual(await h.ingestCompetitor({ clips: [second, comp({ views: 60000 })] }), { ok: true, clips: 2, added: 1, updated: 1 });
+        const a = JSON.parse(h.competitorAlbum());
+        assert.deepStrictEqual(a.clips.map(c => c.id), ['7500000000000000001', '7600000000000000001', '7600000000000000002']);
+        assert.strictEqual(a.clips[1].views, 60000);
+        assert.strictEqual(a.meta.count, 3);
+        // one bad clip rejects the whole push, nothing written
+        const bad = await h.ingestCompetitor({ clips: [comp({ id: '7600000000000000003', url: 'https://www.tiktok.com/@other/video/7600000000000000003' }), comp({ seen: 'x' })] });
+        assert.strictEqual(bad.ok, false);
+        assert.strictEqual(Object.keys(store.docs).length, 2);
+        assert.strictEqual((await h.ingestCompetitor({ clips: [] })).ok, false);
+        assert.strictEqual(h.competitorCount(), 2);
     });
     console.log(`\n${n} passed`);
 })().catch(e => { console.error('FAIL', e); process.exit(1); });
