@@ -172,6 +172,11 @@ function createHooks({ itemsRef, coversRef, staticFile, compRef, compStaticFile,
     let compBase = { meta: {}, clips: [] };
     let compCached = null;
     let compReady = false;
+    // Read now, not in start(): the route is mounted before start() runs, and a
+    // request in that gap would otherwise get an album with no clips.
+    if (compRef) {
+        try { compBase = JSON.parse(fs.readFileSync(compStaticFile, 'utf8')); } catch (e) { log.error('competitor clips base unreadable:', e.message); }
+    }
 
     function loadBase() {
         try { base = JSON.parse(fs.readFileSync(staticFile, 'utf8')); } catch (e) { log.error('hook album base unreadable:', e.message); }
@@ -187,7 +192,6 @@ function createHooks({ itemsRef, coversRef, staticFile, compRef, compStaticFile,
             ready = true;
         }, err => log.error('hooks snapshot error:', err && err.message));
         if (!compRef) return;
-        try { compBase = JSON.parse(fs.readFileSync(compStaticFile, 'utf8')); } catch (e) { log.error('competitor clips base unreadable:', e.message); }
         compRef.onSnapshot(snap => {
             compItems.clear();
             snap.forEach(d => compItems.set(d.id, d.data()));
