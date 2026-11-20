@@ -158,6 +158,11 @@ const t = async (name, fn) => { await fn(); n++; console.log('ok', name); };
         assert.deepStrictEqual(a.clips.map(c => c.id), ['7500000000000000001', '7600000000000000001', '7600000000000000002']);
         assert.strictEqual(a.clips[1].views, 60000);
         assert.strictEqual(a.meta.count, 3);
+        // pushing a clip again without its optional fields keeps the ones it had
+        const { flow, opening, ad, ...bare } = comp({ views: 70000 });
+        await h.ingestCompetitor({ clips: [bare] });
+        const kept = JSON.parse(h.competitorAlbum()).clips[1];
+        assert.deepStrictEqual([kept.views, kept.flow, kept.opening, kept.ad], [70000, 'fl', 'o', true]);
         // one bad clip rejects the whole push, nothing written
         const bad = await h.ingestCompetitor({ clips: [comp({ id: '7600000000000000003', url: 'https://www.tiktok.com/@other/video/7600000000000000003' }), comp({ seen: 'x' })] });
         assert.strictEqual(bad.ok, false);

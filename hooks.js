@@ -109,7 +109,7 @@ function cleanCompetitor(x) {
     if (!isStr(x.shop, 80) || !x.shop.trim()) return `${x.id}: bad shop`;
     const m = /^https:\/\/www\.tiktok\.com\/@([\w.]{1,40})\/video\/(\d{15,25})$/.exec(x.url || '');
     if (!m || m[2] !== x.id) return `${x.id}: bad url`;
-    if (OWN_HANDLES.has(m[1])) return `${x.id}: own clip, push it to /api/hooks`;
+    if (OWN_HANDLES.has(m[1].toLowerCase())) return `${x.id}: own clip, push it to /api/hooks`;
     if (!DATE.test(x.date || '')) return `${x.id}: bad date`;
     if (!isNum(x.dur, 0, 3600)) return `${x.id}: bad dur`;
     for (const k of COMP_COUNTS) if (!isNum(x[k], 0, 1e10)) return `${x.id}: bad ${k}`;
@@ -123,13 +123,14 @@ function cleanCompetitor(x) {
         if (!PILLARS.has(x.pillar)) return `${x.id}: bad pillar`;
         out.pillar = x.pillar;
     }
+    // A field left out stays out, so pushing a clip again without it keeps what the album already has.
     for (const k of COMP_TEXT) {
-        const v = x[k] === undefined ? '' : x[k];
-        if (!isStr(v, 1500)) return `${x.id}: bad ${k}`;
-        out[k] = v;
+        if (x[k] === undefined) continue;
+        if (!isStr(x[k], 1500)) return `${x.id}: bad ${k}`;
+        out[k] = x[k];
     }
-    if (!out.trick.trim() || !out.adapt.trim()) return `${x.id}: trick and adapt are required`;
-    out.ad = !!x.ad;
+    if (!(out.trick || '').trim() || !(out.adapt || '').trim()) return `${x.id}: trick and adapt are required`;
+    if (x.ad !== undefined) out.ad = !!x.ad;
     if (Buffer.byteLength(JSON.stringify(out), 'utf8') > MAX_COMP_BYTES) return `${x.id}: too big`;
     return out;
 }
@@ -216,7 +217,7 @@ function createHooks({ itemsRef, coversRef, staticFile, compRef, compStaticFile,
         const now = new Date().toISOString();
         for (const c of clean) {
             const prev = compItems.get(c.id);
-            await compRef.doc(c.id).set({ ...c, pushedAt: (prev && prev.pushedAt) || now });
+            await compRef.doc(c.id).set({ ...(prev || {}), ...c, pushedAt: (prev && prev.pushedAt) || now });
         }
         return { ok: true, clips: clean.length, added, updated: clean.length - added };
     }

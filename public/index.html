@@ -5652,7 +5652,7 @@
             catch (e) { document.getElementById('hcMeta').textContent = 'โหลดคลิปคู่แข่งไม่สำเร็จ — ลองรีเฟรชหน้า'; return; }
         }
         await loadPlaybook();
-        const m = compAlbum.meta;
+        const m = { source: '', method: '', caveat: '', patterns: [], ...(compAlbum.meta || {}) };
         // Clips are added over time, so the counts are worked out here, not written into the text.
         const ads = compAlbum.clips.filter(c => c.ad).length;
         const adNote = ads ? `TikTok ติดป้ายว่า ${ads} จาก ${compAlbum.clips.length} คลิปนี้ถูกใช้เป็นโฆษณา ยอดวิวจึงรวมวิวจากแอด · ` : '';
