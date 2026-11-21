@@ -654,6 +654,40 @@
         /* ============================================================
            NEW-PRODUCT LAUNCH PLANS (tab: สินค้าใหม่)
         ============================================================ */
+        .tr-body { padding: 14px 24px 24px; }
+        .tr-week { font: inherit; font-size: 0.82rem; padding: 6px 10px; border-radius: var(--radius-sm); border: 1px solid var(--border); background: var(--surface); color: var(--text); }
+        .tr-meta { margin: 0 0 8px; font-size: 0.8rem; color: var(--text-2); }
+        .tr-summary { margin: 0 0 14px; padding: 12px 14px; border-radius: var(--radius-md); background: var(--brand-soft); color: var(--text); font-size: 0.88rem; line-height: 1.6; }
+        .tr-filters { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
+        .tr-filters button { font: inherit; font-size: 0.78rem; font-weight: 700; padding: 6px 12px; border-radius: var(--radius-full); border: 1px solid var(--border); background: var(--surface); color: var(--text-2); cursor: pointer; }
+        .tr-filters button.on { background: var(--brand); border-color: var(--brand); color: #fff; }
+        .tr-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 12px; }
+        .tr-card { display: flex; flex-direction: column; gap: 8px; padding: 14px 16px; border-radius: var(--radius-md); background: var(--surface); border: 1px solid var(--border); }
+        .tr-card.hot { border-left: 4px solid var(--danger); }
+        .tr-card.rising { border-left: 4px solid var(--warning); }
+        .tr-card.upcoming { border-left: 4px solid var(--info); }
+        .tr-top { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; font-size: 0.72rem; font-weight: 700; }
+        .tr-heat { padding: 2px 8px; border-radius: var(--radius-full); }
+        .tr-heat.hot { background: var(--danger-bg); color: var(--danger-text); }
+        .tr-heat.rising { background: var(--warning-bg); color: var(--warning-text); }
+        .tr-heat.upcoming { background: var(--st-editing-bg); color: var(--st-editing-text); }
+        .tr-cat { padding: 2px 8px; border-radius: var(--radius-full); background: var(--surface-2); color: var(--text-2); }
+        .tr-when { margin-left: auto; color: var(--text-2); font-weight: 600; }
+        .tr-card h3 { margin: 0; font-size: 0.98rem; line-height: 1.4; }
+        .tr-why { margin: 0; font-size: 0.84rem; color: var(--text-2); line-height: 1.55; }
+        .tr-sub { font-size: 0.72rem; font-weight: 700; color: var(--text-3); margin-top: 2px; }
+        .tr-angles { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+        .tr-angles li { display: flex; align-items: flex-start; gap: 8px; font-size: 0.84rem; line-height: 1.5; padding: 8px 10px; border-radius: var(--radius-sm); background: var(--surface-2); }
+        .tr-angles li span { flex: 1; }
+        .tr-angles .queue-btn { flex-shrink: 0; padding: 4px 8px; }
+        .tr-chips { display: flex; flex-wrap: wrap; gap: 5px; }
+        .tr-chips span { font-size: 0.74rem; padding: 2px 8px; border-radius: var(--radius-full); background: var(--brand-soft); color: var(--brand-text); font-weight: 600; }
+        .tr-src { display: flex; flex-wrap: wrap; gap: 4px 12px; font-size: 0.76rem; }
+        .tr-src a { color: var(--info); text-decoration: none; }
+        .tr-src a:hover { text-decoration: underline; }
+        .tr-postby { font-size: 0.76rem; font-weight: 700; color: var(--danger-text); }
+        .tr-empty { padding: 28px; text-align: center; color: var(--text-2); font-size: 0.88rem; border: 1px dashed var(--border-strong); border-radius: var(--radius-md); }
+        @media (max-width: 640px) { .tr-body { padding: 12px 14px 18px; } .tr-grid { grid-template-columns: 1fr; } }
         .prd-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; padding: 18px 24px 24px; }
         .prd-card {
             display: flex; flex-direction: column; gap: 8px; text-align: left;
@@ -1801,6 +1835,9 @@
             <button type="button" class="tab-btn" id="tabBtnProducts" data-tab="Products" role="tab" onclick="setTab('Products')">
                 <span class="material-icons-round">inventory_2</span> สินค้าใหม่
             </button>
+            <button type="button" class="tab-btn" id="tabBtnTrends" data-tab="Trends" role="tab" onclick="setTab('Trends')">
+                <span class="material-icons-round">trending_up</span> เทรนด์กีฬา
+            </button>
         </nav>
 
         <!-- ===== TAB: CLIPS ===== -->
@@ -2312,6 +2349,22 @@
                 <div class="prd-grid" id="prodGrid"></div>
             </div>
             <div class="section-card" id="prodDetail" hidden></div>
+        </div>
+
+        <!-- ===== TAB: SPORTS TRENDS ===== -->
+        <div class="tab-panel" id="tabTrends">
+            <div class="section-card">
+                <div class="section-header">
+                    <h2><span class="material-icons-round">trending_up</span>เทรนด์กีฬา — เรื่องที่คนกำลังพูดถึง เอามาทำคลิปต่อ</h2>
+                    <select id="trWeek" class="tr-week" aria-label="เลือกสัปดาห์" onchange="trSelectWeek(this.value)"></select>
+                </div>
+                <div class="tr-body">
+                    <p class="tr-meta" id="trMeta">กำลังโหลด…</p>
+                    <p class="tr-summary" id="trSummary" hidden></p>
+                    <div class="tr-filters" role="tablist" aria-label="กรองตามความร้อนแรง" id="trFilters"></div>
+                    <div class="tr-grid" id="trGrid"></div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -4266,11 +4319,12 @@
             if (name === 'Schedule' && typeof schedScrollToday === 'function') setTimeout(schedScrollToday, 60);
             if (name === 'Hooks' && typeof loadHookAlbum === 'function') loadHookAlbum();
             if (name === 'Playbook' && typeof loadPlaybook === 'function') loadPlaybook().then(renderPlaybook);
+            if (name === 'Trends' && typeof loadTrends === 'function') loadTrends();
         }
         function initTab() {
             let saved = 'Clips';
             try { saved = localStorage.getItem('clipTracker.tab') || 'Clips'; } catch (e) {}
-            setTab(['Kpi', 'Products', 'Schedule', 'Hooks', 'Playbook'].includes(saved) ? saved : 'Clips');
+            setTab(['Kpi', 'Products', 'Schedule', 'Hooks', 'Playbook', 'Trends'].includes(saved) ? saved : 'Clips');
             window.scrollTo({ top: 0 });
         }
         function kpiJump(n) {
@@ -6386,6 +6440,116 @@ if (socket) {
 
 kpiBoot(); // show something immediately; init:data refines it
 
+    })();
+    </script>
+
+    <script>
+    // ============================================================
+    //  SPORTS TRENDS (tab: เทรนด์กีฬา)
+    //  Pushed every Friday by the scheduled task "เทรนด์กีฬาประจำสัปดาห์"
+    //  (tools/push_trends.py), one week per push. Each clip idea can be put
+    //  straight onto the clip board.
+    // ============================================================
+    (function () {
+        const HEAT = {
+            hot: { label: 'กำลังฮิต', icon: 'local_fire_department' },
+            rising: { label: 'กำลังมา', icon: 'trending_up' },
+            upcoming: { label: 'ใกล้ถึง', icon: 'event' },
+        };
+        let data = null, week = null, filter = 'all', loading = null;
+        const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+        const iso = d => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+        const thaiDate = k => { const [y, m, d] = k.split('-').map(Number); return d + ' ' + THAI_MONTHS_SHORT[m - 1] + ' ' + String((y + 543) % 100).padStart(2, '0'); };
+        function daysTo(k) {
+            const [y, m, d] = k.split('-').map(Number);
+            const now = new Date(); now.setHours(0, 0, 0, 0);
+            return Math.round((new Date(y, m - 1, d) - now) / 86400000);
+        }
+        const cur = () => (data && data.weeks || []).find(w => w.week === week) || null;
+
+        window.loadTrends = function () {
+            if (loading) return loading;
+            loading = fetch('/trends.json', { cache: 'no-cache' })
+                .then(r => r.json())
+                .then(j => {
+                    data = j;
+                    const weeks = j.weeks || [];
+                    if (!week || !weeks.some(w => w.week === week)) week = weeks.length ? weeks[0].week : null;
+                    render();
+                })
+                .catch(() => { document.getElementById('trMeta').textContent = 'โหลดเทรนด์ไม่สำเร็จ — ลองรีเฟรชหน้า'; })
+                .finally(() => { loading = null; });
+            return loading;
+        };
+        window.trSelectWeek = function (k) { week = k; render(); };
+        window.trFilter = function (f) { filter = f; render(); };
+
+        window.trAddClip = function (itemId, i) {
+            const w = cur(); if (!w) return;
+            const it = w.items.find(x => x.id === itemId); if (!it || !it.angles[i]) return;
+            const angle = it.angles[i];
+            const today = iso(new Date());
+            const date = it.postBy && it.postBy >= today ? it.postBy : today;
+            const clip = {
+                id: genId(), title: angle.slice(0, 120), desc: 'เทรนด์กีฬา: ' + it.title + (it.when ? ' (' + it.when + ')' : ''),
+                creator: '', status: 'idle', channel: DEFAULT_CHANNEL, type: 'clip', uploaded: false,
+                date, links: (it.sources || []).slice(0, 2).map(s => s.url), trendId: w.week + '/' + it.id,
+            };
+            clips.unshift(clip);
+            syncClipSave(clip);
+            if (typeof window.render === 'function') window.render(); // the clip board's render, not this tab's
+            if (typeof showToast === 'function') showToast('เพิ่มลงตารางคลิปแล้ว — ลงวันที่ ' + thaiDate(date) + ' ยังไม่ระบุคนทำ', 'success');
+        };
+
+        function card(it) {
+            const h = HEAT[it.heat] || HEAT.upcoming;
+            let when = it.when ? esc(it.when) : '';
+            if (it.date) {
+                const n = daysTo(it.date);
+                when += (when ? ' · ' : '') + (n > 0 ? 'อีก ' + n + ' วัน' : n === 0 ? 'วันนี้' : 'ผ่านมา ' + (-n) + ' วัน');
+            }
+            const postBy = it.postBy ? (() => {
+                const n = daysTo(it.postBy);
+                return `<div class="tr-postby">ควรลงคลิปภายใน ${thaiDate(it.postBy)}${n >= 0 ? ' (อีก ' + n + ' วัน)' : ' — เลยกำหนดแล้ว'}</div>`;
+            })() : '';
+            return `<article class="tr-card ${it.heat}">
+                <div class="tr-top"><span class="tr-heat ${it.heat}">${h.label}</span><span class="tr-cat">${esc(it.cat)}</span>${when ? `<span class="tr-when">${when}</span>` : ''}</div>
+                <h3>${esc(it.title)}</h3>
+                <p class="tr-why">${esc(it.why)}</p>
+                ${postBy}
+                <div class="tr-sub">ไอเดียคลิป</div>
+                <ul class="tr-angles">${it.angles.map((a, i) => `<li><span>${esc(a)}</span><button type="button" class="queue-btn" title="เพิ่มไอเดียนี้ลงตารางคลิป" onclick="trAddClip('${it.id}', ${i})"><span class="material-icons-round">add</span>ลงตาราง</button></li>`).join('')}</ul>
+                ${(it.products || []).length ? `<div class="tr-sub">สินค้าที่ผูกได้</div><div class="tr-chips">${it.products.map(x => `<span>${esc(x)}</span>`).join('')}</div>` : ''}
+                ${(it.sources || []).length ? `<div class="tr-src">${it.sources.map(x => `<a href="${esc(x.url)}" target="_blank" rel="noopener noreferrer">${esc(x.title)}</a>`).join('')}</div>` : ''}
+            </article>`;
+        }
+
+        function render() {
+            const weeks = (data && data.weeks) || [];
+            const sel = document.getElementById('trWeek');
+            sel.innerHTML = weeks.map(w => `<option value="${w.week}" ${w.week === week ? 'selected' : ''}>สัปดาห์ ${thaiDate(w.week)}</option>`).join('');
+            sel.hidden = !weeks.length;
+            const meta = document.getElementById('trMeta'), sum = document.getElementById('trSummary');
+            const grid = document.getElementById('trGrid'), fil = document.getElementById('trFilters');
+            const w = cur();
+            if (!w) {
+                meta.textContent = 'อัปเดตทุกวันศุกร์ 10:00';
+                sum.hidden = true; fil.innerHTML = '';
+                grid.innerHTML = '<div class="tr-empty">ยังไม่มีเทรนด์ — รอบแรกจะขึ้นวันศุกร์ 10:00 พร้อมงานเช็ค KPI</div>';
+                return;
+            }
+            const at = w.pushedAt ? new Date(w.pushedAt) : null;
+            meta.textContent = `อัปเดตทุกวันศุกร์ 10:00 · รอบนี้ ${at ? at.toLocaleString('th-TH', { dateStyle: 'medium', timeStyle: 'short' }) : thaiDate(w.week)} · ${w.items.length} เรื่อง`;
+            sum.hidden = !w.summary; sum.textContent = w.summary || '';
+            const count = k => w.items.filter(x => x.heat === k).length;
+            fil.innerHTML = [['all', 'ทั้งหมด', w.items.length], ...Object.keys(HEAT).map(k => [k, HEAT[k].label, count(k)])]
+                .filter(([k, , c]) => k === 'all' || c)
+                .map(([k, l, c]) => `<button type="button" role="tab" aria-selected="${filter === k}" class="${filter === k ? 'on' : ''}" onclick="trFilter('${k}')">${l} ${c}</button>`).join('');
+            const order = { hot: 0, rising: 1, upcoming: 2 };
+            const items = w.items.filter(x => filter === 'all' || x.heat === filter)
+                .slice().sort((a, b) => (order[a.heat] - order[b.heat]) || String(a.date || '9').localeCompare(String(b.date || '9')));
+            grid.innerHTML = items.length ? items.map(card).join('') : '<div class="tr-empty">ไม่มีเรื่องในกลุ่มนี้</div>';
+        }
     })();
     </script>
 </body>

@@ -51,6 +51,10 @@ const hooks = require('./hooks').createHooks({
     compRef: db.collection('clipTracker').doc('competitorHooks').collection('items'),
     compStaticFile: path.join(__dirname, 'public', 'competitor-hooks.json'),
 });
+// Sports trends pushed weekly by a scheduled task — see trends.js.
+const trends = require('./trends').createTrends({
+    ref: db.collection('clipTracker').doc('trends').collection('weeks'),
+});
 
 // ============ INITIAL DATA ============
 function getDefaultClips() {
@@ -150,6 +154,7 @@ async function initDB() {
     startKpiListener();
     products.startListener();
     hooks.start();
+    trends.start();
     backfillHasCoverOnce();
 }
 // Started at the bottom of this file, once the cache bindings below exist.
@@ -414,6 +419,7 @@ app.get('/__diag', async (req, res) => {
         products: products.count(),
         hookAlbumPushed: hooks.count(),
         competitorClipsPushed: hooks.competitorCount(),
+        trendWeeks: trends.count(),
         lastError: clipsCacheError ? clipsCacheError.message : null
     };
     out.backfill = lastBackfillResult;
@@ -449,6 +455,7 @@ app.get('/__diag', async (req, res) => {
 
 // ============ SERVE STATIC ============
 hooks.routes(app, express);
+trends.routes(app, express);
 app.use(express.static(path.join(__dirname, 'public')));
 hooks.coverRoute(app);
 
