@@ -1911,6 +1911,7 @@
                     </button>
                 </div>
                 <p class="kpi-intro-sub">สิงหาคม 2026 (เดือนที่ 1) · เน้นครีเอทีฟ 42/100 คะแนน · 4 คลิป/วัน (JS 3 + ME 1) · ประชุมทุกวันจันทร์ · ยอดขาย กำไร แอด นายหน้า อยู่ในไฟล์ KPI ฝ่ายบริหารแยก · ข้อมูลจริงจาก TikTok Shop / TikTok Ads API ณ 24 ก.ค. 2026 · + TikTok Studio Overview CSV (@j.s.sport_shop) 31 ธ.ค. 2025 – 27 ก.ค. 2026 = 209 วัน</p>
+                <p class="kpi-intro-sub"><strong>★ ตั้งแต่ ธ.ค. 2026:</strong> 9 คลิป/วัน (คนทำคลิป 3 คน × 3 คลิป) JS + ME รวมกัน ไม่แยกช่อง · เป้า 270 คลิป/เดือน (Min 240 · Stretch 300) · ช่อง ME ลงเฉพาะคลิปที่ปักตะกร้า · เดือนก่อนหน้ายังคิดคะแนนตามเกณฑ์เดิม</p>
             </div>
 
             <!-- Month picker and score history in one control: every month is
@@ -5953,8 +5954,45 @@ const fmtVal = (v,u) => v===null||v===undefined ? "—"
 // here so a perfect month still scores 100 (the 94 that remain × 100/94).
 // Applies to every month, past ones included, by the owner's choice.
 const KPI_WT_RAW_TOTAL = KPI.reduce((s, k) => s + k.wt, 0);
-KPI.forEach(k => { k.wt = k.wt * 100 / KPI_WT_RAW_TOTAL; });
+KPI.forEach(k => { k.wtRaw = k.wt; k.wt = k.wt * 100 / KPI_WT_RAW_TOTAL; });
 const fmtWt = w => String(Math.round(w * 10) / 10);
+
+// Revisions to the ladders, each from a given month onward. Earlier months
+// keep the ladder they were scored on, so changing a target never rewrites
+// a score that has already been reported. `wt` here is a raw weight on the
+// same scale as KPI above; every month is rescaled so a perfect month is 100.
+// dir "info" = counted and shown, but worth no points.
+const KPI_REVISIONS = [
+  { from: '2026-12', rows: {
+    // Owner, 2026-11-21: three people now make clips, 3 clips each per day,
+    // 9 a day across both channels together, 270 a month.
+    A1: { defn: "คลิปถ่าย/ตัดใหม่ที่โพสต์ในเดือน — JS + ME รวมกัน ไม่แยกช่อง — ไม่นับคลิปตัดไลฟ์ รีโพสต์ สไลด์ภาพนิ่ง",
+          min: 240, tgt: 270, str: 300, wt: 11,
+          why: "★ เจ้าของกำหนด 21 พ.ย. 2026 (เริ่ม ธ.ค. 2026): คนทำคลิป 3 คน × 3 คลิป/คน/วัน = 9 คลิป/วัน × 30 = 270 · Min 240 (8/วัน) · Stretch 300 (10/วัน) · รับน้ำหนักของ A2 + A3 มารวม เพราะไม่แยกช่องแล้ว" },
+    A2: { dir: "info", wt: 0,
+          why: "ตั้งแต่ ธ.ค. 2026 ไม่แยกเป้าตามช่องแล้ว — ยังกรอกจำนวนไว้ดูสัดส่วน แต่ไม่คิดคะแนน (น้ำหนักย้ายไปรวมที่ A1)" },
+    A3: { dir: "info", wt: 0,
+          defn: "คลิปผลิตใหม่ของช่อง ME เท่านั้น — ★ ตั้งแต่ ธ.ค. 2026 ช่อง ME ลงเฉพาะคลิปที่ปักตะกร้า",
+          why: "ตั้งแต่ ธ.ค. 2026 ไม่แยกเป้าตามช่องแล้ว — ยังกรอกจำนวนไว้ดูสัดส่วน แต่ไม่คิดคะแนน (น้ำหนักย้ายไปรวมที่ A1)" },
+    A4: { name: "วันที่ทำครบโควตา (≥ 9 คลิป)",
+          defn: "จำนวนวันในเดือนที่มีคลิปผลิตใหม่ขึ้นครบ 9 คลิป (JS + ME รวมกัน)",
+          why: "ตั้งแต่ ธ.ค. 2026 โควตารายวันคือ 9 คลิป (3 คน × 3 คลิป) แทน 4 คลิป" },
+    A5: { defn: "นับจำนวนคลิปที่มีสินค้าติดในเดือน (นับจาก Clip Tracker) — ไม่ใช่อัตราส่วน เพราะการปักเยอะไม่ได้ดีกว่า · ★ ตั้งแต่ ธ.ค. 2026 ทุกคลิปของช่อง ME ต้องปักตะกร้า" },
+  } },
+];
+function kpiDefsFor(month) {
+  const defs = KPI.map(k => Object.assign({}, k, { wt: k.wtRaw }));
+  KPI_REVISIONS.filter(r => month >= r.from).forEach(r => {
+    defs.forEach(d => { if (r.rows[d.id]) Object.assign(d, r.rows[d.id]); });
+  });
+  const total = defs.reduce((s, d) => s + d.wt, 0);
+  defs.forEach(d => { d.wt = total ? d.wt * 100 / total : 0; });
+  return defs;
+}
+let KPI_CUR = KPI;   // the ladder of the month on screen
+const kpiLadderHtml = k => k.dir==="pass" ? "ผ่าน = 1 / ไม่ผ่าน = 0"
+  : k.dir==="info" ? "นับไว้ดู · ไม่คิดคะแนน"
+  : `${fmtVal(k.min,k.unit)} · <b>${fmtVal(k.tgt,k.unit)}</b> · ${fmtVal(k["str"],k.unit)}`;
 
 const host = document.getElementById("kpitables");
 const groups = [...new Set(KPI.map(k=>k.grp))];
@@ -5963,7 +6001,7 @@ groups.forEach(g => {
   const wt = items.reduce((s,k)=>s+k.wt,0);
   const div = document.createElement("div");
   div.className = "kpigrp";
-  div.innerHTML = `<h3>${g} <span class="dim" style="font-weight:400">— น้ำหนักรวม ${fmtWt(wt)} คะแนน</span></h3>
+  div.innerHTML = `<h3>${g} <span class="dim" style="font-weight:400" id="gw_${g.charCodeAt(0)}">— น้ำหนักรวม ${fmtWt(wt)} คะแนน</span></h3>
   <div class="tablewrap"><table><thead><tr>
     <th style="width:52px">รหัส</th><th>ตัวชี้วัด</th><th>Min · Target · Stretch</th>
     <th class="num" style="width:64px">น้ำหนัก</th><th style="width:130px">ผลจริง</th>
@@ -5971,11 +6009,10 @@ groups.forEach(g => {
   </tr></thead><tbody>${items.map(k=>`
     <tr>
       <td><strong>${k.id}</strong></td>
-      <td><strong>${k.name}</strong><div class="why">${k.defn}</div><div class="why" style="margin-top:3px;font-style:italic">${k.why}</div></td>
-      <td class="ladder">${k.dir==="pass" ? "ผ่าน = 1 / ไม่ผ่าน = 0"
-        : `${fmtVal(k.min,k.unit)} · <b>${fmtVal(k.tgt,k.unit)}</b> · ${fmtVal(k["str"],k.unit)}`}
+      <td><strong id="nm_${k.id}">${k.name}</strong><div class="why" id="df_${k.id}">${k.defn}</div><div class="why" style="margin-top:3px;font-style:italic" id="wy_${k.id}">${k.why}</div></td>
+      <td class="ladder"><span id="lad_${k.id}">${kpiLadderHtml(k)}</span>
         <div class="why">ฐานปัจจุบัน: ${fmtVal(k.base,k.unit)}</div></td>
-      <td class="num">${fmtWt(k.wt)}</td>
+      <td class="num" id="wt_${k.id}">${fmtWt(k.wt)}</td>
       <td><input type="number" step="any" id="in_${k.id}" aria-label="ผลจริง ${k.name}"></td>
       <td class="num" id="pc_${k.id}">—</td>
       <td class="num" id="pt_${k.id}">—</td>
@@ -5985,6 +6022,7 @@ groups.forEach(g => {
 
 function pctOf(k, a) {
   if (a === null || Number.isNaN(a)) return null;
+  if (k.dir === "info") return null;
   if (k.dir === "pass") return a >= 1 ? 1 : 0;
   if (k.dir === "up") {
     if (a < k.min) return 0;
@@ -6004,10 +6042,23 @@ bars.innerHTML = groups.map(g => {
   return `<div class="grpbar"><span>${g}</span><span class="track"><span class="fill" id="bar_${g.charCodeAt(0)}" style="width:0%"></span></span><span class="num" id="gs_${g.charCodeAt(0)}">0 / ${fmtWt(wt)}</span></div>`;
 }).join("");
 
+function kpiPaintDefs() {
+  KPI_CUR.forEach(k => {
+    document.getElementById("nm_"+k.id).textContent = k.name;
+    document.getElementById("df_"+k.id).textContent = k.defn;
+    document.getElementById("wy_"+k.id).textContent = k.why;
+    document.getElementById("lad_"+k.id).innerHTML = kpiLadderHtml(k);
+    document.getElementById("wt_"+k.id).textContent = fmtWt(k.wt);
+  });
+  groups.forEach(g => {
+    const wt = KPI_CUR.filter(k=>k.grp===g).reduce((s,k)=>s+k.wt,0);
+    document.getElementById("gw_"+g.charCodeAt(0)).textContent = "— น้ำหนักรวม " + fmtWt(wt) + " คะแนน";
+  });
+}
 function recalc() {
   let total = 0, penalty = 0;
   const byGrp = {};
-  KPI.forEach(k => {
+  KPI_CUR.forEach(k => {
     const el = document.getElementById("in_"+k.id);
     const raw = el.value.trim();
     const a = raw === "" ? null : parseFloat(raw);
@@ -6022,12 +6073,12 @@ function recalc() {
   const net = Math.max(0, total + penalty);
   document.getElementById("score").innerHTML = net.toFixed(1) + '<small> / 100</small>';
   const gEl = document.getElementById("grade");
-  const anyInput = KPI.some(k => document.getElementById("in_"+k.id).value.trim() !== "");
+  const anyInput = KPI_CUR.some(k => document.getElementById("in_"+k.id).value.trim() !== "");
   gEl.textContent = !anyInput ? "รอกรอกผล"
     : (net >= 85 ? "ดีเยี่ยม" : net >= 70 ? "ผ่าน" : net >= 55 ? "ต้องปรับปรุง" : "ไม่ผ่าน");
   if (penalty && anyInput) gEl.textContent += " · หัก 5 คะแนน (คลิปตัดไลฟ์เกินเพดาน)";
   groups.forEach(g => {
-    const wt = KPI.filter(k=>k.grp===g).reduce((s,k)=>s+k.wt,0);
+    const wt = KPI_CUR.filter(k=>k.grp===g).reduce((s,k)=>s+k.wt,0);
     const v = byGrp[g] || 0;
     document.getElementById("bar_"+g.charCodeAt(0)).style.width = (v/wt*100).toFixed(1)+"%";
     document.getElementById("gs_"+g.charCodeAt(0)).textContent = v.toFixed(1)+" / "+fmtWt(wt);
@@ -6101,7 +6152,7 @@ function kpiScoreOf(month) {
     const d = kpiMonths[month];
     if (!d || !d.inputs || !Object.keys(d.inputs).length) return null;
     let total = 0, penalty = 0;
-    KPI.forEach(k => {
+    kpiDefsFor(month).forEach(k => {
         const raw = d.inputs[k.id];
         const a = (raw === undefined || raw === '') ? null : parseFloat(raw);
         const p = pctOf(k, a);
@@ -6136,6 +6187,8 @@ function renderKpiMonths() {
 }
 
 function kpiApplyMonth() {
+    KPI_CUR = kpiDefsFor(kpiMonth);
+    kpiPaintDefs();
     kpiLoading = true;
     const d = kpiMonths[kpiMonth] || { inputs: {}, checks: {} };
     KPI.forEach(k => {
