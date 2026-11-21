@@ -824,6 +824,10 @@
         .ha-rule { border: 1px solid var(--border); border-radius: var(--radius-md); padding: 10px 12px; background: var(--surface-2); }
         .ha-rule b { display: block; font-size: 0.84rem; color: var(--text); margin-bottom: 2px; }
         .ha-rule span { font-size: 0.78rem; color: var(--text-2); line-height: 1.5; }
+        .fn-tag { display: inline-flex; align-items: center; padding: 1px 7px; border-radius: var(--radius-full); font-size: 0.68rem; font-weight: 800; letter-spacing: 0.03em; white-space: nowrap; flex-shrink: 0; }
+        .fn-tag.TOFU { background: var(--st-editing-bg); color: var(--st-editing-text); }
+        .fn-tag.MOFU { background: var(--warning-bg); color: var(--warning-text); }
+        .fn-tag.BOFU { background: var(--st-done-bg); color: var(--st-done-text); }
         .ha-funnels { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; padding: 14px 20px 0; }
         .ha-funnel { border: 1px solid var(--border); border-radius: var(--radius-md); padding: 10px 12px; background: var(--surface); text-align: left; font: inherit; cursor: pointer; color: var(--text); }
         .ha-funnel.on { border-color: var(--brand); outline: 1px solid var(--brand); outline-offset: -2px; background: var(--brand-soft); }
@@ -4354,12 +4358,12 @@
     // Posting order. `no` is the format number used everywhere (specs.<no>,
     // clip ids); `day` is the day it goes out, arrival = day 1.
     const PRODUCT_FORMATS = [
-        { no: 1, label: 'บอกของเข้า',     day: 1 },
-        { no: 2, label: 'โปรโมท',         day: 2 },
-        { no: 3, label: 'ภาพนิ่ง 7 รูป',   day: 3, photo: true },
-        { no: 4, label: 'แนะนำคุณภาพ',    day: 4 },
-        { no: 6, label: 'เปรียบเทียบ',     day: 5 },
-        { no: 5, label: 'เหมาะกับใคร',     day: 6 },
+        { no: 1, label: 'บอกของเข้า',     day: 1, funnel: 'BOFU' },
+        { no: 2, label: 'โปรโมท',         day: 2, funnel: 'BOFU' },
+        { no: 3, label: 'ภาพนิ่ง 7 รูป',   day: 3, funnel: 'MOFU', photo: true },
+        { no: 4, label: 'แนะนำคุณภาพ',    day: 4, funnel: 'MOFU' },
+        { no: 6, label: 'เปรียบเทียบ',     day: 5, funnel: 'MOFU' },
+        { no: 5, label: 'เหมาะกับใคร',     day: 6, funnel: 'MOFU' },
     ];
     const PRODUCT_SPARE_DAY = 7;
     const TAG_TAIL = '#รองเท้าสตั๊ด #รองเท้าฟุตบอล #เจเอสสปอร์ตหนองบัวลําภู #JSSPORT';
@@ -4758,7 +4762,7 @@
         return `
             <article class="prd-spec ${st.posted ? 'posted' : ''}">
                 <div class="prd-spec-row">
-                    <div class="prd-spec-title"><span class="t">${escHtml(p.code || '')}${f.no} · ${f.label}</span><span class="meta">${meta}</span></div>
+                    <div class="prd-spec-title"><span class="t">${escHtml(p.code || '')}${f.no} · ${f.label} <span class="fn-tag ${f.funnel}">${f.funnel}</span></span><span class="meta">${meta}</span></div>
                     <select class="form-select prd-who" onchange="productSetCreator('${p.id}', ${f.no}, this.value)" aria-label="คนทำ ${escAttr((p.code || '') + f.no)}">
                         <option value="">— คนทำ —</option>
                         ${CREATORS.map(c => `<option value="${c.id}" ${productCreatorFor(p, f.no) === c.id ? 'selected' : ''}>${escHtml(c.name)}</option>`).join('')}
@@ -4919,7 +4923,7 @@
             const clip = productClipOf(p, f.no);
             const set = (p.dates || {})[f.no] || (clip && clip.date !== productDefaultDate(p, f) ? clip.date : '');
             return `<div class="arr-row ${posted ? 'done' : ''}">
-                <div class="arr-head"><span class="arr-day">วัน ${f.day}</span><span class="arr-fmt">${escHtml(p.code || '')}${f.no} · ${f.label}<span class="arr-def" data-def="${f.no}"></span></span></div>
+                <div class="arr-head"><span class="arr-day">วัน ${f.day}</span><span class="arr-fmt">${escHtml(p.code || '')}${f.no} · ${f.label} <span class="fn-tag ${f.funnel}">${f.funnel}</span><span class="arr-def" data-def="${f.no}"></span></span></div>
                 <input class="form-input" type="date" data-date="${f.no}" value="${set || ''}" ${posted ? 'disabled' : ''} oninput="arrivalRefreshDefaults()" aria-label="วันลง ${escAttr((p.code || '') + f.no)}">
                 <select class="form-select" data-no="${f.no}" aria-label="คนทำ ${escAttr((p.code || '') + f.no)}"><option value="">— คนทำ —</option>${opts}</select>
             </div>`;
@@ -5856,14 +5860,17 @@
             box.style.display = '';
         });
     }
+    function pbFunnelTag(f) { return /^(TOFU|MOFU|BOFU)$/.test(f || '') ? `<span class="fn-tag ${f}">${f}</span>` : ''; }
     function pbNewClip(pillarId, topicIdx, compareIdx) {
         const pl = pbPillar(pillarId);
         if (!pl) return;
         const title = compareIdx != null ? playbook.compare.types[compareIdx].example
             : topicIdx != null ? pl.topics[topicIdx] : '';
+        const funnel = compareIdx != null ? playbook.compare.types[compareIdx].funnel
+            : topicIdx != null ? (pl.topicFunnels || [])[topicIdx] : '';
         openModal(false);
         document.getElementById('clipName').value = title;
-        document.getElementById('clipDesc').value = pbBrief(pl)
+        document.getElementById('clipDesc').value = (funnel ? 'ฟันเนล: ' + funnel + '\n' : '') + pbBrief(pl)
             + (compareIdx != null ? '\nเทียบ: ' + playbook.compare.rules.slice(0, 3).join(' · ') : '');
         document.getElementById('clipPillar').value = pillarId;
         pillarTip();
@@ -5926,7 +5933,7 @@
                         <span class="share">${pl.share}%<small>JS ${pl.week.JS} · ME ${pl.week.ME} / สัปดาห์</small></span></header>
                     <span class="stat">${escHtml(pl.stat)}</span>
                     <div><h5>ทำยังไง</h5><ul>${li(pl.how)}</ul></div>
-                    <div><h5>หัวข้อตัวอย่าง</h5><div class="pb-topics">${pl.topics.map((t, i) => `<button type="button" class="pb-topic" onclick="pbNewClip('${pl.id}', ${i})"><span>${escHtml(t)}</span><span>+ ทำคลิปนี้</span></button>`).join('')}</div></div>
+                    <div><h5>หัวข้อตัวอย่าง</h5><div class="pb-topics">${pl.topics.map((t, i) => `<button type="button" class="pb-topic" onclick="pbNewClip('${pl.id}', ${i})"><span>${pbFunnelTag((pl.topicFunnels || [])[i])} ${escHtml(t)}</span><span>+ ทำคลิปนี้</span></button>`).join('')}</div></div>
                     <div class="pb-ends">ลงท้ายแคปชัน ${pl.endings.map(e => `<i>${escHtml(e)}</i>`).join('')}</div>
                     <div class="pb-ends">ปิดท้ายคลิป: ${escHtml(pl.cta)}</div>
                     <details><summary>ทำไมต้องมีเสานี้ (ตัวเลข)</summary><ul>${li(pl.why)}</ul></details>
@@ -5941,8 +5948,8 @@
                     <div class="pb-box"><h4>ที่ร้านทำมาแล้ว</h4><ul class="pb-list">${li(C.facts)}</ul></div>
                     <div class="pb-box"><h4>แบรนด์ที่เทียบได้</h4><ul class="pb-list">${C.brands.map(b => `<li><b>${escHtml(b.label)}:</b> ${escHtml(b.list)}</li>`).join('')}</ul></div>
                 </div>
-                <div class="pb-scroll"><table class="pb-table"><thead><tr><th>แบบ</th><th>หัวข้อตัวอย่าง</th><th>สถานะ</th><th></th></tr></thead>
-                    <tbody>${C.types.map((t, i) => `<tr><td><b>${escHtml(t.name)}</b></td><td>${escHtml(t.example)}</td><td>${escHtml(t.status)}</td>
+                <div class="pb-scroll"><table class="pb-table"><thead><tr><th>แบบ</th><th>ฟันเนล</th><th>หัวข้อตัวอย่าง</th><th>สถานะ</th><th></th></tr></thead>
+                    <tbody>${C.types.map((t, i) => `<tr><td><b>${escHtml(t.name)}</b></td><td>${pbFunnelTag(t.funnel)}</td><td>${escHtml(t.example)}</td><td>${escHtml(t.status)}</td>
                         <td><button type="button" class="btn" style="padding:5px 10px;white-space:nowrap" onclick="pbNewClip('${C.pillar}', null, ${i})"><span class="material-icons-round">add</span>ทำคลิปนี้</button></td></tr>`).join('')}</tbody></table></div>
                 <div class="pb-box" style="margin-top:12px"><h4>กติกาคลิปเปรียบเทียบ</h4><ul class="pb-list">${li(C.rules)}</ul></div>
             </section>
